@@ -1,0 +1,110 @@
+import { usePrototype } from '../core/PrototypeContext.jsx'
+import { fitDemoScale, panFromDragSnapshot, resetCanvasViewport } from './navigation.js'
+import { ScreenFrame } from './ScreenFrame.jsx'
+import { useWheelZoom } from './useWheelZoom.js'
+
+function readContentBox(el) {
+  const style = window.getComputedStyle(el)
+  const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight)
+  const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom)
+  return {
+    width: Math.max(0, el.clientWidth - padX),
+    height: Math.max(0, el.clientHeight - padY),
+  }
+}
+
+export function DemoMode({
+  project,
+  hotspotsVisible,
+  spaceHeld,
+  scale,
+  setScale,
+  viewResetKey,
+}) {
+  const { currentScreenId, viewport, viewportKey } = usePrototype()
+  const screenIndex = project.screens.findIndex((item) => item.id === currentScreenId)
+  const screen = screenIndex >= 0 ? project.screens[screenIndex] : null
+  const [view, setView] = React.useState(() => ({ ...resetCanvasViewport(), scale }))
+  const [dragging, setDragging] = React.useState(false)
+  const drag = React.useRef(null)
+  const viewportRef = React.useRef(null)
+  const stageRef = React.useRef(null)
+
+  const applyFit = React.useCallback(() => {
+    const container = viewportRef.current
+    const stage = stageRef.current
+    if (!container || !stage) return
+    const box = readContentBox(container)
+    const next = fitDemoScale(box.width, box.height, stage.offsetWidth, stage.offsetHeight)
+    setScale(next)
+    setView({ ...resetCanvasViewport(), scale: next })
+  }, [setScale])
+
+  React.useEffect(() => {
+    setView((current) => ({ ...current, scale }))
+  }, [scale])
+
+  React.useEffect(() => {
+    const container = viewportRef.current
+    if (!container || typeof ResizeObserver !== 'function') {
+      applyFit()
+      return undefined
+    }
+    const observer = new ResizeObserver(() => applyFit())
+    observer.observe(container)
+    applyFit()
+    return () => observer.disconnect()
+  }, [applyFit, viewport, viewportKey, currentScreenId, viewResetKey])
+
+  useWheelZoom(viewportRef, scale, setScale)
+
+  const startPan = (event) => {
+    if (!spaceHeld) return
+    if (event.button != null && event.button !== 0) return
+    drag.current = { x: event.clientX, y: event.clientY, panX: view.panX, panY: view.panY }
+    setDragging(true)
+    event.currentTarget.setPointerCapture(event.pointerId)
+    event.preventDefault()
+  }
+
+  const movePan = (event) => {
+    const snapshot = drag.current
+    if (!snapshot) return
+    const { clientX, clientY } = event
+    setView((current) => panFromDragSnapshot(current, snapshot, clientX, clientY))
+  }
+
+  const endPan = () => {
+    drag.current = null
+    setDragging(false)
+  }
+
+  return (
+    <div className={hotspotsVisible ? 'wf-demo is-showing-hotspots' : 'wf-demo'}>
+      <div
+        ref={viewportRef}
+        className={`wf-demo-viewport${dragging ? ' is-dragging' : ''}${spaceHeld ? ' is-locked' : ''}`}
+        onPointerDown={startPan}
+        onPointerMove={movePan}
+        onPointerUp={endPan}
+        onPointerCancel={endPan}
+      >
+        <div
+          ref={stageRef}
+          className="wf-demo-stage"
+          style={{ transform: `translate(${view.panX}px, ${view.panY}px) scale(${view.scale})` }}
+        >
+          <ScreenFrame
+            screen={screen}
+            viewport={viewport}
+            mode="demo"
+            index={screenIndex}
+            spaceHeld={spaceHeld}
+            scale={view.scale}
+          />
+        </div>
+      </div>
+      <p className="wf-demo-hint">点击页面内按钮 / 链接跳转；可在工具栏开关热区高亮</p>
+    </div>
+  )
+}
