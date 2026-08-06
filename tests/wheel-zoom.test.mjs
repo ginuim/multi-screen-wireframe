@@ -14,6 +14,7 @@ const el = {
 
 let scale = 1
 const scales = []
+let locked = false
 const cleanup = bindWheelZoom(
   el,
   () => scale,
@@ -21,6 +22,7 @@ const cleanup = bindWheelZoom(
     scale = next
     scales.push(next)
   },
+  () => locked,
 )
 
 assert.equal(listeners.length, 1)
@@ -50,6 +52,20 @@ listeners[0].handler({
 assert.equal(prevented, true)
 assert.equal(scales.length, 1)
 assert.ok(scales[0] < 1)
+
+locked = true
+prevented = false
+const beforeLocked = scales.length
+listeners[0].handler({
+  target: el,
+  deltaY: 100,
+  deltaX: 0,
+  ctrlKey: false,
+  metaKey: false,
+  preventDefault() { prevented = true },
+})
+assert.equal(prevented, true)
+assert.equal(scales.length, beforeLocked + 1)
 
 cleanup()
 assert.equal(listeners.length, 0)

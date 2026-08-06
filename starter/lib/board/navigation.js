@@ -98,11 +98,11 @@ function isEditableTarget(target) {
 
 /**
  * 在可滚动区域内按住拖拽 → 滚动内容。
- * 按住空格时返回 null（交给画布平移，禁止屏内拖拽滚动）。
+ * 画布锁定（可交互关闭 / 空格）时返回 null，交给画布平移。
  * 返回 null 表示不应接管该次 pointerdown。
  */
-export function beginContentDragScroll(event, rootEl, { spaceHeld = false, scale = 1 } = {}) {
-  if (spaceHeld) return null
+export function beginContentDragScroll(event, rootEl, { locked = false, scale = 1 } = {}) {
+  if (locked) return null
   if (event.button != null && event.button !== 0) return null
   if (!rootEl || !rootEl.contains(event.target)) return null
   if (isEditableTarget(event.target)) return null
@@ -164,10 +164,11 @@ export function canScrollInDirection(el, deltaX, deltaY) {
 }
 
 /**
- * 仅 Ctrl/Meta + 滚轮缩放（触控板 pinch 在浏览器里通常带 ctrlKey）。
- * 普通滚轮不缩放，留给屏内原生滚动。
+ * 画布锁定时任意滚轮缩放；未锁定时仅 Ctrl/Meta + 滚轮
+ *（触控板 pinch 在浏览器里通常带 ctrlKey）。未锁定时普通滚轮留给屏内滚动。
  */
-export function shouldZoomOnWheel(event) {
+export function shouldZoomOnWheel(event, { locked = false } = {}) {
+  if (locked) return true
   return !!(event.ctrlKey || event.metaKey)
 }
 

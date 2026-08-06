@@ -283,42 +283,67 @@ button:disabled {
   text-align: center;
 }
 
-.wf-pan-hint {
+.wf-interaction-lock {
   display: inline-flex;
   height: var(--board-control-h);
   align-items: center;
   gap: 6px;
-  padding: 0 8px;
-  border-radius: var(--board-radius);
-  color: var(--board-muted);
-  font-size: 12px;
-  transition: color 0.15s, background 0.15s;
-}
-
-.wf-pan-hint kbd {
-  display: inline-flex;
-  min-width: 28px;
-  height: 22px;
-  align-items: center;
-  justify-content: center;
-  padding: 0 6px;
+  padding: 0 10px;
   border: 1px solid var(--board-border);
-  border-bottom-width: 2px;
-  border-radius: 5px;
+  border-radius: var(--board-radius);
   background: #fff;
   color: var(--board-text);
-  font: inherit;
-  font-size: 11px;
+  font-size: 12px;
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.wf-interaction-lock:hover {
+  background: var(--board-fill);
+}
+
+.wf-interaction-lock.is-locked {
+  border-color: var(--board-text);
+  background: var(--board-fill);
+  color: var(--board-text);
   font-weight: 600;
 }
 
-.wf-pan-hint.is-active {
-  background: var(--board-fill);
-  color: var(--board-text);
+.wf-lock-icon {
+  position: relative;
+  display: inline-block;
+  width: 12px;
+  height: 13px;
+  flex-shrink: 0;
 }
 
-.wf-pan-hint.is-active kbd {
-  border-color: var(--board-text);
+.wf-lock-icon::before {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  width: 8px;
+  height: 5px;
+  border: 1.5px solid currentColor;
+  border-bottom: 0;
+  border-radius: 5px 5px 0 0;
+  content: '';
+}
+
+.wf-lock-icon.is-open::before {
+  left: 4px;
+  transform: rotate(28deg);
+  transform-origin: 0 100%;
+}
+
+.wf-lock-icon::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 8px;
+  border-radius: 2px;
+  background: currentColor;
+  content: '';
 }
 
 .wf-canvas-shell {
@@ -503,6 +528,12 @@ button:disabled {
   cursor: grab !important;
   user-select: none !important;
   -webkit-user-select: none !important;
+}
+
+/* 锁住时事件穿透到画布，禁止屏内点击/滚动 */
+.wf-canvas.is-locked .wf-canvas-stage,
+.wf-canvas.is-locked .wf-canvas-stage * {
+  pointer-events: none !important;
 }
 
 .wf-canvas.is-dragging,
@@ -833,6 +864,11 @@ button:disabled {
   cursor: grab !important;
   user-select: none !important;
   -webkit-user-select: none !important;
+}
+
+.wf-demo-viewport.is-locked .wf-demo-stage,
+.wf-demo-viewport.is-locked .wf-demo-stage * {
+  pointer-events: none !important;
 }
 
 .wf-demo-viewport.is-dragging,

@@ -193,6 +193,13 @@ assert.equal(
   shouldZoomOnWheel({ target: root, deltaX: 0, deltaY: 40, ctrlKey: false, metaKey: false }),
   false,
 )
+assert.equal(
+  shouldZoomOnWheel(
+    { target, deltaX: 0, deltaY: 40, ctrlKey: false, metaKey: false },
+    { locked: true },
+  ),
+  true,
+)
 
 const contentRoot = {
   nodeType: 1,
@@ -221,7 +228,7 @@ assert.equal(
   beginContentDragScroll(
     { target: contentChild, button: 0, pointerId: 1, clientX: 10, clientY: 20 },
     contentRoot,
-    { spaceHeld: true, scale: 1 },
+    { locked: true, scale: 1 },
   ),
   null,
 )
@@ -229,7 +236,7 @@ assert.equal(
 const drag = beginContentDragScroll(
   { target: contentChild, button: 0, pointerId: 1, clientX: 10, clientY: 20 },
   contentRoot,
-  { spaceHeld: false, scale: 2 },
+  { locked: false, scale: 2 },
 )
 assert.equal(drag.el, contentRoot)
 assert.equal(drag.scale, 2)

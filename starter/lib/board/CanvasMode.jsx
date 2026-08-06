@@ -38,7 +38,7 @@ export function CanvasMode({
   project,
   scale,
   setScale,
-  spaceHeld,
+  canvasLocked,
   selectedIds,
   setSelectedIds,
   onExportIds,
@@ -105,10 +105,10 @@ export function CanvasMode({
     if (copiedTimer.current) window.clearTimeout(copiedTimer.current)
   }, [])
 
-  useWheelZoom(canvasRef, scale, setScale)
+  useWheelZoom(canvasRef, scale, setScale, canvasLocked)
 
   const startPan = (event) => {
-    if (!spaceHeld) return
+    if (!canvasLocked) return
     if (event.button != null && event.button !== 0) return
     drag.current = { x: event.clientX, y: event.clientY, panX: view.panX, panY: view.panY }
     setDragging(true)
@@ -129,7 +129,7 @@ export function CanvasMode({
   }
 
   const enterDemo = (screenId) => {
-    if (!demoAvailable || spaceHeld) return
+    if (!demoAvailable || canvasLocked) return
     enterDemoMode(screenId)
   }
 
@@ -202,18 +202,16 @@ export function CanvasMode({
         </ul>
         <div className="wf-sidebar-tips" aria-label="操作提示">
           <div className="wf-sidebar-tip">
-            <kbd>Ctrl</kbd>
-            <span>+ 滚轮缩放</span>
+            <span>不可交互：拖拽平移 / 滚轮缩放</span>
           </div>
           <div className="wf-sidebar-tip">
-            <kbd>空格</kbd>
-            <span>+ 拖拽移动画布</span>
+            <span>可交互：空格拖拽 / Ctrl+滚轮</span>
           </div>
         </div>
       </aside>
       <main
         ref={canvasRef}
-        className={`wf-canvas${dragging ? ' is-dragging' : ''}${spaceHeld ? ' is-locked' : ''}`}
+        className={`wf-canvas${dragging ? ' is-dragging' : ''}${canvasLocked ? ' is-locked' : ''}`}
         onPointerDown={startPan}
         onPointerMove={movePan}
         onPointerUp={endPan}
@@ -270,7 +268,7 @@ export function CanvasMode({
                   index={index}
                   focused={screen.id === currentScreenId}
                   onExport={() => onExportIds([screen.id])}
-                  spaceHeld={spaceHeld}
+                  canvasLocked={canvasLocked}
                   scale={view.scale}
                 />
               </div>

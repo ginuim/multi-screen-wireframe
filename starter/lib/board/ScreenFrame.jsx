@@ -15,7 +15,7 @@ export function ScreenFrame({
   index = 0,
   focused = false,
   onExport,
-  spaceHeld = false,
+  canvasLocked = false,
   scale = 1,
 }) {
   const { navigate } = usePrototype()
@@ -33,12 +33,12 @@ export function ScreenFrame({
   ].filter(Boolean).join(' ')
 
   const onPointerDown = (event) => {
-    // 空格平移画布时不接管屏内拖拽滚动，让事件冒泡给画布
-    if (spaceHeld) {
+    // 画布锁定时不接管屏内拖拽滚动，让事件落到画布平移
+    if (canvasLocked) {
       event.preventDefault()
       return
     }
-    const state = beginContentDragScroll(event, contentRef.current, { spaceHeld, scale })
+    const state = beginContentDragScroll(event, contentRef.current, { locked: canvasLocked, scale })
     if (!state) return
     dragRef.current = state
     setDragScrolling(true)

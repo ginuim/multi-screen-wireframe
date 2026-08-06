@@ -16,7 +16,7 @@ function readContentBox(el) {
 export function DemoMode({
   project,
   hotspotsVisible,
-  spaceHeld,
+  canvasLocked,
   scale,
   setScale,
   viewResetKey,
@@ -56,10 +56,10 @@ export function DemoMode({
     return () => observer.disconnect()
   }, [applyFit, viewport, viewportKey, currentScreenId, viewResetKey])
 
-  useWheelZoom(viewportRef, scale, setScale)
+  useWheelZoom(viewportRef, scale, setScale, canvasLocked)
 
   const startPan = (event) => {
-    if (!spaceHeld) return
+    if (!canvasLocked) return
     if (event.button != null && event.button !== 0) return
     drag.current = { x: event.clientX, y: event.clientY, panX: view.panX, panY: view.panY }
     setDragging(true)
@@ -83,7 +83,7 @@ export function DemoMode({
     <div className={hotspotsVisible ? 'wf-demo is-showing-hotspots' : 'wf-demo'}>
       <div
         ref={viewportRef}
-        className={`wf-demo-viewport${dragging ? ' is-dragging' : ''}${spaceHeld ? ' is-locked' : ''}`}
+        className={`wf-demo-viewport${dragging ? ' is-dragging' : ''}${canvasLocked ? ' is-locked' : ''}`}
         onPointerDown={startPan}
         onPointerMove={movePan}
         onPointerUp={endPan}
@@ -99,7 +99,7 @@ export function DemoMode({
             viewport={viewport}
             mode="demo"
             index={screenIndex}
-            spaceHeld={spaceHeld}
+            canvasLocked={canvasLocked}
             scale={view.scale}
           />
         </div>

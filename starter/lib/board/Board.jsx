@@ -21,12 +21,21 @@ function ZoomControls({ scale, setScale, onReset }) {
   )
 }
 
-function PanHint({ spaceHeld }) {
+/** interactive=true 显示开锁「可交互」；false 为上锁，可直接拖拽平移、滚轮缩放 */
+function InteractionLock({ interactive, onToggle }) {
   return (
-    <span className={spaceHeld ? 'wf-pan-hint is-active' : 'wf-pan-hint'} title="按住空格键后拖拽，可在任意位置移动画布">
-      <kbd>空格</kbd>
-      {' + 拖拽移动画布'}
-    </span>
+    <button
+      type="button"
+      className={interactive ? 'wf-interaction-lock' : 'wf-interaction-lock is-locked'}
+      onClick={onToggle}
+      aria-pressed={!interactive}
+      title={interactive
+        ? '当前可交互页面。点击锁住后：拖拽平移画布，滚轮缩放；也可按住空格临时锁住'
+        : '当前已锁住。拖拽平移、滚轮缩放；页面内点击与滚动已禁用。点击恢复可交互'}
+    >
+      <span className={interactive ? 'wf-lock-icon is-open' : 'wf-lock-icon'} aria-hidden="true" />
+      <span>{interactive ? '可交互' : '不可交互'}</span>
+    </button>
   )
 }
 
@@ -54,14 +63,23 @@ export function Board({ project }) {
   const [canvasScale, setCanvasScale] = React.useState(1)
   const [demoScale, setDemoScale] = React.useState(1)
   const [demoViewResetKey, setDemoViewResetKey] = React.useState(0)
+  const [interactive, setInteractive] = React.useState(true)
   const [spaceHeld, setSpaceHeld] = React.useState(false)
   const [hotspotsVisible, setHotspotsVisible] = React.useState(false)
   const [exportError, setExportError] = React.useState(null)
   const [exporting, setExporting] = React.useState(false)
 
+  const canvasLocked = !interactive || spaceHeld
+
   React.useEffect(() => {
     const down = (event) => {
-      if (event.code === 'Space' && !event.repeat) setSpaceHeld(true)
+      if (event.code !== 'Space' || event.repeat) return
+      const tag = event.target && event.target.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || event.target.isContentEditable) {
+        return
+      }
+      event.preventDefault()
+      setSpaceHeld(true)
     }
     const up = (event) => {
       if (event.code === 'Space') setSpaceHeld(false)
@@ -156,7 +174,10 @@ export function Board({ project }) {
                 setScale={setCanvasScale}
                 onReset={() => setCanvasScale(1)}
               />
-              <PanHint spaceHeld={spaceHeld} />
+              <InteractionLock
+                interactive={interactive}
+                onToggle={() => setInteractive((value) => !value)}
+              />
             </>
           ) : (
             <>
@@ -165,7 +186,10 @@ export function Board({ project }) {
                 setScale={setDemoScale}
                 onReset={resetDemoView}
               />
-              <PanHint spaceHeld={spaceHeld} />
+              <InteractionLock
+                interactive={interactive}
+                onToggle={() => setInteractive((value) => !value)}
+              />
               <button
                 type="button"
                 className={hotspotsVisible ? 'wf-board-button is-active' : 'wf-board-button'}
@@ -223,7 +247,7 @@ export function Board({ project }) {
           project={project}
           scale={canvasScale}
           setScale={setCanvasScale}
-          spaceHeld={spaceHeld}
+          canvasLocked={canvasLocked}
           selectedIds={selectedIds}
           setSelectedIds={setSelectedIds}
           onExportIds={exportIds}
@@ -232,7 +256,7 @@ export function Board({ project }) {
         <DemoMode
           project={project}
           hotspotsVisible={hotspotsVisible}
-          spaceHeld={spaceHeld}
+          canvasLocked={canvasLocked}
           scale={demoScale}
           setScale={setDemoScale}
           viewResetKey={demoViewResetKey}
