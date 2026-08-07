@@ -1,7 +1,14 @@
 import { usePrototype } from '../core/PrototypeContext.jsx'
-import { fitDemoScale, panFromDragSnapshot, resetCanvasViewport } from './navigation.js'
+import {
+  fitDemoScale,
+  isDemoBlankExitTarget,
+  panFromDragSnapshot,
+  resetCanvasViewport,
+} from './navigation.js'
 import { ScreenFrame } from './ScreenFrame.jsx'
 import { useWheelZoom } from './useWheelZoom.js'
+
+const BLANK_EXIT_HINT = '双击空白处退出演示'
 
 function readContentBox(el) {
   const style = window.getComputedStyle(el)
@@ -23,7 +30,7 @@ export function DemoMode({
   expandedIds = new Set(),
   onToggleExpand,
 }) {
-  const { currentScreenId, viewport, viewportKey } = usePrototype()
+  const { currentScreenId, viewport, viewportKey, setMode } = usePrototype()
   const screenIndex = project.screens.findIndex((item) => item.id === currentScreenId)
   const screen = screenIndex >= 0 ? project.screens[screenIndex] : null
   const currentExpanded = !!(screen && expandedIds.has(screen.id))
@@ -32,6 +39,25 @@ export function DemoMode({
   const drag = React.useRef(null)
   const viewportRef = React.useRef(null)
   const stageRef = React.useRef(null)
+
+  const exitOnBlankDoubleClick = (event) => {
+    if (!isDemoBlankExitTarget(event.target)) return
+    setMode('canvas')
+  }
+
+  // title 挂在视口上会落到屏内子节点，干扰操作；只在空白处悬停时挂上。
+  const syncBlankExitHint = (event) => {
+    const el = viewportRef.current
+    if (!el) return
+    const next = isDemoBlankExitTarget(event.target) ? BLANK_EXIT_HINT : ''
+    if ((el.getAttribute('title') || '') === next) return
+    if (next) el.setAttribute('title', next)
+    else el.removeAttribute('title')
+  }
+
+  const clearBlankExitHint = () => {
+    viewportRef.current?.removeAttribute('title')
+  }
 
   const applyFit = React.useCallback(() => {
     const container = viewportRef.current
@@ -93,6 +119,9 @@ export function DemoMode({
         onPointerMove={movePan}
         onPointerUp={endPan}
         onPointerCancel={endPan}
+        onMouseMove={syncBlankExitHint}
+        onMouseLeave={clearBlankExitHint}
+        onDoubleClick={exitOnBlankDoubleClick}
       >
         <div
           ref={stageRef}

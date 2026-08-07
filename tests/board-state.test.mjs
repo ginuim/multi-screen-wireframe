@@ -9,6 +9,7 @@ import {
   fitDemoScale,
   goBackDemo,
   inferEntryId,
+  isDemoBlankExitTarget,
   isScrollableOverflow,
   moveContentDragScroll,
   navigateDemo,
@@ -35,6 +36,11 @@ assert.equal(fitDemoScale(400, 800, 390, 844), clampScale(Math.min(400 / 390, 80
 assert.equal(fitDemoScale(2000, 2000, 390, 844), clampScale(Math.min(2000 / 390, 2000 / 844)))
 assert.equal(fitDemoScale(0, 100, 390, 844), 1)
 assert.equal(fitDemoScale(100, 100, 0, 844), 1)
+
+assert.equal(isDemoBlankExitTarget(null), true)
+assert.equal(isDemoBlankExitTarget({}), true)
+assert.equal(isDemoBlankExitTarget({ closest: () => null }), true)
+assert.equal(isDemoBlankExitTarget({ closest: (sel) => (sel === '.wf-screen-chrome' ? {} : null) }), false)
 assert.deepEqual(resetCanvasViewport({ scale: 1.6, panX: 50, panY: -20 }), {
   scale: 1,
   panX: 0,

@@ -57,7 +57,7 @@ export const project = {
 
 自定义点击区域优先用组件的 `to`（`Button` / `Card` / `Box` / `Row` / `Column` / `Cell` 等）。热区高亮认 `[data-flow-to]`；`ScreenFrame` 会对屏内该属性做点击委托，因此即便写成裸 `span`/`div` 只带 `data-flow-to`，演示模式也能跳转。仍推荐用库组件，以便带上 `wf-interactive` 与键盘可达性。
 
-演示模式中 `navigate(id)` 只允许当前 screen 的 `links` 目标；入口下拉列出全部页面，`selectEntry(id)` 可把任意屏设为演示起点并清空历史，重置回到当前 `entryId`。默认入口仍取第一个 `entry: true`。画布模式可直接聚焦任意 screen。
+演示模式中 `navigate(id)` 只允许当前 screen 的 `links` 目标；入口下拉列出全部页面，`selectEntry(id)` 可把任意屏设为演示起点并清空历史，重置回到当前 `entryId`。默认入口仍取第一个 `entry: true`。画布模式可直接聚焦任意 screen。画板双击某屏进入演示；演示视口双击屏外空白退出回画板（点在 `.wf-screen-chrome` 内不退出）。
 
 `currentScreenId` 是画板聚焦 / 演示当前页，不是“我正在渲染的这屏”。布局里 `TabBar` / `SideNav` 的选中态必须用 `useScreenId()`（由 `ScreenFrame` 注入），否则画布上所有屏会一起高亮同一个 tab。
 

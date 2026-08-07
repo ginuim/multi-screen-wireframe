@@ -74,6 +74,40 @@ export function restoreInlineBox(el, snapshot) {
 }
 
 /**
+ * offsetTop / offsetLeft 相对 offsetParent，而不一定相对直接父节点。
+ * 后台页里连续的 static 容器通常共享 screen root 作为 offsetParent，
+ * 因此需要先换算到当前父节点坐标，避免逐层重复累加同一段偏移。
+ */
+function childStartWithin(el, child, axis) {
+  const offsetKey = axis === 'x' ? 'offsetLeft' : 'offsetTop'
+  const rectStart = axis === 'x' ? 'left' : 'top'
+  const rectSize = axis === 'x' ? 'width' : 'height'
+  const layoutSize = axis === 'x' ? 'offsetWidth' : 'offsetHeight'
+  const scrollKey = axis === 'x' ? 'scrollLeft' : 'scrollTop'
+  const childOffset = child[offsetKey] || 0
+
+  if (child.offsetParent === el) return childOffset
+  if (child.offsetParent && child.offsetParent === el.offsetParent) {
+    return childOffset - (el[offsetKey] || 0)
+  }
+
+  if (typeof el.getBoundingClientRect === 'function'
+    && typeof child.getBoundingClientRect === 'function') {
+    const parentRect = el.getBoundingClientRect()
+    const childRect = child.getBoundingClientRect()
+    const renderedSize = parentRect[rectSize]
+    const scale = el[layoutSize] > 0 && renderedSize > 0
+      ? renderedSize / el[layoutSize]
+      : 1
+    const start = (childRect[rectStart] - parentRect[rectStart]) / scale
+      + (el[scrollKey] || 0)
+    if (Number.isFinite(start)) return start
+  }
+
+  return childOffset
+}
+
+/**
  * overflow:visible 时部分浏览器 scrollWidth ≈ clientWidth，
  * 所以再扫子节点 offset 边界，避免宽表撑不开外框。
  */
@@ -82,8 +116,8 @@ export function measureIntrinsicBox(el) {
   let height = Math.max(el.scrollHeight || 0, el.offsetHeight || 0)
   const children = el.children ? Array.from(el.children) : []
   for (const child of children) {
-    width = Math.max(width, (child.offsetLeft || 0) + (child.offsetWidth || 0))
-    height = Math.max(height, (child.offsetTop || 0) + (child.offsetHeight || 0))
+    width = Math.max(width, childStartWithin(el, child, 'x') + (child.offsetWidth || 0))
+    height = Math.max(height, childStartWithin(el, child, 'y') + (child.offsetHeight || 0))
   }
   return { width, height }
 }

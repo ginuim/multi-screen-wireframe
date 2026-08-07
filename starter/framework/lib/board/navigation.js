@@ -13,6 +13,15 @@ export function fitDemoScale(containerWidth, containerHeight, contentWidth, cont
   return clampScale(Math.min(containerWidth / contentWidth, containerHeight / contentHeight))
 }
 
+/**
+ * 演示视口双击目标是否为屏外空白。
+ * 点在 .wf-screen-chrome（标题栏 / 内容）内不算空白，避免误退出。
+ */
+export function isDemoBlankExitTarget(target) {
+  if (!target || typeof target.closest !== 'function') return true
+  return !target.closest('.wf-screen-chrome')
+}
+
 export function resetCanvasViewport() {
   return { scale: 1, panX: 0, panY: 0 }
 }

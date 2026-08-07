@@ -105,6 +105,30 @@ collapseScreenContent(snapshots)
 assert.equal(inner.style.height, '')
 assert.equal(root.style.height, '')
 
+// 静态嵌套节点常共享 screen root 作为 offsetParent；offsetTop/Left 不是相对直接父级。
+// 后台页层级较深时若直接累加全局 offset，会在每一层重复计算顶部和左侧偏移。
+const sharedOffsetParent = el({ clientWidth: 1440, clientHeight: 900 })
+const staticChild = el({
+  clientWidth: 400,
+  clientHeight: 200,
+  offsetWidth: 400,
+  offsetHeight: 200,
+  offsetLeft: 140,
+  offsetTop: 260,
+  offsetParent: sharedOffsetParent,
+})
+const staticParent = el({
+  clientWidth: 400,
+  clientHeight: 200,
+  offsetWidth: 400,
+  offsetHeight: 200,
+  offsetLeft: 100,
+  offsetTop: 200,
+  offsetParent: sharedOffsetParent,
+  children: [staticChild],
+})
+assert.deepEqual(measureIntrinsicBox(staticParent), { width: 440, height: 260 })
+
 // 宽表：中间 shell 非滚动（grid + width:100%），必须靠祖先链 + 子节点 offset 把外框撑开
 const table = el({
   clientWidth: 800,
