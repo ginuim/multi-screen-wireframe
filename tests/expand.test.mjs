@@ -63,10 +63,16 @@ const root = el({
   children: [inner],
   __computed: { overflowX: 'hidden', overflowY: 'auto' },
 })
+const outsideBoard = el({
+  clientWidth: 1200,
+  clientHeight: 800,
+  children: [root],
+})
 
 const listed = listExpandableNodes(root)
 assert.equal(listed[0], inner)
 assert.equal(listed[1], root)
+assert.equal(listed.includes(outsideBoard), false, '展开节点不得越过 screen 根节点')
 
 const snap = snapshotInlineBox(inner)
 assert.equal(snap.height, '')
@@ -92,6 +98,7 @@ root.offsetHeight = 400
 const snapshots = expandScreenContent(root)
 assert.equal(inner.style.height, '400px')
 assert.equal(root.style.height, '400px')
+assert.deepEqual(outsideBoard.style, {}, '展开不得改写 screen 外层画板')
 assert.deepEqual(measureContentBox(root), { width: 200, height: 400 })
 
 collapseScreenContent(snapshots)

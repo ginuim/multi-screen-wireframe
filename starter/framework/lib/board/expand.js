@@ -47,6 +47,9 @@ export function listExpandableNodes(rootEl) {
 
   const set = new Set(scrollables)
   for (const el of scrollables) {
+    // root 本身已在集合中；从它的父节点继续上溯会越过 screen 边界，
+    // 把 ScreenFrame、canvas、board 甚至 body/html 一并改写。
+    if (el === rootEl) continue
     let node = el.parentElement
     while (node) {
       set.add(node)
