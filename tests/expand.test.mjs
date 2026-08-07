@@ -5,6 +5,7 @@ import {
   expandScreenContent,
   listExpandableNodes,
   measureContentBox,
+  measureIntrinsicBox,
   resolveExpandTargets,
   snapshotInlineBox,
 } from '../starter/lib/board/expand.js'
@@ -15,6 +16,8 @@ function el(props = {}) {
     style: {},
     children: props.children || [],
     parentElement: null,
+    offsetLeft: props.offsetLeft ?? 0,
+    offsetTop: props.offsetTop ?? 0,
     scrollWidth: props.scrollWidth ?? props.clientWidth ?? 100,
     scrollHeight: props.scrollHeight ?? props.clientHeight ?? 100,
     clientWidth: props.clientWidth ?? 100,
@@ -25,6 +28,14 @@ function el(props = {}) {
   }
   for (const child of node.children) child.parentElement = node
   return node
+}
+
+function liveSize(node, axis, fallback) {
+  const key = axis === 'x' ? 'width' : 'height'
+  Object.defineProperty(node, axis === 'x' ? 'offsetWidth' : 'offsetHeight', {
+    get() { return parseInt(this.style[key], 10) || fallback },
+    configurable: true,
+  })
 }
 
 globalThis.window = {
@@ -64,14 +75,17 @@ assert.equal(inner.style.height, '400px')
 assert.equal(inner.style.overflow, 'visible')
 
 inner.style.height = ''
+inner.style.minHeight = ''
 inner.style.overflow = ''
 inner.style.overflowX = ''
 inner.style.overflowY = ''
 inner.style.maxWidth = ''
 inner.style.maxHeight = ''
+inner.style.width = ''
+inner.style.minWidth = ''
 
-// 撑开后内层变高，根再量一次
 inner.scrollHeight = 400
+inner.offsetHeight = 400
 root.scrollHeight = 400
 root.offsetHeight = 400
 
@@ -83,5 +97,98 @@ assert.deepEqual(measureContentBox(root), { width: 200, height: 400 })
 collapseScreenContent(snapshots)
 assert.equal(inner.style.height, '')
 assert.equal(root.style.height, '')
+
+// 宽表：中间 shell 非滚动（grid + width:100%），必须靠祖先链 + 子节点 offset 把外框撑开
+const table = el({
+  clientWidth: 800,
+  offsetWidth: 800,
+  scrollWidth: 2200,
+  clientHeight: 200,
+  offsetHeight: 200,
+  scrollHeight: 200,
+  __computed: { overflowX: 'auto', overflowY: 'hidden' },
+})
+liveSize(table, 'x', 800)
+Object.defineProperty(table, 'scrollWidth', {
+  get() { return Math.max(2200, parseInt(this.style.width, 10) || 800) },
+  configurable: true,
+})
+
+const main = el({
+  clientWidth: 800,
+  offsetWidth: 800,
+  scrollWidth: 800,
+  clientHeight: 600,
+  offsetHeight: 600,
+  scrollHeight: 600,
+  offsetLeft: 220,
+  children: [table],
+  __computed: { overflowX: 'auto', overflowY: 'auto' },
+})
+liveSize(main, 'x', 800)
+Object.defineProperty(main, 'scrollWidth', {
+  get() {
+    return Math.max(800, table.offsetWidth, parseInt(this.style.width, 10) || 0)
+  },
+  configurable: true,
+})
+
+const aside = el({
+  offsetWidth: 220,
+  offsetHeight: 600,
+  clientWidth: 220,
+  clientHeight: 600,
+  scrollWidth: 220,
+  scrollHeight: 600,
+})
+const shell = el({
+  clientWidth: 1020,
+  offsetWidth: 1020,
+  scrollWidth: 1020,
+  clientHeight: 600,
+  offsetHeight: 600,
+  scrollHeight: 600,
+  children: [aside, main],
+  __computed: { overflowX: 'visible', overflowY: 'visible' },
+})
+liveSize(shell, 'x', 1020)
+Object.defineProperty(shell, 'scrollWidth', {
+  get() {
+    return Math.max(
+      1020,
+      aside.offsetWidth,
+      main.offsetLeft + main.offsetWidth,
+      parseInt(this.style.width, 10) || 0,
+    )
+  },
+  configurable: true,
+})
+
+const frame = el({
+  clientWidth: 1020,
+  offsetWidth: 1020,
+  scrollWidth: 1020,
+  clientHeight: 600,
+  offsetHeight: 600,
+  scrollHeight: 600,
+  children: [shell],
+  __computed: { overflowX: 'hidden', overflowY: 'auto' },
+})
+liveSize(frame, 'x', 1020)
+Object.defineProperty(frame, 'scrollWidth', {
+  get() {
+    return Math.max(1020, shell.offsetWidth, parseInt(this.style.width, 10) || 0)
+  },
+  configurable: true,
+})
+
+assert.ok(listExpandableNodes(frame).includes(shell), '非滚动祖先也要进链')
+
+expandScreenContent(frame)
+assert.equal(table.style.width, '2200px')
+assert.equal(main.style.width, '2200px')
+assert.equal(shell.style.width, '2420px')
+assert.equal(frame.style.width, '2420px')
+assert.deepEqual(measureIntrinsicBox(frame), { width: 2420, height: 600 })
 
 console.log('expand: pass')
