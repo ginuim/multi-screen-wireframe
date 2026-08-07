@@ -36,15 +36,20 @@ for (const leaked of ['board', 'core', 'ui']) {
   )
 }
 
-const sourceFiles = [
+const businessFiles = [
   ...filesUnder(join(root, 'starter', 'src')),
-  ...filesUnder(join(fw, 'lib')),
-  ...filesUnder(join(fw, 'styles')),
   ...filesUnder(join(root, 'demo', 'order-admin', 'src')),
   ...filesUnder(join(root, 'demo', 'order-admin', 'styles')),
   ...filesUnder(join(root, 'demo', 'claims-app', 'src')),
   ...filesUnder(join(root, 'demo', 'claims-app', 'styles')),
 ].filter((file) => ['.js', '.jsx', '.css'].includes(extname(file)))
+
+const frameworkFiles = [
+  ...filesUnder(join(fw, 'lib')),
+  ...filesUnder(join(fw, 'styles')),
+].filter((file) => ['.js', '.jsx', '.css'].includes(extname(file)))
+
+const sourceFiles = [...businessFiles, ...frameworkFiles]
 
 const demoMode = readFileSync(join(fw, 'lib', 'board', 'DemoMode.jsx'), 'utf8')
 const canvasMode = readFileSync(join(fw, 'lib', 'board', 'CanvasMode.jsx'), 'utf8')
@@ -76,15 +81,23 @@ assert.match(screenFrame, /handleDelegatedFlowClick/)
 assert.match(screenFrame, /wf-expand-one/)
 assert.match(board, /全部展开/)
 assert.match(board, /resolveExpandTargets/)
+assert.match(board, /function LockIcon/)
+assert.match(board, /<svg className="wf-lock-icon"/)
+assert.doesNotMatch(board, /wf-lock-icon is-open/)
 assert.doesNotMatch(screenFrame, /mode === 'canvas' \? \([\s\S]*wf-screen-chrome-label/)
 
 const css = readFileSync(join(fw, 'styles', 'prototype.css'), 'utf8')
 assert.match(css, /\.wf-tab-bar\s*\{[^}]*margin-top:\s*auto/s)
 assert.match(css, /\.wf-mobile-shell\s*\{/)
+assert.doesNotMatch(css, /\.wf-lock-icon::before/)
+
+for (const file of businessFiles) {
+  const source = readFileSync(file, 'utf8')
+  assert.doesNotMatch(source, /<svg\b/i, `${file} must not contain semantic SVG`)
+}
 
 for (const file of sourceFiles) {
   const source = readFileSync(file, 'utf8')
-  assert.doesNotMatch(source, /<svg\b/i, `${file} must not contain semantic SVG`)
   assert.doesNotMatch(source, /[←›✓⌂😀-🙏]/u, `${file} contains a prohibited icon glyph`)
   assert.doesNotMatch(source, /position\s*:\s*fixed/i, `${file} contains fixed positioning`)
 }

@@ -83,7 +83,7 @@ version: 1.3.0
 - 页面跳转只用 project `links` 声明；`Card`、`Button`、`Cell`、`Box`、`Row`、`Column`、`Grid`、`SideNav`、`TabBar` 使用 `to`。裸标签若只写了 `data-flow-to` 也能点（屏内委托兜底），但仍应优先用库组件。
 - 移动端 / 小程序带底栏：优先 `MobileShell` + `TabBar`（或全高 Column 末尾放 `TabBar`）。禁止把 TabBar 夹在内容中间；禁止用 `position: fixed` 钉底栏。
 - 默认灰黑白。图标只用方形、圆形、线框块；图片只还原外框尺寸、比例、圆角和位置。
-- 不使用 emoji、Unicode 图标、语义化 SVG、在线资源或真实后端。
+- 生成业务代码（`src/screens`、`src/layouts`、业务样式）不使用 emoji、Unicode 图标、语义化 SVG、在线资源或真实后端。框架画板 chrome（`framework/`）可用 SVG 画控件图标。
 - 有视觉参考时，先测量 viewport、区域边界、宽高、间距、对齐、层级和圆角；按测量值写布局，不能用通用卡片大概拼版。
 
 ## 内容完整度（默认）

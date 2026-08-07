@@ -22,6 +22,33 @@ function ZoomControls({ scale, setScale, onReset }) {
   )
 }
 
+/** 线框锁：开锁=可交互，闭锁=不可交互。框架 chrome 可用 SVG。 */
+function LockIcon({ open }) {
+  return (
+    <svg className="wf-lock-icon" viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
+      {open ? (
+        // 开锁：梁从左侧立起后向右上悬空，右脚不扣回锁体
+        <path
+          d="M4.25 6.75V4.35a2.75 2.75 0 0 1 5.35-.2"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      ) : (
+        <path
+          d="M4.25 6.75V4.5a2.75 2.75 0 0 1 5.5 0v2.25"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      )}
+      <rect x="2.75" y="6.75" width="8.5" height="5.5" rx="1.25" fill="currentColor" />
+    </svg>
+  )
+}
+
 /** interactive=true 显示开锁「可交互」；false 为上锁，可直接拖拽平移、滚轮缩放 */
 function InteractionLock({ interactive, onToggle }) {
   return (
@@ -34,7 +61,7 @@ function InteractionLock({ interactive, onToggle }) {
         ? '当前可交互页面。点击锁住后：拖拽平移画布，滚轮缩放；也可按住空格临时锁住'
         : '当前已锁住。拖拽平移、滚轮缩放；页面内点击与滚动已禁用。点击恢复可交互'}
     >
-      <span className={interactive ? 'wf-lock-icon is-open' : 'wf-lock-icon'} aria-hidden="true" />
+      <LockIcon open={interactive} />
       <span>{interactive ? '可交互' : '不可交互'}</span>
     </button>
   )
