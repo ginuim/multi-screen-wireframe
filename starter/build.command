@@ -5,8 +5,8 @@ ROOT="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 ARCH="$(uname -m)"
 
 case "$ARCH" in
-  arm64) ESBUILD="$ROOT/tools/esbuild-darwin-arm64" ;;
-  x86_64) ESBUILD="$ROOT/tools/esbuild-darwin-x64" ;;
+  arm64) ESBUILD="$ROOT/framework/tools/esbuild-darwin-arm64" ;;
+  x86_64) ESBUILD="$ROOT/framework/tools/esbuild-darwin-x64" ;;
   *) echo "Unsupported macOS architecture: $ARCH" >&2; exit 1 ;;
 esac
 

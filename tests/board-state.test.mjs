@@ -18,8 +18,8 @@ import {
   focusCanvasScreen,
   selectDemoEntry,
   shouldZoomOnWheel,
-} from '../starter/lib/board/navigation.js'
-import { canUseDemo } from '../starter/lib/board/validation.js'
+} from '../starter/framework/lib/board/navigation.js'
+import { canUseDemo } from '../starter/framework/lib/board/validation.js'
 
 const screens = [
   { id: 'home', entry: true, links: ['detail'] },

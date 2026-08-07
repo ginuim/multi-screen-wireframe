@@ -2,12 +2,17 @@
 
 以下四段都是完整 screen，可直接保存到 `src/screens/`。保存后在 `src/project.js` 导入组件、加入 screen，并更新相关 `links`。
 
-组件从 `../../lib/ui/index.js` 导入（`src/layouts/` 下按层级使用正确相对路径）。
+组件从 `../../framework/lib/ui/index.js` 导入（`src/layouts/` 同层级）。
 
 ## 页面示例
 
 ```jsx
-import { Column, Heading, Text } from '../../lib/ui/index.js'
+/**
+ * @wireframe-skill multi-screen-wireframe@1.3.0
+ * 创建基于 v1.3.0
+ * 修改基于 v1.3.0
+ */
+import { Column, Heading, Text } from '../../framework/lib/ui/index.js'
 
 export function AboutScreen() {
   return (
@@ -22,7 +27,7 @@ export function AboutScreen() {
 ## 布局示例
 
 ```jsx
-import { Card, Column, Grid, Heading, Row, Text } from '../../lib/ui/index.js'
+import { Card, Column, Grid, Heading, Row, Text } from '../../framework/lib/ui/index.js'
 
 export function DashboardScreen() {
   return (
@@ -44,7 +49,7 @@ export function DashboardScreen() {
 ## 导航示例
 
 ```jsx
-import { Card, Column, Heading, Row } from '../../lib/ui/index.js'
+import { Card, Column, Heading, Row } from '../../framework/lib/ui/index.js'
 
 export function ProductsScreen() {
   return (
@@ -74,8 +79,8 @@ export function ProductsScreen() {
 App / 小程序带底栏时，用 `MobileShell`（或全高 Column 末尾放 `TabBar`，库样式会 `margin-top: auto` 贴底）。不要把 TabBar 夹在内容中间。
 
 ```jsx
-import { Column, Heading, MobileShell, Text } from '../../lib/ui/index.js'
-import { useScreenId } from '../../lib/core/ScreenIdentity.jsx'
+import { Column, Heading, MobileShell, Text } from '../../framework/lib/ui/index.js'
+import { useScreenId } from '../../framework/lib/core/ScreenIdentity.jsx'
 
 const tabs = [
   { label: '首页', to: 'home' },
@@ -99,7 +104,7 @@ export function DiscoverScreen() {
 ## 弹窗示例
 
 ```jsx
-import { Button, Column, ConfirmDialog, Heading } from '../../lib/ui/index.js'
+import { Button, Column, ConfirmDialog, Heading } from '../../framework/lib/ui/index.js'
 
 export function DeleteScreen() {
   const [open, setOpen] = React.useState(false)

@@ -7,7 +7,7 @@ import {
   PageHeader,
   Select,
   TextArea,
-} from '../../../../starter/lib/ui/index.js'
+} from '../../../../starter/framework/lib/ui/index.js'
 import { AdminLayout } from '../layouts/AdminLayout.jsx'
 
 export function OrderCancelScreen() {

@@ -8,7 +8,7 @@ import { pathToFileURL } from 'node:url'
 import { darwinEsbuild } from './test-platform.mjs'
 
 const css = readFileSync(
-  new URL('../starter/styles/prototype.css', import.meta.url),
+  new URL('../starter/framework/styles/prototype.css', import.meta.url),
   'utf8',
 )
 
@@ -24,7 +24,7 @@ const output = join(temp, 'feedback.cjs')
 
 try {
   execFileSync(darwinEsbuild(starter), [
-    new URL('./lib/ui/feedback.jsx', starter).pathname,
+    new URL('./framework/lib/ui/feedback.jsx', starter).pathname,
     '--bundle',
     '--platform=node',
     '--format=cjs',

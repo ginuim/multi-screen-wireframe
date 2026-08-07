@@ -9,8 +9,8 @@ fi
 
 DEMO_ROOT="$(CDPATH= cd -- "$SKILL_ROOT/$1" && pwd)"
 case "$(uname -m)" in
-  arm64) ESBUILD="$SKILL_ROOT/starter/tools/esbuild-darwin-arm64" ;;
-  x86_64) ESBUILD="$SKILL_ROOT/starter/tools/esbuild-darwin-x64" ;;
+  arm64) ESBUILD="$SKILL_ROOT/starter/framework/tools/esbuild-darwin-arm64" ;;
+  x86_64) ESBUILD="$SKILL_ROOT/starter/framework/tools/esbuild-darwin-x64" ;;
   *) echo "Unsupported macOS architecture: $(uname -m)" >&2; exit 1 ;;
 esac
 

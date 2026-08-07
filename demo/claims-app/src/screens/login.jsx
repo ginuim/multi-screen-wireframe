@@ -5,7 +5,7 @@ import {
   Heading,
   Text,
   TextInput,
-} from '../../../../starter/lib/ui/index.js'
+} from '../../../../starter/framework/lib/ui/index.js'
 
 export function LoginScreen() {
   return (

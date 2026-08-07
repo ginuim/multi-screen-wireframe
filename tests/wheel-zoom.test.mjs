@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { bindWheelZoom } from '../starter/lib/board/useWheelZoom.js'
+import { bindWheelZoom } from '../starter/framework/lib/board/useWheelZoom.js'
 
 const listeners = []
 const el = {

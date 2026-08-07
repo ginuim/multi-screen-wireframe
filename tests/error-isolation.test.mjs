@@ -12,7 +12,7 @@ const output = join(temp, 'boundary.cjs')
 
 try {
   execFileSync(darwinEsbuild(starter), [
-    new URL('./lib/core/ErrorBoundary.jsx', starter).pathname,
+    new URL('./framework/lib/core/ErrorBoundary.jsx', starter).pathname,
     '--bundle',
     '--platform=node',
     '--format=cjs',
@@ -43,7 +43,7 @@ try {
   boundary.componentDidUpdate(previousProps)
   assert.equal(boundary.state.error, null)
 
-  const frameSource = readFileSync(new URL('./lib/board/ScreenFrame.jsx', starter), 'utf8')
+  const frameSource = readFileSync(new URL('./framework/lib/board/ScreenFrame.jsx', starter), 'utf8')
   assert.match(frameSource, /<ErrorBoundary[\s\S]*scope="screen"/)
   assert.match(frameSource, /screenId=\{screen\.id\}/)
   assert.match(frameSource, /resetKey=\{screen\.id\}/)

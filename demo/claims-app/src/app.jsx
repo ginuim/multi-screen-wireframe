@@ -1,7 +1,7 @@
-import { Board } from '../../../starter/lib/board/Board.jsx'
-import { ErrorBoundary } from '../../../starter/lib/core/ErrorBoundary.jsx'
-import { PrototypeProvider } from '../../../starter/lib/core/PrototypeContext.jsx'
-import { validateProject } from '../../../starter/lib/core/validateProject.js'
+import { Board } from '../../../starter/framework/lib/board/Board.jsx'
+import { ErrorBoundary } from '../../../starter/framework/lib/core/ErrorBoundary.jsx'
+import { PrototypeProvider } from '../../../starter/framework/lib/core/PrototypeContext.jsx'
+import { validateProject } from '../../../starter/framework/lib/core/validateProject.js'
 import { project } from './project.js'
 
 validateProject(project)

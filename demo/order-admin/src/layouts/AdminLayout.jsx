@@ -1,5 +1,5 @@
-import { Column, SideNav } from '../../../../starter/lib/ui/index.js'
-import { useScreenId } from '../../../../starter/lib/core/ScreenIdentity.jsx'
+import { Column, SideNav } from '../../../../starter/framework/lib/ui/index.js'
+import { useScreenId } from '../../../../starter/framework/lib/core/ScreenIdentity.jsx'
 
 export function AdminLayout({ children }) {
   const screenId = useScreenId()

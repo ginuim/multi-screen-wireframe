@@ -5,7 +5,7 @@ import {
   Heading,
   PageHeader,
   Text,
-} from '../../../../starter/lib/ui/index.js'
+} from '../../../../starter/framework/lib/ui/index.js'
 import { AdminLayout } from '../layouts/AdminLayout.jsx'
 
 const rows = [

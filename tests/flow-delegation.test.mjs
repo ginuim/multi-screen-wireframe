@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import {
   findFlowTargetId,
   handleDelegatedFlowClick,
-} from '../starter/lib/ui/flow-target.js'
+} from '../starter/framework/lib/ui/flow-target.js'
 
 function el(attrs = {}, parent = null) {
   const node = {

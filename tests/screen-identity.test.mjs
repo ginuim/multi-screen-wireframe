@@ -12,7 +12,7 @@ const output = join(temp, 'identity.cjs')
 
 try {
   execFileSync(darwinEsbuild(starter), [
-    new URL('./lib/core/ScreenIdentity.jsx', starter).pathname,
+    new URL('./framework/lib/core/ScreenIdentity.jsx', starter).pathname,
     '--bundle',
     '--platform=node',
     '--format=cjs',

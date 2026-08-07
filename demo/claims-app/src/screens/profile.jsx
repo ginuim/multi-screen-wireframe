@@ -6,7 +6,7 @@ import {
   Row,
   Text,
   Toggle,
-} from '../../../../starter/lib/ui/index.js'
+} from '../../../../starter/framework/lib/ui/index.js'
 import { MobileLayout } from '../layouts/MobileLayout.jsx'
 
 export function ProfileScreen() {

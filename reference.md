@@ -1,5 +1,7 @@
 # v2 协议与组件参考
 
+Skill 版本见仓库根目录 `VERSION`（与 `SKILL.md` / `package.json` 同步）。框架在 `framework/`，业务在 `src/`。生成的 `src/screens`、`src/layouts` 须带 `@wireframe-skill` 版本注释；每个 `screens[].id` 必须有对应 `src/screens/<id>.jsx`；业务样式写 `src/styles/app.css` 或内联 style，禁止改 `framework/styles/prototype.css`。
+
 ## Project schema
 
 ```js

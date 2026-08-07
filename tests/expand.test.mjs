@@ -8,7 +8,7 @@ import {
   measureIntrinsicBox,
   resolveExpandTargets,
   snapshotInlineBox,
-} from '../starter/lib/board/expand.js'
+} from '../starter/framework/lib/board/expand.js'
 
 function el(props = {}) {
   const node = {

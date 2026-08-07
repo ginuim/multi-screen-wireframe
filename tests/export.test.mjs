@@ -3,7 +3,7 @@ import {
   captureScreen,
   exportSelected,
   loadExportLibraries,
-} from '../starter/lib/board/export.js'
+} from '../starter/framework/lib/board/export.js'
 
 const downloads = []
 const bodyNodes = []

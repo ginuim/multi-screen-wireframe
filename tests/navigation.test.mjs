@@ -13,7 +13,7 @@ const calls = []
 
 try {
   execFileSync(darwinEsbuild(starter), [
-    new URL('./lib/ui/index.js', starter).pathname,
+    new URL('./framework/lib/ui/index.js', starter).pathname,
     '--bundle',
     '--platform=node',
     '--format=cjs',

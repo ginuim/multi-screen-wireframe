@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { validateProject } from '../starter/lib/core/validateProject.js'
+import { validateProject } from '../starter/framework/lib/core/validateProject.js'
 
 const Screen = () => null
 

@@ -13,7 +13,7 @@ const esbuild = darwinEsbuild(root)
 
 try {
   execFileSync(esbuild, [
-    new URL('./lib/ui/layout.jsx', root).pathname,
+    new URL('./framework/lib/ui/layout.jsx', root).pathname,
     '--bundle',
     '--platform=node',
     '--format=cjs',

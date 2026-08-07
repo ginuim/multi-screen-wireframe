@@ -12,38 +12,50 @@ function filesUnder(directory) {
   })
 }
 
+const fw = join(root, 'starter', 'framework')
+assert.equal(existsSync(join(fw, 'lib', 'board')), true)
+assert.equal(existsSync(join(fw, 'lib', 'core')), true)
+assert.equal(existsSync(join(fw, 'lib', 'ui')), true)
+assert.equal(existsSync(join(fw, 'styles', 'prototype.css')), true)
+assert.equal(existsSync(join(fw, 'vendor')), true)
+assert.equal(existsSync(join(fw, 'tools')), true)
+
+for (const leaked of ['lib', 'styles', 'vendor', 'tools']) {
+  assert.equal(
+    existsSync(join(root, 'starter', leaked)),
+    false,
+    `starter/${leaked} must not exist at root; use framework/${leaked}`,
+  )
+}
+
+for (const leaked of ['board', 'core', 'ui']) {
+  assert.equal(
+    existsSync(join(root, 'starter', 'src', leaked)),
+    false,
+    `starter/src/${leaked} must not exist; library code lives under framework/lib/`,
+  )
+}
+
 const sourceFiles = [
   ...filesUnder(join(root, 'starter', 'src')),
-  ...filesUnder(join(root, 'starter', 'lib')),
-  ...filesUnder(join(root, 'starter', 'styles')),
+  ...filesUnder(join(fw, 'lib')),
+  ...filesUnder(join(fw, 'styles')),
   ...filesUnder(join(root, 'demo', 'order-admin', 'src')),
   ...filesUnder(join(root, 'demo', 'order-admin', 'styles')),
   ...filesUnder(join(root, 'demo', 'claims-app', 'src')),
   ...filesUnder(join(root, 'demo', 'claims-app', 'styles')),
 ].filter((file) => ['.js', '.jsx', '.css'].includes(extname(file)))
 
-for (const leaked of ['board', 'core', 'ui']) {
-  assert.equal(
-    existsSync(join(root, 'starter', 'src', leaked)),
-    false,
-    `starter/src/${leaked} must not exist; library code lives under lib/`,
-  )
-}
-
-assert.equal(existsSync(join(root, 'starter', 'lib', 'board')), true)
-assert.equal(existsSync(join(root, 'starter', 'lib', 'core')), true)
-assert.equal(existsSync(join(root, 'starter', 'lib', 'ui')), true)
-
-const demoMode = readFileSync(join(root, 'starter', 'lib', 'board', 'DemoMode.jsx'), 'utf8')
-const canvasMode = readFileSync(join(root, 'starter', 'lib', 'board', 'CanvasMode.jsx'), 'utf8')
-const board = readFileSync(join(root, 'starter', 'lib', 'board', 'Board.jsx'), 'utf8')
-const screenFrame = readFileSync(join(root, 'starter', 'lib', 'board', 'ScreenFrame.jsx'), 'utf8')
+const demoMode = readFileSync(join(fw, 'lib', 'board', 'DemoMode.jsx'), 'utf8')
+const canvasMode = readFileSync(join(fw, 'lib', 'board', 'CanvasMode.jsx'), 'utf8')
+const board = readFileSync(join(fw, 'lib', 'board', 'Board.jsx'), 'utf8')
+const screenFrame = readFileSync(join(fw, 'lib', 'board', 'ScreenFrame.jsx'), 'utf8')
 assert.match(demoMode, /useWheelZoom/)
 assert.match(demoMode, /clampScale|useWheelZoom/)
 assert.doesNotMatch(demoMode, /onWheel=\{/)
 assert.match(canvasMode, /useWheelZoom/)
 assert.doesNotMatch(canvasMode, /onWheel=\{/)
-const wheelZoom = readFileSync(join(root, 'starter', 'lib', 'board', 'useWheelZoom.js'), 'utf8')
+const wheelZoom = readFileSync(join(fw, 'lib', 'board', 'useWheelZoom.js'), 'utf8')
 assert.match(wheelZoom, /passive:\s*false/)
 assert.match(demoMode, /wf-demo-stage/)
 assert.match(demoMode, /panFromDragSnapshot/)
@@ -59,7 +71,7 @@ assert.match(board, /全部展开/)
 assert.match(board, /resolveExpandTargets/)
 assert.doesNotMatch(screenFrame, /mode === 'canvas' \? \([\s\S]*wf-screen-chrome-label/)
 
-const css = readFileSync(join(root, 'starter', 'styles', 'prototype.css'), 'utf8')
+const css = readFileSync(join(fw, 'styles', 'prototype.css'), 'utf8')
 assert.match(css, /\.wf-tab-bar\s*\{[^}]*margin-top:\s*auto/s)
 assert.match(css, /\.wf-mobile-shell\s*\{/)
 
@@ -76,16 +88,17 @@ for (const demo of ['order-admin', 'claims-app']) {
   assert.match(dist, /^\/\* GENERATED FILE\. EDIT src\/, THEN RUN BUILD\. \*\//)
   assert.match(dist, /sourceMappingURL=data:application\/json;base64/)
   const html = readFileSync(join(root, 'demo', demo, 'index.html'), 'utf8')
-  assert.match(html, /WIREFRAME_VENDOR_BASE\s*=\s*new URL\('\.\.\/\.\.\/starter\/vendor\/'/)
+  assert.match(html, /WIREFRAME_VENDOR_BASE\s*=\s*new URL\('\.\.\/\.\.\/starter\/framework\/vendor\/'/)
 }
 
 const starterHtml = readFileSync(join(root, 'starter', 'index.html'), 'utf8')
-assert.match(starterHtml, /WIREFRAME_VENDOR_BASE\s*=\s*new URL\('vendor\/'/)
+assert.match(starterHtml, /WIREFRAME_VENDOR_BASE\s*=\s*new URL\('framework\/vendor\/'/)
+assert.match(starterHtml, /framework\/styles\/prototype\.css/)
 
 for (const [indexPath, vendorPath] of [
-  [join(root, 'starter', 'index.html'), 'vendor/'],
-  [join(root, 'demo', 'order-admin', 'index.html'), '../../starter/vendor/'],
-  [join(root, 'demo', 'claims-app', 'index.html'), '../../starter/vendor/'],
+  [join(root, 'starter', 'index.html'), 'framework/vendor/'],
+  [join(root, 'demo', 'order-admin', 'index.html'), '../../starter/framework/vendor/'],
+  [join(root, 'demo', 'claims-app', 'index.html'), '../../starter/framework/vendor/'],
 ]) {
   const vendorBase = new URL(vendorPath, pathToFileURL(indexPath))
   for (const file of ['html2canvas.min.js', 'jszip.min.js', 'FileSaver.min.js']) {
@@ -94,7 +107,9 @@ for (const [indexPath, vendorPath] of [
 }
 
 const readme = readFileSync(join(root, 'README.md'), 'utf8')
-assert.match(readme, /skill 根目录/)
+assert.match(readme, /VERSION/)
+assert.match(readme, /1\.3\.0|Skill 版本/)
+assert.match(readme, /framework/)
 
 const orderProject = readFileSync(join(root, 'demo', 'order-admin', 'src', 'project.js'), 'utf8')
 const claimsProject = readFileSync(join(root, 'demo', 'claims-app', 'src', 'project.js'), 'utf8')

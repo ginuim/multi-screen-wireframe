@@ -20,7 +20,7 @@ try {
     const id = `stress-${run}`
     const component = `StressScreen${run}`
     writeFileSync(join(projectRoot, 'src', 'screens', `${id}.jsx`), `
-import { Card, Column, Grid, Row, Text } from '../../lib/ui/index.js'
+import { Card, Column, Grid, Row, Text } from '../../framework/lib/ui/index.js'
 
 export function ${component}() {
   return (
@@ -60,7 +60,7 @@ export function ${component}() {
     const validationEntry = join(projectRoot, 'validation-entry.js')
     const validationOutput = join(projectRoot, 'validation.cjs')
     writeFileSync(validationEntry, `
-import { validateProject } from './lib/core/validateProject.js'
+import { validateProject } from './framework/lib/core/validateProject.js'
 import { project } from './src/project.js'
 validateProject(project)
 `.trimStart())

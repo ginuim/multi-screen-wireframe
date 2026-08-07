@@ -1,7 +1,7 @@
 @echo off
 setlocal
 set "ROOT=%~dp0"
-set "ESBUILD=%ROOT%tools\esbuild-windows-x64.exe"
+set "ESBUILD=%ROOT%framework\tools\esbuild-windows-x64.exe"
 set "TMP=%ROOT%.build-tmp"
 
 if not exist "%ESBUILD%" (

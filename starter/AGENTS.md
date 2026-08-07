@@ -6,25 +6,31 @@
 
 | 路径 | 角色 |
 |------|------|
-| `src/` | 业务：screens、layouts、`project.js`、`app.jsx` |
-| `lib/` | 库：board、core、ui |
-| `styles/prototype.css` | 库样式（主题 token 可按需改） |
+| `src/` | 业务：screens、layouts、`project.js`、`app.jsx`、`styles/app.css` |
+| `framework/lib/` | 库：board、core、ui |
+| `framework/styles/prototype.css` | 库样式（升级时整夹替换；业务不要改） |
+| `framework/vendor/` | React 与导出库 |
+| `framework/tools/` | 本地 esbuild |
+| `src/styles/app.css` | 可选业务共享样式（在 `index.html` 引入） |
 
-升级库时，用新 starter 的 `lib/` + `styles/prototype.css`（及需要时的 `vendor/` / `tools/`）覆盖对应路径；**不要覆盖 `src/`**。
+升级框架：用新 starter 的 `framework/` **整目录覆盖**本目录的 `framework/`；**不要覆盖 `src/`**。
 
 ## 数据模型
 
 `src/project.js` 直接导入 screen 函数。`project.viewports` 定义视口，`project.screens` 定义页面；`screens[].links` 是唯一页面流边。screen id 必须唯一并匹配 `^[a-z0-9-]+$`，每个 link 必须指向现有 id，演示模式至少需要一个 `entry: true`。
 
+每个 `screens[].id` 必须对应真实文件 `src/screens/<id>.jsx`。缺源码等于无法再编辑，禁止只改 `dist/app.js`。
+
 ## 允许修改
 
-- 业务只修改 `src/` 中的 JSX、布局和 `src/project.js`。
-- 按明确需求调整 `styles/prototype.css` 中的主题 token；不要改画板定位和组件契约。
-- 库缺陷只在 `lib/` 修，不要在业务文件里打补丁。
+- 业务只修改 `src/` 中的 JSX、布局、`src/project.js` 和 `src/styles/app.css`。
+- **禁止**修改 `framework/`（含 `framework/styles/prototype.css`）。业务样式用 JSX `style` 或 `src/styles/app.css`。
+- 库缺陷只在 `framework/lib/` 修（skill 源头），不要在业务文件里打补丁。
 - 新页面从 `src/screens/_template.jsx` 复制，使用标准 JSX 与 ESM import/export。
-- UI 组件从 `../../lib/ui/index.js` 导入（layouts 同理按层级调整相对路径）。
+- UI 组件从 `../../framework/lib/ui/index.js` 导入（layouts 同层级）。
+- **版本注释**：每个 `src/screens/*.jsx`、`src/layouts/*.jsx` 文件顶部保留 `@wireframe-skill` 注释块。新建时填写当前 skill 版本；修改时保留「创建基于」，更新「修改基于」为本次 skill 版本。
 
-禁止修改 `dist/app.js`。它是构建产物。禁止改 `vendor/`、`tools/` 和构建脚本来绕过源码错误。
+禁止修改 `dist/app.js`。它是构建产物。禁止改 `framework/vendor/`、`framework/tools/` 和构建脚本来绕过源码错误。
 
 ## 构建
 
@@ -35,8 +41,8 @@
 
 ## 编辑步骤
 
-1. 复制 `src/screens/_template.jsx`，重命名组件和文件。
-2. 在 `src/project.js` 导入组件并加入 `screens`。
+1. 复制 `src/screens/_template.jsx`，重命名组件和文件；保留并填写版本注释。
+2. 在 `src/project.js` 导入组件并加入 `screens`（确认 `src/screens/<id>.jsx` 已存在）。
 3. 只用 `links` 声明页面流；交互组件使用 `to="target-id"`。
 4. 运行构建。
 5. 构建成功后双击 `index.html`，检查画布、演示、导航和目标视口。

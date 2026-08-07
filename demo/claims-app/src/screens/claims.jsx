@@ -4,7 +4,7 @@ import {
   Column,
   EmptyState,
   Heading,
-} from '../../../../starter/lib/ui/index.js'
+} from '../../../../starter/framework/lib/ui/index.js'
 import { MobileLayout } from '../layouts/MobileLayout.jsx'
 
 const claims = []

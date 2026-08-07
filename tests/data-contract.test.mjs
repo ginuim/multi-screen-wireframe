@@ -10,11 +10,11 @@ const root = new URL('../starter/', import.meta.url)
 const temp = mkdtempSync(join(tmpdir(), 'wireframe-v2-data-'))
 const output = join(temp, 'data.cjs')
 const esbuild = darwinEsbuild(root)
-const css = readFileSync(new URL('./styles/prototype.css', root), 'utf8')
+const css = readFileSync(new URL('./framework/styles/prototype.css', root), 'utf8')
 
 try {
   execFileSync(esbuild, [
-    new URL('./lib/ui/data.jsx', root).pathname,
+    new URL('./framework/lib/ui/data.jsx', root).pathname,
     '--bundle',
     '--platform=node',
     '--format=cjs',

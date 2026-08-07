@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { darwinEsbuild } from './test-platform.mjs'
 
-const tools = new URL('../starter/tools/', import.meta.url)
+const tools = new URL('../starter/framework/tools/', import.meta.url)
 const expected = new Map(
   readFileSync(new URL('./SHA256SUMS', tools), 'utf8')
     .trim()

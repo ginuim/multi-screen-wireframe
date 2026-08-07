@@ -12,7 +12,7 @@ const output = join(temp, 'canvas.cjs')
 
 try {
   execFileSync(darwinEsbuild(starter), [
-    new URL('./lib/board/CanvasMode.jsx', starter).pathname,
+    new URL('./framework/lib/board/CanvasMode.jsx', starter).pathname,
     '--bundle',
     '--platform=node',
     '--format=cjs',

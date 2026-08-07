@@ -1,5 +1,7 @@
 # Multi-Screen Wireframe
 
+**Skill 版本 / Version：`1.3.0`**（见 `VERSION`）
+
 从产品需求或视觉参考，生成**可双击打开**的多屏线框原型。
 
 Generate **double-clickable** multi-screen wireframe prototypes from product requirements or visual references.
@@ -92,7 +94,7 @@ scripts/build-demo.sh demo/order-admin
 scripts/build-demo.sh demo/claims-app
 ```
 
-demo 不携带编译器，只在维护时使用 `starter/tools/`。
+demo 不携带编译器，只在维护时使用 `starter/framework/tools/`。
 
 ## 给 AI Agent / For AI agents
 
@@ -102,6 +104,6 @@ Follow `SKILL.md`: confirm output path → copy `starter/` → edit only busines
 
 ## 平台与版本 / Platforms
 
-携带 esbuild 0.28.1 的 macOS arm64、macOS x64、Windows x64 官方二进制。来源、版本、许可证和 SHA-256 位于 `starter/tools/`。第三方浏览器库的版本与许可证位于 `starter/vendor/`。
+携带 esbuild 0.28.1 的 macOS arm64、macOS x64、Windows x64 官方二进制。来源、版本、许可证和 SHA-256 位于 `starter/framework/tools/`。第三方浏览器库的版本与许可证位于 `starter/framework/vendor/`。
 
-Ships official esbuild 0.28.1 binaries for macOS arm64, macOS x64, and Windows x64. Provenance, versions, licenses, and SHA-256 sums live under `starter/tools/`. Browser vendor libs are under `starter/vendor/`.
+Ships official esbuild 0.28.1 binaries for macOS arm64, macOS x64, and Windows x64. Provenance, versions, licenses, and SHA-256 sums live under `starter/framework/tools/`. Browser vendor libs are under `starter/framework/vendor/`.
