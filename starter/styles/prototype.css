@@ -642,7 +642,15 @@ button:disabled {
   gap: 8px;
 }
 
-.wf-export-one {
+.wf-screen-chrome-actions {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.wf-export-one,
+.wf-expand-one {
   padding: 3px 10px;
   border: 1px solid var(--board-border);
   border-radius: 6px;
@@ -652,9 +660,15 @@ button:disabled {
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.wf-export-one:hover {
+.wf-export-one:hover,
+.wf-expand-one:hover {
   border-color: #c9ced6;
   background: var(--board-fill);
+  color: var(--board-text);
+}
+
+.wf-screen-chrome.is-expanded .wf-expand-one {
+  border-color: var(--board-text);
   color: var(--board-text);
 }
 
@@ -667,6 +681,10 @@ button:disabled {
   background: var(--wf-white);
   cursor: pointer;
   touch-action: none;
+}
+
+.wf-screen-content.is-expanded {
+  overflow: visible;
 }
 
 .wf-screen-content.is-drag-scrolling {

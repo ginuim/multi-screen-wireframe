@@ -1,6 +1,7 @@
 import { usePrototype } from '../core/PrototypeContext.jsx'
 import { CanvasMode, runExportWithFeedback } from './CanvasMode.jsx'
 import { DemoMode } from './DemoMode.jsx'
+import { resolveExpandTargets } from './expand.js'
 import { exportSelected } from './export.js'
 import { canUseDemo } from './validation.js'
 import { clampScale } from './navigation.js'
@@ -68,8 +69,35 @@ export function Board({ project }) {
   const [hotspotsVisible, setHotspotsVisible] = React.useState(false)
   const [exportError, setExportError] = React.useState(null)
   const [exporting, setExporting] = React.useState(false)
+  const [expandedIds, setExpandedIds] = React.useState(() => new Set())
 
   const canvasLocked = !interactive || spaceHeld
+  const allScreenIds = project.screens.map((screen) => screen.id)
+
+  React.useEffect(() => {
+    setExpandedIds(new Set())
+  }, [viewportKey])
+
+  const toggleExpand = (id) => {
+    setExpandedIds((current) => {
+      const next = new Set(current)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const expandTargets = (shouldExpand) => {
+    const targets = resolveExpandTargets(selectedIds, allScreenIds)
+    setExpandedIds((current) => {
+      const next = new Set(current)
+      for (const id of targets) {
+        if (shouldExpand) next.add(id)
+        else next.delete(id)
+      }
+      return next
+    })
+  }
 
   React.useEffect(() => {
     const down = (event) => {
@@ -106,6 +134,7 @@ export function Board({ project }) {
           title: screen.title,
           element: document.querySelector(`[data-screen-id="${id}"] .wf-screen-content`),
           viewport,
+          expanded: expandedIds.has(id),
           projectName: project.name,
         }
       })
@@ -229,6 +258,22 @@ export function Board({ project }) {
         <div className="wf-toolbar-right">
           <button
             type="button"
+            className="wf-board-button"
+            title={selectedIds.size > 0 ? '展开已勾选的屏；无勾选时展开全部' : '展开全部屏'}
+            onClick={() => expandTargets(true)}
+          >
+            全部展开
+          </button>
+          <button
+            type="button"
+            className="wf-board-button"
+            title={selectedIds.size > 0 ? '收起已勾选的屏；无勾选时收起全部' : '收起全部屏'}
+            onClick={() => expandTargets(false)}
+          >
+            全部收起
+          </button>
+          <button
+            type="button"
             className="wf-board-primary"
             disabled={exporting || selectedIds.size === 0 || mode === 'demo'}
             onClick={() => exportIds([...selectedIds])}
@@ -250,6 +295,8 @@ export function Board({ project }) {
           canvasLocked={canvasLocked}
           selectedIds={selectedIds}
           setSelectedIds={setSelectedIds}
+          expandedIds={expandedIds}
+          onToggleExpand={toggleExpand}
           onExportIds={exportIds}
         />
       ) : (
@@ -260,6 +307,8 @@ export function Board({ project }) {
           scale={demoScale}
           setScale={setDemoScale}
           viewResetKey={demoViewResetKey}
+          expandedIds={expandedIds}
+          onToggleExpand={toggleExpand}
         />
       )}
     </div>

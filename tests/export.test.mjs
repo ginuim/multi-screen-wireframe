@@ -84,13 +84,50 @@ assert.equal(loadedSources[1], 'file:///wireframe/shared/vendor/html2canvas.min.
 
 const element = {
   cloneNode() {
-    return { style: {} }
+    return {
+      style: {},
+      children: [],
+      nodeType: 1,
+      scrollWidth: 375,
+      scrollHeight: 812,
+      offsetWidth: 375,
+      offsetHeight: 812,
+      clientWidth: 375,
+      clientHeight: 812,
+    }
   },
 }
 const viewport = { width: 375, height: 812 }
 const blob = await captureScreen(element, viewport)
 assert.equal(blob.type, 'image/png')
 assert.equal(bodyNodes.length, 0)
+
+globalThis.window.getComputedStyle = () => ({ overflowX: 'hidden', overflowY: 'auto' })
+const tall = {
+  cloneNode() {
+    const clone = {
+      style: {},
+      children: [],
+      nodeType: 1,
+      scrollWidth: 375,
+      scrollHeight: 1600,
+      offsetWidth: 375,
+      offsetHeight: 812,
+      clientWidth: 375,
+      clientHeight: 812,
+    }
+    return clone
+  },
+}
+let capturedSize = null
+window.html2canvas = async (node, options) => {
+  capturedSize = { width: options.width, height: options.height }
+  return {
+    toBlob(callback) { callback(new Blob(['png'], { type: 'image/png' })) },
+  }
+}
+await captureScreen(tall, viewport, { expanded: true })
+assert.deepEqual(capturedSize, { width: 375, height: 1600 })
 
 await exportSelected([{ id: 'home', element, viewport, projectName: 'Demo' }])
 assert.equal(downloads[0].name, 'home.png')

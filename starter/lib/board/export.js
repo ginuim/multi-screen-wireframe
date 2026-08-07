@@ -1,3 +1,5 @@
+import { expandScreenContent, measureContentBox } from './expand.js'
+
 let exportLibrariesPromise
 
 const libraries = [
@@ -57,25 +59,34 @@ export function loadExportLibraries() {
   return exportLibrariesPromise
 }
 
-export async function captureScreen(screenElement, viewport) {
+export async function captureScreen(screenElement, viewport, { expanded = false } = {}) {
   if (!screenElement) throw new Error('找不到要导出的 screen 元素')
   await loadExportLibraries()
 
   const sandbox = document.createElement('div')
   sandbox.className = 'wf-export-sandbox'
-  sandbox.style.width = `${viewport.width}px`
-  sandbox.style.height = `${viewport.height}px`
   const clone = screenElement.cloneNode(true)
-  clone.style.width = `${viewport.width}px`
-  clone.style.height = `${viewport.height}px`
   sandbox.appendChild(clone)
   document.body.appendChild(sandbox)
 
+  let width = viewport.width
+  let height = viewport.height
   try {
+    if (expanded) {
+      expandScreenContent(clone)
+      const box = measureContentBox(clone)
+      width = box.width
+      height = box.height
+    }
+    clone.style.width = `${width}px`
+    clone.style.height = `${height}px`
+    sandbox.style.width = `${width}px`
+    sandbox.style.height = `${height}px`
+
     const canvas = await window.html2canvas(clone, {
       backgroundColor: '#ffffff',
-      width: viewport.width,
-      height: viewport.height,
+      width,
+      height,
       scale: 2,
       useCORS: false,
       logging: false,
@@ -107,7 +118,9 @@ export async function exportSelected(screens) {
   for (const screen of screens) {
     captured.push({
       name: `${slug(screen.id)}.png`,
-      blob: await captureScreen(screen.element, screen.viewport),
+      blob: await captureScreen(screen.element, screen.viewport, {
+        expanded: !!screen.expanded,
+      }),
     })
   }
 

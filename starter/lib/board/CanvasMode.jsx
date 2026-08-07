@@ -41,6 +41,8 @@ export function CanvasMode({
   canvasLocked,
   selectedIds,
   setSelectedIds,
+  expandedIds = new Set(),
+  onToggleExpand,
   onExportIds,
 }) {
   const { currentScreenId, navigate, viewport, viewportKey, enterDemo: enterDemoMode } = usePrototype()
@@ -234,11 +236,11 @@ export function CanvasMode({
                 key={screen.id}
                 title={demoAvailable ? '双击进入演示' : undefined}
                 onClick={(event) => {
-                  if (event.target.closest('.wf-export-one, .wf-screen-meta-copy')) return
+                  if (event.target.closest('.wf-export-one, .wf-expand-one, .wf-screen-meta-copy')) return
                   navigate(screen.id)
                 }}
                 onDoubleClick={(event) => {
-                  if (event.target.closest('.wf-export-one, .wf-screen-meta-copy')) return
+                  if (event.target.closest('.wf-export-one, .wf-expand-one, .wf-screen-meta-copy')) return
                   event.preventDefault()
                   enterDemo(screen.id)
                 }}
@@ -267,6 +269,8 @@ export function CanvasMode({
                   mode="canvas"
                   index={index}
                   focused={screen.id === currentScreenId}
+                  expanded={expandedIds.has(screen.id)}
+                  onToggleExpand={() => onToggleExpand(screen.id)}
                   onExport={() => onExportIds([screen.id])}
                   canvasLocked={canvasLocked}
                   scale={view.scale}

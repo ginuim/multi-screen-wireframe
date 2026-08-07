@@ -31,3 +31,14 @@
 .order-login-card {
   width: 380px;
 }
+
+/* 宽表：强制超出视口，方便测横向展开 */
+.demo-wide-table .wf-table {
+  width: max-content;
+  min-width: 2200px;
+}
+
+.demo-wide-table .wf-table th,
+.demo-wide-table .wf-table td {
+  white-space: nowrap;
+}

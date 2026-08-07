@@ -20,10 +20,13 @@ export function DemoMode({
   scale,
   setScale,
   viewResetKey,
+  expandedIds = new Set(),
+  onToggleExpand,
 }) {
   const { currentScreenId, viewport, viewportKey } = usePrototype()
   const screenIndex = project.screens.findIndex((item) => item.id === currentScreenId)
   const screen = screenIndex >= 0 ? project.screens[screenIndex] : null
+  const currentExpanded = !!(screen && expandedIds.has(screen.id))
   const [view, setView] = React.useState(() => ({ ...resetCanvasViewport(), scale }))
   const [dragging, setDragging] = React.useState(false)
   const drag = React.useRef(null)
@@ -46,15 +49,17 @@ export function DemoMode({
 
   React.useEffect(() => {
     const container = viewportRef.current
+    const stage = stageRef.current
     if (!container || typeof ResizeObserver !== 'function') {
       applyFit()
       return undefined
     }
     const observer = new ResizeObserver(() => applyFit())
     observer.observe(container)
+    if (stage) observer.observe(stage)
     applyFit()
     return () => observer.disconnect()
-  }, [applyFit, viewport, viewportKey, currentScreenId, viewResetKey])
+  }, [applyFit, viewport, viewportKey, currentScreenId, viewResetKey, currentExpanded])
 
   useWheelZoom(viewportRef, scale, setScale, canvasLocked)
 
@@ -99,12 +104,14 @@ export function DemoMode({
             viewport={viewport}
             mode="demo"
             index={screenIndex}
+            expanded={currentExpanded}
+            onToggleExpand={screen && onToggleExpand ? () => onToggleExpand(screen.id) : undefined}
             canvasLocked={canvasLocked}
             scale={view.scale}
           />
         </div>
       </div>
-      <p className="wf-demo-hint">点击页面内按钮 / 链接跳转；可在工具栏开关热区高亮</p>
+      <p className="wf-demo-hint">点击页面内按钮 / 链接跳转；可在工具栏开关热区高亮；标题栏可临时展开看全貌</p>
     </div>
   )
 }
