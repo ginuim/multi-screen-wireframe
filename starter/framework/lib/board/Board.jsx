@@ -67,6 +67,23 @@ function InteractionLock({ interactive, onToggle }) {
   )
 }
 
+function getFullscreenElement() {
+  return document.fullscreenElement || document.webkitFullscreenElement || null
+}
+
+function requestBoardFullscreen(el) {
+  const request = el && (el.requestFullscreen || el.webkitRequestFullscreen)
+  if (!request) return Promise.resolve()
+  return Promise.resolve(request.call(el)).catch(() => {})
+}
+
+function exitBoardFullscreen() {
+  if (!getFullscreenElement()) return Promise.resolve()
+  const exit = document.exitFullscreen || document.webkitExitFullscreen
+  if (!exit) return Promise.resolve()
+  return Promise.resolve(exit.call(document)).catch(() => {})
+}
+
 export function Board({ project }) {
   const {
     mode,
@@ -97,9 +114,28 @@ export function Board({ project }) {
   const [exportError, setExportError] = React.useState(null)
   const [exporting, setExporting] = React.useState(false)
   const [expandedIds, setExpandedIds] = React.useState(() => new Set())
+  const [immersive, setImmersive] = React.useState(false)
+  const [browserFullscreen, setBrowserFullscreen] = React.useState(false)
+  const boardRef = React.useRef(null)
 
   const canvasLocked = !interactive || spaceHeld
   const allScreenIds = project.screens.map((screen) => screen.id)
+  const isDemo = mode === 'demo' && demoAvailable
+  const activeScale = isDemo ? demoScale : canvasScale
+  const setActiveScale = isDemo ? setDemoScale : setCanvasScale
+
+  const exitImmersive = React.useCallback(() => {
+    setImmersive(false)
+    exitBoardFullscreen()
+  }, [])
+
+  const toggleBrowserFullscreen = () => {
+    if (getFullscreenElement()) {
+      exitBoardFullscreen()
+      return
+    }
+    requestBoardFullscreen(boardRef.current)
+  }
 
   React.useEffect(() => {
     setExpandedIds(new Set())
@@ -151,6 +187,28 @@ export function Board({ project }) {
     if (mode !== 'demo') setHotspotsVisible(false)
   }, [mode])
 
+  React.useEffect(() => {
+    const sync = () => setBrowserFullscreen(!!getFullscreenElement())
+    document.addEventListener('fullscreenchange', sync)
+    document.addEventListener('webkitfullscreenchange', sync)
+    return () => {
+      document.removeEventListener('fullscreenchange', sync)
+      document.removeEventListener('webkitfullscreenchange', sync)
+    }
+  }, [])
+
+  React.useEffect(() => {
+    if (!immersive) return undefined
+    const onKey = (event) => {
+      if (event.key !== 'Escape') return
+      if (getFullscreenElement()) return
+      event.preventDefault()
+      setImmersive(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [immersive])
+
   const exportIds = (ids) => runExportWithFeedback(async () => {
     setExporting(true)
     try {
@@ -180,8 +238,13 @@ export function Board({ project }) {
     setDemoViewResetKey((value) => value + 1)
   }
 
+  const resetActiveView = isDemo ? resetDemoView : () => setCanvasScale(1)
+
   return (
-    <div className="wf-board">
+    <div
+      ref={boardRef}
+      className={immersive ? 'wf-board is-immersive' : 'wf-board'}
+    >
       <header className="wf-board-toolbar">
         <div className="wf-toolbar-left">
           <h1 className="wf-project-name">{project.name}</h1>
@@ -286,6 +349,14 @@ export function Board({ project }) {
           <button
             type="button"
             className="wf-board-button"
+            title="进入沉浸：隐藏顶栏与侧栏"
+            onClick={() => setImmersive(true)}
+          >
+            全屏
+          </button>
+          <button
+            type="button"
+            className="wf-board-button"
             title={selectedIds.size > 0 ? '展开已勾选的屏；无勾选时展开全部' : '展开全部屏'}
             onClick={() => expandTargets(true)}
           >
@@ -312,6 +383,50 @@ export function Board({ project }) {
 
       {exportError ? (
         <div className="wf-toolbar-error" role="alert">{exportError}</div>
+      ) : null}
+
+      {immersive ? (
+        <div className="wf-immersive-chrome" role="toolbar" aria-label="沉浸控件">
+          <button
+            type="button"
+            className="wf-board-button"
+            title="退出沉浸（Esc）"
+            onClick={exitImmersive}
+          >
+            退出
+          </button>
+          <button
+            type="button"
+            className={browserFullscreen ? 'wf-board-button is-active' : 'wf-board-button'}
+            title={browserFullscreen ? '退出浏览器全屏' : '浏览器全屏'}
+            onClick={toggleBrowserFullscreen}
+          >
+            {browserFullscreen ? '浏览器全屏 ON' : '浏览器全屏'}
+          </button>
+          <ZoomControls
+            scale={activeScale}
+            setScale={setActiveScale}
+            onReset={resetActiveView}
+          />
+          <InteractionLock
+            interactive={interactive}
+            onToggle={() => setInteractive((value) => !value)}
+          />
+          {isDemo ? (
+            <>
+              {canGoBack ? (
+                <button type="button" className="wf-board-button" onClick={goBack}>返回</button>
+              ) : null}
+              <button
+                type="button"
+                className={hotspotsVisible ? 'wf-board-button is-active' : 'wf-board-button'}
+                onClick={() => setHotspotsVisible((value) => !value)}
+              >
+                {hotspotsVisible ? '热区 ON' : '热区 OFF'}
+              </button>
+            </>
+          ) : null}
+        </div>
       ) : null}
 
       {mode === 'canvas' ? (

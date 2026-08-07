@@ -94,6 +94,7 @@ button:disabled {
 }
 
 .wf-board {
+  position: relative;
   display: flex;
   width: 100%;
   height: 100%;
@@ -144,6 +145,46 @@ button:disabled {
   background: #fff7f6;
   color: #b42318;
   font-size: 12px;
+}
+
+.wf-board.is-immersive .wf-board-toolbar,
+.wf-board.is-immersive .wf-toolbar-error,
+.wf-board.is-immersive .wf-screen-sidebar {
+  display: none;
+}
+
+.wf-board.is-immersive:fullscreen,
+.wf-board.is-immersive:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--board-bg);
+}
+
+.wf-immersive-chrome {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+  display: inline-flex;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid rgba(32, 36, 40, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 8px 24px rgba(20, 24, 28, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.wf-immersive-chrome .wf-zoom-controls,
+.wf-immersive-chrome .wf-interaction-lock,
+.wf-immersive-chrome .wf-board-button {
+  background: rgba(255, 255, 255, 0.88);
 }
 
 .wf-project-name {

@@ -83,12 +83,17 @@ assert.match(board, /全部展开/)
 assert.match(board, /resolveExpandTargets/)
 assert.match(board, /function LockIcon/)
 assert.match(board, /<svg className="wf-lock-icon"/)
+assert.match(board, /is-immersive/)
+assert.match(board, /wf-immersive-chrome/)
+assert.match(board, /requestBoardFullscreen/)
 assert.doesNotMatch(board, /wf-lock-icon is-open/)
 assert.doesNotMatch(screenFrame, /mode === 'canvas' \? \([\s\S]*wf-screen-chrome-label/)
 
 const css = readFileSync(join(fw, 'styles', 'prototype.css'), 'utf8')
 assert.match(css, /\.wf-tab-bar\s*\{[^}]*margin-top:\s*auto/s)
 assert.match(css, /\.wf-mobile-shell\s*\{/)
+assert.match(css, /\.wf-board\.is-immersive/)
+assert.match(css, /\.wf-immersive-chrome/)
 assert.doesNotMatch(css, /\.wf-lock-icon::before/)
 
 for (const file of businessFiles) {
