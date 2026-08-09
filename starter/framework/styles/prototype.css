@@ -705,6 +705,12 @@ button:disabled {
   white-space: nowrap;
 }
 
+.wf-review-breadcrumbs button:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
 .wf-review-selector {
   display: block;
   padding: 8px;
@@ -1115,6 +1121,11 @@ button:disabled {
 .wf-screen-chrome.is-focused {
   border-color: var(--board-text);
   box-shadow: 0 0 0 2px var(--board-text), var(--board-shadow);
+}
+
+.wf-board.is-reviewing .wf-screen-chrome {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px #2563eb, var(--board-shadow);
 }
 
 .wf-screen-chrome-label {

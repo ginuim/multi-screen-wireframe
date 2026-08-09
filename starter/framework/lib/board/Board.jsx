@@ -137,11 +137,13 @@ export function Board({ project }) {
   const [immersive, setImmersive] = React.useState(false)
   const [browserFullscreen, setBrowserFullscreen] = React.useState(false)
   const [reviewEnabled, setReviewEnabled] = React.useState(false)
+  const [reviewPanelVisible, setReviewPanelVisible] = React.useState(false)
   const [reviewSelections, setReviewSelections] = React.useState([])
   const [reviewMultiSelect, setReviewMultiSelect] = React.useState(false)
   const [reviewItems, setReviewItems] = React.useState([])
   const boardRef = React.useRef(null)
   const selectedReviewElementsRef = React.useRef(new Set())
+  const breadcrumbHoverElementRef = React.useRef(null)
 
   const canvasLocked = !interactive || spaceHeld
   const allScreenIds = project.screens.map((screen) => screen.id)
@@ -164,6 +166,7 @@ export function Board({ project }) {
     if (!element || !activeScreen || !activeRoot) return
     const nextSelection = describeReviewElement(element, activeRoot, activeScreen)
     const additive = reviewMultiSelect || options.additive
+    setReviewPanelVisible(true)
 
     setReviewSelections((current) => {
       if (options.replaceElement) {
@@ -202,8 +205,17 @@ export function Board({ project }) {
 
   const closeReview = React.useCallback(() => {
     setReviewEnabled(false)
+    setReviewPanelVisible(false)
+    breadcrumbHoverElementRef.current?.classList.remove('is-review-hovered')
+    breadcrumbHoverElementRef.current = null
     clearReviewSelection()
   }, [clearReviewSelection])
+
+  const hoverReviewBreadcrumb = React.useCallback((element) => {
+    breadcrumbHoverElementRef.current?.classList.remove('is-review-hovered')
+    breadcrumbHoverElementRef.current = element || null
+    breadcrumbHoverElementRef.current?.classList.add('is-review-hovered')
+  }, [])
 
   const toggleReview = () => {
     if (reviewEnabled) {
@@ -211,6 +223,7 @@ export function Board({ project }) {
       return
     }
     setInteractive(true)
+    setReviewPanelVisible(false)
     setReviewEnabled(true)
   }
 
@@ -229,11 +242,15 @@ export function Board({ project }) {
     for (const element of selectedReviewElementsRef.current) {
       element.classList.remove('is-review-selected')
     }
+    breadcrumbHoverElementRef.current?.classList.remove('is-review-hovered')
   }, [])
 
   React.useEffect(() => {
-    if (reviewEnabled) clearReviewSelection()
-  }, [clearReviewSelection, mode, reviewEnabled, viewportKey])
+    if (!reviewEnabled) return
+    clearReviewSelection()
+    hoverReviewBreadcrumb(null)
+    setReviewPanelVisible(false)
+  }, [clearReviewSelection, hoverReviewBreadcrumb, mode, reviewEnabled, viewportKey])
 
   const exitImmersive = React.useCallback(() => {
     setImmersive(false)
@@ -596,7 +613,7 @@ export function Board({ project }) {
       {reviewEnabled ? (
         <ReviewMarkers boardRef={boardRef} items={reviewItems} />
       ) : null}
-      {reviewEnabled ? (
+      {reviewEnabled && reviewPanelVisible ? (
         <ReviewPanel
           project={project}
           selections={reviewSelections}
@@ -606,6 +623,7 @@ export function Board({ project }) {
           onSelectElement={(element) => selectReviewElement(element, null, null, {
             replaceElement: reviewSelections[reviewSelections.length - 1]?.element,
           })}
+          onHoverElement={hoverReviewBreadcrumb}
           onRemoveSelection={removeReviewSelection}
           onClearSelection={clearReviewSelection}
           onAddItem={addReviewItem}

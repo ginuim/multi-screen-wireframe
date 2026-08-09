@@ -24,6 +24,7 @@ export function ReviewPanel({
   items,
   onToggleMultiSelect,
   onSelectElement,
+  onHoverElement,
   onRemoveSelection,
   onClearSelection,
   onAddItem,
@@ -135,6 +136,8 @@ export function ReviewPanel({
                     type="button"
                     key={ancestor.selector}
                     title={ancestor.selector}
+                    onMouseEnter={() => onHoverElement?.(ancestor.element)}
+                    onMouseLeave={() => onHoverElement?.(null)}
                     onClick={() => onSelectElement(ancestor.element)}
                   >
                     {ancestor.label}
