@@ -5,6 +5,9 @@ import { resolveExpandTargets } from './expand.js'
 import { exportSelected } from './export.js'
 import { canUseDemo } from './validation.js'
 import { clampScale } from './navigation.js'
+import { ReviewPanel } from './ReviewPanel.jsx'
+import { ReviewMarkers } from './ReviewMarkers.jsx'
+import { describeReviewElement } from './review.js'
 
 const VIEWPORT_LABELS = {
   mobile: '手机',
@@ -19,6 +22,23 @@ function ZoomControls({ scale, setScale, onReset }) {
       <button type="button" title="放大" onClick={() => setScale((value) => clampScale(value + 0.1))}>+</button>
       <button type="button" title="重置缩放" onClick={onReset}>复位</button>
     </div>
+  )
+}
+
+/** Lucide 风格工具栏图标。仅用于框架 chrome。 */
+function ToolbarIcon({ name }) {
+  const paths = {
+    review: <><rect x="8" y="2" width="8" height="4" rx="1" /><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><path d="m9 14 2 2 4-4" /></>,
+    fullscreen: <><path d="M8 3H5a2 2 0 0 0-2 2v3" /><path d="M21 8V5a2 2 0 0 0-2-2h-3" /><path d="M3 16v3a2 2 0 0 0 2 2h3" /><path d="M16 21h3a2 2 0 0 0 2-2v-3" /></>,
+    expand: <><path d="m17 11-5-5-5 5" /><path d="m17 18-5-5-5 5" /></>,
+    collapse: <><path d="m7 13 5 5 5-5" /><path d="m7 6 5 5 5-5" /></>,
+    download: <><path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M5 21h14" /></>,
+  }
+
+  return (
+    <svg className="wf-toolbar-icon" viewBox="0 0 24 24" aria-hidden="true">
+      {paths[name]}
+    </svg>
   )
 }
 
@@ -116,13 +136,104 @@ export function Board({ project }) {
   const [expandedIds, setExpandedIds] = React.useState(() => new Set())
   const [immersive, setImmersive] = React.useState(false)
   const [browserFullscreen, setBrowserFullscreen] = React.useState(false)
+  const [reviewEnabled, setReviewEnabled] = React.useState(false)
+  const [reviewSelections, setReviewSelections] = React.useState([])
+  const [reviewMultiSelect, setReviewMultiSelect] = React.useState(false)
+  const [reviewItems, setReviewItems] = React.useState([])
   const boardRef = React.useRef(null)
+  const selectedReviewElementsRef = React.useRef(new Set())
 
-  const canvasLocked = !interactive || spaceHeld
+  const canvasLocked = reviewEnabled ? spaceHeld : !interactive || spaceHeld
   const allScreenIds = project.screens.map((screen) => screen.id)
   const isDemo = mode === 'demo' && demoAvailable
   const activeScale = isDemo ? demoScale : canvasScale
   const setActiveScale = isDemo ? setDemoScale : setCanvasScale
+
+  const clearReviewSelection = React.useCallback(() => {
+    for (const element of selectedReviewElementsRef.current) {
+      element.classList.remove('is-review-selected')
+    }
+    selectedReviewElementsRef.current.clear()
+    setReviewSelections([])
+  }, [])
+
+  const selectReviewElement = React.useCallback((element, screen, contentRoot, options = {}) => {
+    const primary = reviewSelections[reviewSelections.length - 1]
+    const activeScreen = screen || project.screens.find((item) => item.id === primary?.screenId)
+    const activeRoot = contentRoot || primary?.contentRoot
+    if (!element || !activeScreen || !activeRoot) return
+    const nextSelection = describeReviewElement(element, activeRoot, activeScreen)
+    const additive = reviewMultiSelect || options.additive
+
+    setReviewSelections((current) => {
+      if (options.replaceElement) {
+        options.replaceElement.classList.remove('is-review-selected')
+        selectedReviewElementsRef.current.delete(options.replaceElement)
+        if (current.some((item) => item.element === element && item.element !== options.replaceElement)) {
+          return current.filter((item) => item.element !== options.replaceElement)
+        }
+        element.classList.add('is-review-selected')
+        selectedReviewElementsRef.current.add(element)
+        return current.map((item) => item.element === options.replaceElement ? nextSelection : item)
+      }
+      const alreadySelected = current.some((item) => item.element === element)
+      if (!additive) {
+        for (const selectedElement of selectedReviewElementsRef.current) {
+          selectedElement.classList.remove('is-review-selected')
+        }
+        selectedReviewElementsRef.current.clear()
+      } else if (alreadySelected) {
+        element.classList.remove('is-review-selected')
+        selectedReviewElementsRef.current.delete(element)
+        return current.filter((item) => item.element !== element)
+      }
+
+      element.classList.add('is-review-selected')
+      selectedReviewElementsRef.current.add(element)
+      return additive ? [...current, nextSelection] : [nextSelection]
+    })
+  }, [project.screens, reviewMultiSelect, reviewSelections])
+
+  const removeReviewSelection = React.useCallback((element) => {
+    element?.classList.remove('is-review-selected')
+    selectedReviewElementsRef.current.delete(element)
+    setReviewSelections((current) => current.filter((item) => item.element !== element))
+  }, [])
+
+  const closeReview = React.useCallback(() => {
+    setReviewEnabled(false)
+    clearReviewSelection()
+  }, [clearReviewSelection])
+
+  const toggleReview = () => {
+    if (reviewEnabled) {
+      closeReview()
+      return
+    }
+    setInteractive(true)
+    setReviewEnabled(true)
+  }
+
+  const addReviewItem = (item) => {
+    setReviewItems((current) => [
+      ...current,
+      { ...item, id: `review-${Date.now()}-${current.length + 1}` },
+    ])
+  }
+
+  const removeReviewItem = (id) => {
+    setReviewItems((current) => current.filter((item) => item.id !== id))
+  }
+
+  React.useEffect(() => () => {
+    for (const element of selectedReviewElementsRef.current) {
+      element.classList.remove('is-review-selected')
+    }
+  }, [])
+
+  React.useEffect(() => {
+    if (reviewEnabled) clearReviewSelection()
+  }, [clearReviewSelection, mode, reviewEnabled, viewportKey])
 
   const exitImmersive = React.useCallback(() => {
     setImmersive(false)
@@ -243,7 +354,7 @@ export function Board({ project }) {
   return (
     <div
       ref={boardRef}
-      className={immersive ? 'wf-board is-immersive' : 'wf-board'}
+      className={`wf-board${immersive ? ' is-immersive' : ''}${reviewEnabled ? ' is-reviewing' : ''}`}
     >
       <header className="wf-board-toolbar">
         <div className="wf-toolbar-left">
@@ -348,35 +459,60 @@ export function Board({ project }) {
         <div className="wf-toolbar-right">
           <button
             type="button"
-            className="wf-board-button"
-            title="进入沉浸：隐藏顶栏与侧栏"
-            onClick={() => setImmersive(true)}
+            className={reviewEnabled ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
+            aria-pressed={reviewEnabled}
+            aria-label={reviewEnabled ? `审阅中（${reviewItems.length} 条意见）` : `审阅（${reviewItems.length} 条意见）`}
+            title="审阅：点选页面节点并整理成可编辑的 AI 修改 Prompt"
+            onClick={toggleReview}
           >
-            全屏
+            <ToolbarIcon name="review" />
+            <span className="wf-toolbar-icon-count">{reviewItems.length}</span>
+            <span className="wf-visually-hidden">审阅</span>
           </button>
           <button
             type="button"
-            className="wf-board-button"
+            className="wf-toolbar-icon-button"
+            aria-label="进入沉浸模式"
+            title="进入沉浸：隐藏顶栏与侧栏"
+            onClick={() => {
+              closeReview()
+              setImmersive(true)
+            }}
+          >
+            <ToolbarIcon name="fullscreen" />
+            <span className="wf-visually-hidden">全屏</span>
+          </button>
+          <button
+            type="button"
+            className="wf-toolbar-icon-button"
+            aria-label={selectedIds.size > 0 ? '展开已勾选的屏' : '展开全部屏'}
             title={selectedIds.size > 0 ? '展开已勾选的屏；无勾选时展开全部' : '展开全部屏'}
             onClick={() => expandTargets(true)}
           >
-            全部展开
+            <ToolbarIcon name="expand" />
+            <span className="wf-visually-hidden">全部展开</span>
           </button>
           <button
             type="button"
-            className="wf-board-button"
+            className="wf-toolbar-icon-button"
+            aria-label={selectedIds.size > 0 ? '收起已勾选的屏' : '收起全部屏'}
             title={selectedIds.size > 0 ? '收起已勾选的屏；无勾选时收起全部' : '收起全部屏'}
             onClick={() => expandTargets(false)}
           >
-            全部收起
+            <ToolbarIcon name="collapse" />
+            <span className="wf-visually-hidden">全部收起</span>
           </button>
           <button
             type="button"
-            className="wf-board-primary"
+            className="wf-toolbar-icon-button wf-toolbar-icon-button--primary"
             disabled={exporting || selectedIds.size === 0 || mode === 'demo'}
+            aria-label={exporting ? '正在导出' : `打包下载（${selectedIds.size} 个屏幕）`}
+            title={exporting ? '导出中…' : `打包下载 ${selectedIds.size} 个屏幕`}
             onClick={() => exportIds([...selectedIds])}
           >
-            {exporting ? '导出中…' : `打包下载 (${selectedIds.size})`}
+            <ToolbarIcon name="download" />
+            <span className="wf-toolbar-icon-count">{exporting ? '…' : selectedIds.size}</span>
+            <span className="wf-visually-hidden">打包下载</span>
           </button>
         </div>
       </header>
@@ -440,6 +576,8 @@ export function Board({ project }) {
           expandedIds={expandedIds}
           onToggleExpand={toggleExpand}
           onExportIds={exportIds}
+          reviewEnabled={reviewEnabled}
+          onReviewSelect={selectReviewElement}
         />
       ) : (
         <DemoMode
@@ -451,8 +589,30 @@ export function Board({ project }) {
           viewResetKey={demoViewResetKey}
           expandedIds={expandedIds}
           onToggleExpand={toggleExpand}
+          reviewEnabled={reviewEnabled}
+          onReviewSelect={selectReviewElement}
         />
       )}
+      {reviewEnabled ? (
+        <ReviewMarkers boardRef={boardRef} items={reviewItems} />
+      ) : null}
+      {reviewEnabled ? (
+        <ReviewPanel
+          project={project}
+          selections={reviewSelections}
+          multiSelect={reviewMultiSelect}
+          items={reviewItems}
+          onToggleMultiSelect={() => setReviewMultiSelect((value) => !value)}
+          onSelectElement={(element) => selectReviewElement(element, null, null, {
+            replaceElement: reviewSelections[reviewSelections.length - 1]?.element,
+          })}
+          onRemoveSelection={removeReviewSelection}
+          onClearSelection={clearReviewSelection}
+          onAddItem={addReviewItem}
+          onRemoveItem={removeReviewItem}
+          onClose={closeReview}
+        />
+      ) : null}
     </div>
   )
 }

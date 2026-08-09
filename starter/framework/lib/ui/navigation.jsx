@@ -1,12 +1,12 @@
 import { usePrototype } from '../core/PrototypeContext.jsx'
 import { createFlowProps } from './flow.js'
 
-export function PageHeader({ title, subtitle, actions, className = '', ...rest }) {
+export function PageHeader({ title, titleId, subtitle, subtitleId, actions, className = '', ...rest }) {
   return (
     <header className={`wf-page-header ${className}`.trim()} {...rest}>
-      <div>
-        <h1>{title}</h1>
-        {subtitle ? <p>{subtitle}</p> : null}
+      <div className="wf-page-header-copy">
+        <h1 id={titleId} className="wf-page-title">{title}</h1>
+        {subtitle ? <p id={subtitleId} className="wf-page-subtitle">{subtitle}</p> : null}
       </div>
       {actions ? <div className="wf-page-actions">{actions}</div> : null}
     </header>
@@ -26,7 +26,7 @@ function NavigationList({ as, items, activeId, className, ...rest }) {
         {...createFlowProps(item.to, item.onClick, navigate)}
       >
         <span className="wf-nav-mark" aria-hidden="true" />
-        <span>{item.label}</span>
+        <span className="wf-nav-label">{item.label}</span>
       </button>
     )),
   )
@@ -71,10 +71,10 @@ export function Breadcrumbs({ items = [], className = '', ...rest }) {
         <React.Fragment key={`${item.label}-${index}`}>
           {index > 0 ? <span className="wf-breadcrumb-divider" aria-hidden="true" /> : null}
           {item.to ? (
-            <button type="button" {...createFlowProps(item.to, item.onClick, navigate)}>
+            <button className="wf-breadcrumb-link" type="button" {...createFlowProps(item.to, item.onClick, navigate)}>
               {item.label}
             </button>
-          ) : <span>{item.label}</span>}
+          ) : <span className="wf-breadcrumb-current">{item.label}</span>}
         </React.Fragment>
       ))}
     </nav>

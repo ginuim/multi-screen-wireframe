@@ -29,8 +29,8 @@ export function Select({ className = '', children, ...rest }) {
 function Choice({ type, label, className = '', ...rest }) {
   return (
     <label className={`wf-choice ${className}`.trim()}>
-      <input type={type} {...rest} />
-      <span>{label}</span>
+      <input className="wf-choice-input" type={type} {...rest} />
+      <span className="wf-choice-label">{label}</span>
     </label>
   )
 }
@@ -54,7 +54,7 @@ export function Toggle({ checked = false, onChange, label, className = '', ...re
       {...rest}
     >
       <span className="wf-toggle-track"><span className="wf-toggle-thumb" /></span>
-      {label ? <span>{label}</span> : null}
+      {label ? <span className="wf-toggle-label">{label}</span> : null}
     </button>
   )
 }
@@ -62,7 +62,7 @@ export function Toggle({ checked = false, onChange, label, className = '', ...re
 export function FormField({ label, htmlFor, hint, error, className = '', children, ...rest }) {
   return (
     <div className={`wf-form-field ${className}`.trim()} {...rest}>
-      <label htmlFor={htmlFor}>{label}</label>
+      <label className="wf-field-label" htmlFor={htmlFor}>{label}</label>
       {children}
       {hint && !error ? <span className="wf-field-hint">{hint}</span> : null}
       {error ? <span className="wf-field-error" role="alert">{error}</span> : null}

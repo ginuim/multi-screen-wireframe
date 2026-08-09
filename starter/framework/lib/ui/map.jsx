@@ -21,7 +21,7 @@ export function MapMarker({ x, y, label, to, onClick, className = '', style, ...
       {...rest}
       {...flow}
     >
-      <span aria-hidden="true" />
+      <span className="wf-map-marker-shape" aria-hidden="true" />
     </button>
   )
 }

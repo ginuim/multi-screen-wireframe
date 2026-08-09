@@ -44,6 +44,8 @@ export function CanvasMode({
   expandedIds = new Set(),
   onToggleExpand,
   onExportIds,
+  reviewEnabled = false,
+  onReviewSelect,
 }) {
   const { currentScreenId, navigate, viewport, viewportKey, enterDemo: enterDemoMode } = usePrototype()
   const [view, setView] = React.useState(() => ({ ...resetCanvasViewport(), scale }))
@@ -274,6 +276,8 @@ export function CanvasMode({
                   onExport={() => onExportIds([screen.id])}
                   canvasLocked={canvasLocked}
                   scale={view.scale}
+                  reviewEnabled={reviewEnabled}
+                  onReviewSelect={onReviewSelect}
                 />
               </div>
             )

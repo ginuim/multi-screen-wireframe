@@ -1,6 +1,12 @@
+/**
+ * @wireframe-skill multi-screen-wireframe@1.5.1
+ * 创建基于 v1.3.0
+ * 修改基于 v1.5.1
+ */
 import {
   Badge,
   Card,
+  Column,
   DataTable,
   Heading,
   PageHeader,
@@ -58,8 +64,8 @@ const rows = [
 
 const columns = [
   { key: 'id', label: '订单号' },
-  { key: 'customer', label: '客户名称' },
   { key: 'channel', label: '下单渠道' },
+  { key: 'customer', label: '客户名称' },
   { key: 'sku', label: '主 SKU' },
   { key: 'warehouse', label: '发货仓' },
   { key: 'amount', label: '订单金额' },
@@ -69,18 +75,20 @@ const columns = [
   { key: 'createdAt', label: '创建时间' },
   { key: 'updatedAt', label: '更新时间' },
   { key: 'remark', label: '备注' },
-  { key: 'status', label: '状态', render: (value) => <Badge>{value}</Badge> },
+  { key: 'status', label: '状态', render: (value) => <Badge className="order-list__status">{value}</Badge> },
 ]
 
 export function OrderListScreen() {
   return (
     <AdminLayout>
-      <PageHeader title="订单列表" subtitle="共 3 条演示数据 · 宽表横向滚动" />
-      <Card to="order-detail">
-        <Heading level={3}>待处理订单</Heading>
-        <Text>打开 SO-1001 详情</Text>
-      </Card>
-      <DataTable className="demo-wide-table" columns={columns} rows={rows} />
+      <Column id="order-list-page" className="order-list__page" gap={16}>
+        <PageHeader id="order-list-header" titleId="order-list-title" className="order-list__header" title="订单列表" subtitle="共 3 条演示数据 · 宽表横向滚动" />
+        <Card id="order-list-featured-order" className="order-list__featured-order" to="order-detail">
+          <Heading className="order-list__featured-title" level={3}>待处理订单</Heading>
+          <Text className="order-list__featured-description">打开 SO-1001 详情</Text>
+        </Card>
+        <DataTable id="order-list-table" className="demo-wide-table order-list__table" columns={columns} rows={rows} />
+      </Column>
     </AdminLayout>
   )
 }

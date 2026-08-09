@@ -2,7 +2,7 @@
 
 本目录是独立的多屏线框 skill。生成流程见 `SKILL.md`，组件与数据协议见 `reference.md`，人类使用说明见 `README.md`。
 
-**当前版本**：见根目录 `VERSION`（现 `1.3.0`）。`SKILL.md` frontmatter 的 `version` 与 `package.json` 必须与之一致。
+**当前版本**：见根目录 `VERSION`（现 `1.5.1`）。`SKILL.md` frontmatter 的 `version` 与 `package.json` 必须与之一致。
 
 ## 维护边界
 
@@ -25,6 +25,7 @@
 - 有参考图时先测量 viewport、区域、尺寸、间距、对齐和圆角，再实现。
 - 生成默认求完整：主路径多屏 + 屏内可演示内容；列表类至少 3 条并尽量超过一屏可滚（用户另有要求除外）。细节见 `SKILL.md`「内容完整度」。
 - 生成/修改 `src/screens`、`src/layouts` 时必须在文件顶注释写明基于的 skill 版本（见 `SKILL.md`「版本注释」）。
+- 生成的业务 JSX 节点必须有语义 class；关键节点有全局唯一 id；重复数据节点有稳定 `data-wf-key`，以支持 Board 审阅模式生成可定位的 AI 修改 Prompt。
 
 ## 维护
 

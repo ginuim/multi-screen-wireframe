@@ -18,12 +18,12 @@ export function Modal({ open, title, children, actions, onClose, className = '',
     <ScreenPortal>
       <div className={`wf-overlay wf-modal-overlay ${className}`.trim()} role="presentation" {...rest}>
         <section className="wf-modal" role="dialog" aria-modal="true" aria-label={title}>
-          <header>
-            <strong>{title}</strong>
+          <header className="wf-modal-header">
+            <strong className="wf-modal-title">{title}</strong>
             {onClose ? <Button onClick={onClose}>关闭</Button> : null}
           </header>
           <div className="wf-modal-body">{children}</div>
-          {actions ? <footer>{actions}</footer> : null}
+          {actions ? <footer className="wf-modal-footer">{actions}</footer> : null}
         </section>
       </div>
     </ScreenPortal>
@@ -38,12 +38,16 @@ export function ConfirmDialog({
   cancelLabel = '取消',
   onConfirm,
   onCancel,
+  className = '',
+  ...rest
 }) {
   return (
     <Modal
       open={open}
       title={title}
+      className={className}
       onClose={onCancel}
+      {...rest}
       actions={(
         <>
           <Button onClick={onCancel}>{cancelLabel}</Button>
@@ -51,7 +55,7 @@ export function ConfirmDialog({
         </>
       )}
     >
-      <p>{message}</p>
+      <p className="wf-confirm-message">{message}</p>
     </Modal>
   )
 }
@@ -71,7 +75,7 @@ export function LoadingOverlay({ open, label = '加载中', className = '', ...r
     <ScreenPortal>
       <div className={`wf-overlay wf-loading ${className}`.trim()} role="status" {...rest}>
         <span className="wf-loading-shape" aria-hidden="true" />
-        <span>{label}</span>
+        <span className="wf-loading-label">{label}</span>
       </div>
     </ScreenPortal>
   )

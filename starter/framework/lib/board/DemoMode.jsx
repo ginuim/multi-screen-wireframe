@@ -29,6 +29,8 @@ export function DemoMode({
   viewResetKey,
   expandedIds = new Set(),
   onToggleExpand,
+  reviewEnabled = false,
+  onReviewSelect,
 }) {
   const { currentScreenId, viewport, viewportKey, setMode } = usePrototype()
   const screenIndex = project.screens.findIndex((item) => item.id === currentScreenId)
@@ -137,6 +139,8 @@ export function DemoMode({
             onToggleExpand={screen && onToggleExpand ? () => onToggleExpand(screen.id) : undefined}
             canvasLocked={canvasLocked}
             scale={view.scale}
+            reviewEnabled={reviewEnabled}
+            onReviewSelect={onReviewSelect}
           />
         </div>
       </div>

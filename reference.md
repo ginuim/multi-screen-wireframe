@@ -61,6 +61,18 @@ export const project = {
 
 `currentScreenId` 是画板聚焦 / 演示当前页，不是“我正在渲染的这屏”。布局里 `TabBar` / `SideNav` 的选中态必须用 `useScreenId()`（由 `ScreenFrame` 注入），否则画布上所有屏会一起高亮同一个 tab。
 
+## 审阅与 DOM 定位
+
+Board 的「审阅」模式会拦截屏内交互。用户可以点选节点、沿面包屑切换到父节点，添加「修改建议 / 修改文字 / 调整顺序 / 删除节点」，再把修改清单生成可手动编辑和复制的 AI Prompt。开启多选或按住 Shift / Command / Ctrl 点击，可把多个节点绑定到同一条意见；所有目标旁显示同一个半透明黄色序号，点击序号浮动显示意见。按住空格时临时切换为画布拖动，松开后恢复审阅；输入框和 Prompt textarea 内的空格不触发画布。批注编号和浮层只高于画布业务内容，低于侧栏、顶栏、画布索引、沉浸控件和审阅面板等框架 chrome。审阅意见只存在于当前页面会话，不修改 JSX，也不生成 sidecar 文件。
+
+选择器优先级：关键节点 id → screen 作用域内的业务 class → `data-wf-key` → 带框架 class 的 DOM 路径兜底。生成业务源码时必须主动提供前三级稳定锚点：
+
+- 所有业务 JSX 节点都有英文语义 `className`，推荐 `<screen-or-module>__<role>`。
+- screen 业务根、header / 标题、主内容区、关键卡片 / 表单 / 表格、主操作和弹层有以 screen id 开头的全局唯一 id。
+- 重复数据节点有稳定 `data-wf-key`；`DataTable` 自动把 row key 和 column key 输出到对应 DOM。
+- 共享 layout 只用 class，不写会在画布多屏渲染时重复的 id。
+- 不用文字内容、`is-*` 状态 class、DOM 层级或 `nth-child` 作为业务定位协议。
+
 ## 布局
 
 - `Box`：普通 `div`，透传 DOM props。
@@ -82,6 +94,8 @@ export const project = {
 
 - 内容：`Heading`、`Text`、`Card`、`Badge`、`Avatar`、`ImagePlaceholder`
 - 表单：`Button`、`TextInput`、`TextArea`、`Select`、`Checkbox`、`Radio`、`Toggle`、`FormField`
+
+`PageHeader` 的页面标题需要精确审阅定位时传 `titleId`，副标题可传 `subtitleId`；header 自身仍用普通 `id`。例如 `<PageHeader id="order-detail-header" titleId="order-detail-title" ... />`。
 
 `Avatar` 只表达圆形几何占位。`ImagePlaceholder` 只表达矩形尺寸、比例和圆角。
 

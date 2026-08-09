@@ -2,6 +2,7 @@ import { usePrototype } from '../core/PrototypeContext.jsx'
 import { ErrorBoundary } from '../core/ErrorBoundary.jsx'
 import { ScreenIdentityProvider } from '../core/ScreenIdentity.jsx'
 import { handleDelegatedFlowClick } from '../ui/flow-target.js'
+import { findReviewTarget } from './review.js'
 import {
   collapseScreenContent,
   expandScreenContent,
@@ -24,11 +25,14 @@ export function ScreenFrame({
   onToggleExpand,
   canvasLocked = false,
   scale = 1,
+  reviewEnabled = false,
+  onReviewSelect,
 }) {
   const { navigate } = usePrototype()
   const contentRef = React.useRef(null)
   const dragRef = React.useRef(null)
   const expandSnapshotRef = React.useRef(null)
+  const hoverReviewElementRef = React.useRef(null)
   const [dragScrolling, setDragScrolling] = React.useState(false)
   const [expandedBox, setExpandedBox] = React.useState(null)
 
@@ -57,6 +61,17 @@ export function ScreenFrame({
     }
   }, [expanded, screen?.id, viewport.width, viewport.height])
 
+  React.useEffect(() => {
+    if (!reviewEnabled) {
+      hoverReviewElementRef.current?.classList.remove('is-review-hovered')
+      hoverReviewElementRef.current = null
+    }
+    return () => {
+      hoverReviewElementRef.current?.classList.remove('is-review-hovered')
+      hoverReviewElementRef.current = null
+    }
+  }, [reviewEnabled, screen?.id])
+
   if (!screen) return null
 
   const Component = screen.component
@@ -68,6 +83,7 @@ export function ScreenFrame({
   ].filter(Boolean).join(' ')
 
   const onPointerDown = (event) => {
+    if (reviewEnabled) return
     // 画布锁定时不接管屏内拖拽滚动，让事件落到画布平移
     if (canvasLocked) {
       event.preventDefault()
@@ -83,6 +99,14 @@ export function ScreenFrame({
   }
 
   const onPointerMove = (event) => {
+    if (reviewEnabled) {
+      const target = findReviewTarget(event.target, contentRef.current)
+      if (target === hoverReviewElementRef.current) return
+      hoverReviewElementRef.current?.classList.remove('is-review-hovered')
+      target?.classList.add('is-review-hovered')
+      hoverReviewElementRef.current = target
+      return
+    }
     const state = dragRef.current
     if (!state) return
     moveContentDragScroll(state, event)
@@ -97,7 +121,24 @@ export function ScreenFrame({
   }
 
   const onContentClick = (event) => {
+    if (reviewEnabled) return
     handleDelegatedFlowClick(event, contentRef.current, navigate)
+  }
+
+  const onReviewClick = (event) => {
+    if (!reviewEnabled) return
+    const target = findReviewTarget(event.target, contentRef.current)
+    if (!target) return
+    event.preventDefault()
+    event.stopPropagation()
+    onReviewSelect?.(target, screen, contentRef.current, {
+      additive: event.shiftKey || event.metaKey || event.ctrlKey,
+    })
+  }
+
+  const clearReviewHover = () => {
+    hoverReviewElementRef.current?.classList.remove('is-review-hovered')
+    hoverReviewElementRef.current = null
   }
 
   const contentStyle = expanded && expandedBox
@@ -116,7 +157,7 @@ export function ScreenFrame({
       <div className="wf-screen-chrome-label">
         <span className="wf-screen-chrome-title">
           <span className="wf-screen-index-num">{index + 1}</span>
-          <span>{screen.title}</span>
+          <span className="wf-screen-chrome-screen-title">{screen.title}</span>
           <span className="wf-screen-file">{screen.id}.jsx</span>
         </span>
         <span className="wf-screen-chrome-actions">
@@ -148,12 +189,14 @@ export function ScreenFrame({
       </div>
       <div
         ref={contentRef}
-        className={`wf-screen-content${dragScrolling ? ' is-drag-scrolling' : ''}${expanded ? ' is-expanded' : ''}`}
+        className={`wf-screen-content${dragScrolling ? ' is-drag-scrolling' : ''}${expanded ? ' is-expanded' : ''}${reviewEnabled ? ' is-reviewing' : ''}`}
         style={contentStyle}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerEnd}
         onPointerCancel={onPointerEnd}
+        onPointerLeave={clearReviewHover}
+        onClickCapture={onReviewClick}
         onClick={onContentClick}
       >
         <ErrorBoundary

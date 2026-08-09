@@ -11,8 +11,8 @@ export function Cell({ to, onClick, title, subtitle, value, className = '', chil
       {...flow}
     >
       <div className="wf-cell-main">
-        <strong>{title}</strong>
-        {subtitle ? <span>{subtitle}</span> : null}
+        <strong className="wf-cell-title">{title}</strong>
+        {subtitle ? <span className="wf-cell-subtitle">{subtitle}</span> : null}
         {children}
       </div>
       {value !== undefined ? <span className="wf-cell-value">{value}</span> : null}
@@ -24,19 +24,26 @@ export function DataTable({ columns = [], rows = [], getRowKey, className = '', 
   return (
     <div className={`wf-table-wrap ${className}`.trim()} {...rest}>
       <table className="wf-table">
-        <thead>
-          <tr>{columns.map((column) => <th key={column.key}>{column.label}</th>)}</tr>
+        <thead className="wf-table-head">
+          <tr className="wf-table-header-row">
+            {columns.map((column) => (
+              <th className="wf-table-heading" data-wf-key={column.key} key={column.key}>{column.label}</th>
+            ))}
+          </tr>
         </thead>
-        <tbody>
-          {rows.map((row, index) => (
-            <tr key={getRowKey ? getRowKey(row) : row.id || index}>
-              {columns.map((column) => (
-                <td key={column.key}>
-                  {column.render ? column.render(row[column.key], row) : row[column.key]}
-                </td>
-              ))}
-            </tr>
-          ))}
+        <tbody className="wf-table-body">
+          {rows.map((row, index) => {
+            const rowKey = getRowKey ? getRowKey(row) : row.id || index
+            return (
+              <tr className="wf-table-row" data-wf-key={rowKey} key={rowKey}>
+                {columns.map((column) => (
+                  <td className="wf-table-cell" data-wf-key={column.key} key={column.key}>
+                    {column.render ? column.render(row[column.key], row) : row[column.key]}
+                  </td>
+                ))}
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>
@@ -48,6 +55,7 @@ export function Tabs({ items = [], activeId, onChange, className = '', ...rest }
     <div className={`wf-tabs ${className}`.trim()} role="tablist" {...rest}>
       {items.map((item) => (
         <button
+          className="wf-tab-control"
           type="button"
           role="tab"
           aria-selected={item.id === activeId}
