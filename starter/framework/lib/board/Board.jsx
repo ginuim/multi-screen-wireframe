@@ -483,7 +483,9 @@ export function Board({ project }) {
             onClick={toggleReview}
           >
             <ToolbarIcon name="edit" />
-            <span className="wf-toolbar-icon-count">{reviewItems.length}</span>
+            {reviewItems.length > 0 ? (
+              <span className="wf-toolbar-icon-count">{reviewItems.length}</span>
+            ) : null}
             <span className="wf-visually-hidden">修改</span>
           </button>
           <button

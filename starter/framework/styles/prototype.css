@@ -1130,8 +1130,8 @@ button:disabled {
 }
 
 .wf-board.is-reviewing .wf-screen-chrome.is-focused {
-  border-color: #1d4ed8;
-  box-shadow: 0 0 0 2px #1d4ed8, var(--board-shadow);
+  border-color: #1e3a8a;
+  box-shadow: 0 0 0 2px #1e3a8a, var(--board-shadow);
 }
 
 .wf-screen-chrome-label {
