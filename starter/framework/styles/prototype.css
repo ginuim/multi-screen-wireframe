@@ -706,7 +706,7 @@ button:disabled {
 }
 
 .wf-review-breadcrumbs button:hover {
-  border-color: #2563eb;
+  border-color: #1d4ed8;
   background: #eff6ff;
   color: #1d4ed8;
 }
@@ -852,12 +852,12 @@ button:disabled {
 }
 
 .wf-screen-content.is-reviewing .is-review-hovered {
-  outline: 2px dashed #2563eb !important;
+  outline: 2px dashed #1d4ed8 !important;
   outline-offset: -2px;
 }
 
 .wf-screen-content.is-reviewing .is-review-selected {
-  outline: 3px solid #2563eb !important;
+  outline: 3px dashed #1d4ed8 !important;
   outline-offset: -3px;
 }
 
@@ -1123,9 +1123,15 @@ button:disabled {
   box-shadow: 0 0 0 2px var(--board-text), var(--board-shadow);
 }
 
+/* 修改态：所有画板蓝色高亮；当前焦点使用更深的蓝色，厚度保持一致。 */
 .wf-board.is-reviewing .wf-screen-chrome {
   border-color: #2563eb;
   box-shadow: 0 0 0 2px #2563eb, var(--board-shadow);
+}
+
+.wf-board.is-reviewing .wf-screen-chrome.is-focused {
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 2px #1d4ed8, var(--board-shadow);
 }
 
 .wf-screen-chrome-label {

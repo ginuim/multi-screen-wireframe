@@ -1,6 +1,6 @@
 /* GENERATED FILE. EDIT src/, THEN RUN BUILD. */
 (() => {
-  // framework/lib/core/PrototypeContext.jsx
+  // starter/framework/lib/core/PrototypeContext.jsx
   var PrototypeContext = React.createContext(null);
   function getInitialScreenId(project2) {
     var _a;
@@ -108,7 +108,7 @@
     return context;
   }
 
-  // framework/lib/board/navigation.js
+  // starter/framework/lib/board/navigation.js
   function clampScale(scale) {
     return Math.min(2, Math.max(0.2, scale));
   }
@@ -223,7 +223,7 @@
     return !!(event.ctrlKey || event.metaKey);
   }
 
-  // framework/lib/core/ErrorBoundary.jsx
+  // starter/framework/lib/core/ErrorBoundary.jsx
   var ErrorBoundary = class extends React.Component {
     constructor(props) {
       super(props);
@@ -247,7 +247,7 @@
     }
   };
 
-  // framework/lib/core/ScreenIdentity.jsx
+  // starter/framework/lib/core/ScreenIdentity.jsx
   var ScreenIdentityContext = React.createContext(null);
   function ScreenIdentityProvider({ screenId, children }) {
     if (!screenId) throw new Error("ScreenIdentityProvider requires screenId");
@@ -261,7 +261,7 @@
     return screenId;
   }
 
-  // framework/lib/ui/flow-target.js
+  // starter/framework/lib/ui/flow-target.js
   function findFlowTargetId(startEl, rootEl) {
     if (!startEl || typeof startEl.closest !== "function") return null;
     const el = startEl.closest("[data-flow-to]");
@@ -280,7 +280,7 @@
     return true;
   }
 
-  // framework/lib/board/review.js
+  // starter/framework/lib/board/review.js
   var TYPE_LABELS = {
     comment: "\u4FEE\u6539\u5EFA\u8BAE",
     text: "\u4FEE\u6539\u6587\u5B57",
@@ -466,7 +466,7 @@
   }
   var REVIEW_TYPE_LABELS = TYPE_LABELS;
 
-  // framework/lib/board/expand.js
+  // starter/framework/lib/board/expand.js
   var STYLE_KEYS = [
     "width",
     "height",
@@ -591,7 +591,7 @@
     return [...allIds];
   }
 
-  // framework/lib/board/ScreenFrame.jsx
+  // starter/framework/lib/board/ScreenFrame.jsx
   function ScreenFrame({
     screen,
     viewport,
@@ -767,7 +767,7 @@
     );
   }
 
-  // framework/lib/board/useWheelZoom.js
+  // starter/framework/lib/board/useWheelZoom.js
   function bindWheelZoom(el, getScale, setScale, getLocked = () => false) {
     if (!el) return () => {
     };
@@ -795,12 +795,12 @@
     );
   }
 
-  // framework/lib/board/validation.js
+  // starter/framework/lib/board/validation.js
   function canUseDemo(screens) {
     return Array.isArray(screens) && screens.some((screen) => screen.entry === true);
   }
 
-  // framework/lib/board/CanvasMode.jsx
+  // starter/framework/lib/board/CanvasMode.jsx
   async function runExportWithFeedback(task, setError) {
     setError(null);
     try {
@@ -1071,7 +1071,7 @@
     ), copyToast ? /* @__PURE__ */ React.createElement("div", { className: "wf-board-toast", role: "status" }, copyToast) : null);
   }
 
-  // framework/lib/board/DemoMode.jsx
+  // starter/framework/lib/board/DemoMode.jsx
   var BLANK_EXIT_HINT = "\u53CC\u51FB\u7A7A\u767D\u5904\u9000\u51FA\u6F14\u793A";
   function readContentBox(el) {
     const style = window.getComputedStyle(el);
@@ -1202,7 +1202,7 @@
     ), /* @__PURE__ */ React.createElement("p", { className: "wf-demo-hint" }, "\u70B9\u51FB\u9875\u9762\u5185\u6309\u94AE / \u94FE\u63A5\u8DF3\u8F6C\uFF1B\u53EF\u5728\u5DE5\u5177\u680F\u5F00\u5173\u70ED\u533A\u9AD8\u4EAE\uFF1B\u6807\u9898\u680F\u53EF\u4E34\u65F6\u5C55\u5F00\u770B\u5168\u8C8C"));
   }
 
-  // framework/lib/board/export.js
+  // starter/framework/lib/board/export.js
   var exportLibrariesPromise;
   var libraries = [
     { file: "html2canvas.min.js", ready: () => typeof window.html2canvas === "function" },
@@ -1324,7 +1324,7 @@
     window.saveAs(blob, `${slug(screens[0].projectName)}.zip`);
   }
 
-  // framework/lib/board/ReviewPanel.jsx
+  // starter/framework/lib/board/ReviewPanel.jsx
   function copyText2(text) {
     if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
     const area = document.createElement("textarea");
@@ -1452,7 +1452,7 @@
     ), /* @__PURE__ */ React.createElement("button", { type: "button", className: "wf-review-copy", onClick: copyPrompt }, copied ? "\u5DF2\u590D\u5236" : "\u590D\u5236 Prompt"))));
   }
 
-  // framework/lib/board/ReviewMarkers.jsx
+  // starter/framework/lib/board/ReviewMarkers.jsx
   function samePositions(left, right) {
     if (left.length !== right.length) return false;
     return left.every((item, index) => {
@@ -1573,7 +1573,7 @@
     ) : null);
   }
 
-  // framework/lib/board/Board.jsx
+  // starter/framework/lib/board/Board.jsx
   var VIEWPORT_LABELS = {
     mobile: "\u624B\u673A",
     desktop: "\u684C\u9762"
@@ -2118,7 +2118,7 @@
     );
   }
 
-  // framework/lib/core/validateProject.js
+  // starter/framework/lib/core/validateProject.js
   function fail(path, message) {
     throw new Error(`${path} ${message}`);
   }
@@ -2169,7 +2169,7 @@
     });
   }
 
-  // framework/lib/ui/flow.js
+  // starter/framework/lib/ui/flow.js
   function createFlowProps(to, onClick, navigate) {
     return {
       "data-flow-to": to || void 0,
@@ -2186,7 +2186,7 @@
     return createFlowProps(to, onClick, navigate);
   }
 
-  // framework/lib/ui/layout.jsx
+  // starter/framework/lib/ui/layout.jsx
   function joinClass(base, extra) {
     return extra ? `${base} ${extra}` : base;
   }
@@ -2261,7 +2261,7 @@
     );
   }
 
-  // framework/lib/ui/content.jsx
+  // starter/framework/lib/ui/content.jsx
   function Heading({ level = 2, className = "", children, ...rest }) {
     const tag = `h${Math.min(6, Math.max(1, level))}`;
     return React.createElement(tag, { className: `wf-heading ${className}`.trim(), ...rest }, children);
@@ -2287,7 +2287,7 @@
     return /* @__PURE__ */ React.createElement("span", { className: `wf-badge ${className}`.trim(), ...rest }, children);
   }
 
-  // framework/lib/ui/forms.jsx
+  // starter/framework/lib/ui/forms.jsx
   function Button({ to, onClick, variant = "default", className = "", children, ...rest }) {
     const flow = useFlowTarget(to, onClick);
     return /* @__PURE__ */ React.createElement(
@@ -2314,7 +2314,7 @@
     return /* @__PURE__ */ React.createElement("div", { className: `wf-form-field ${className}`.trim(), ...rest }, /* @__PURE__ */ React.createElement("label", { className: "wf-field-label", htmlFor }, label), children, hint && !error ? /* @__PURE__ */ React.createElement("span", { className: "wf-field-hint" }, hint) : null, error ? /* @__PURE__ */ React.createElement("span", { className: "wf-field-error", role: "alert" }, error) : null);
   }
 
-  // framework/lib/ui/navigation.jsx
+  // starter/framework/lib/ui/navigation.jsx
   function PageHeader({ title, titleId, subtitle, subtitleId, actions, className = "", ...rest }) {
     return /* @__PURE__ */ React.createElement("header", { className: `wf-page-header ${className}`.trim(), ...rest }, /* @__PURE__ */ React.createElement("div", { className: "wf-page-header-copy" }, /* @__PURE__ */ React.createElement("h1", { id: titleId, className: "wf-page-title" }, title), subtitle ? /* @__PURE__ */ React.createElement("p", { id: subtitleId, className: "wf-page-subtitle" }, subtitle) : null), actions ? /* @__PURE__ */ React.createElement("div", { className: "wf-page-actions" }, actions) : null);
   }
@@ -2349,7 +2349,7 @@
     );
   }
 
-  // framework/lib/ui/data.jsx
+  // starter/framework/lib/ui/data.jsx
   function DataTable({ columns: columns2 = [], rows: rows2 = [], getRowKey, className = "", ...rest }) {
     return /* @__PURE__ */ React.createElement("div", { className: `wf-table-wrap ${className}`.trim(), ...rest }, /* @__PURE__ */ React.createElement("table", { className: "wf-table" }, /* @__PURE__ */ React.createElement("thead", { className: "wf-table-head" }, /* @__PURE__ */ React.createElement("tr", { className: "wf-table-header-row" }, columns2.map((column) => /* @__PURE__ */ React.createElement("th", { className: "wf-table-heading", "data-wf-key": column.key, key: column.key }, column.label)))), /* @__PURE__ */ React.createElement("tbody", { className: "wf-table-body" }, rows2.map((row, index) => {
       const rowKey = getRowKey ? getRowKey(row) : row.id || index;
@@ -2357,7 +2357,7 @@
     }))));
   }
 
-  // framework/lib/ui/feedback.jsx
+  // starter/framework/lib/ui/feedback.jsx
   function ScreenPortal({ children }) {
     const anchor = React.useRef(null);
     const [host, setHost] = React.useState(null);
@@ -2397,12 +2397,12 @@
     );
   }
 
-  // ../demo/order-admin/src/screens/login.jsx
+  // demo/order-admin/src/screens/login.jsx
   function LoginScreen() {
     return /* @__PURE__ */ React.createElement("div", { id: "order-login-page", className: "order-login order-login__page" }, /* @__PURE__ */ React.createElement(Card, { id: "order-login-card", className: "order-login-card order-login__card" }, /* @__PURE__ */ React.createElement(Column, { className: "order-login__form", gap: 16 }, /* @__PURE__ */ React.createElement(Heading, { id: "order-login-title", className: "order-login__title", level: 1 }, "\u8BA2\u5355\u7BA1\u7406\u540E\u53F0"), /* @__PURE__ */ React.createElement(Text, { className: "order-login__description" }, "\u4F7F\u7528\u6F14\u793A\u8D26\u53F7\u8FDB\u5165\u7CFB\u7EDF\u3002"), /* @__PURE__ */ React.createElement(FormField, { className: "order-login__account-field", label: "\u8D26\u53F7", htmlFor: "order-login-account" }, /* @__PURE__ */ React.createElement(TextInput, { id: "order-login-account", className: "order-login__account-input", placeholder: "\u8BF7\u8F93\u5165\u7528\u6237\u540D" })), /* @__PURE__ */ React.createElement(FormField, { className: "order-login__password-field", label: "\u5BC6\u7801", htmlFor: "order-login-password" }, /* @__PURE__ */ React.createElement(TextInput, { id: "order-login-password", className: "order-login__password-input", type: "password", placeholder: "\u8BF7\u8F93\u5165\u5BC6\u7801" })), /* @__PURE__ */ React.createElement(Button, { id: "order-login-submit", className: "order-login__submit", variant: "primary", to: "order-list" }, "\u767B\u5F55"))));
   }
 
-  // ../demo/order-admin/src/layouts/AdminLayout.jsx
+  // demo/order-admin/src/layouts/AdminLayout.jsx
   function AdminLayout({ children }) {
     const screenId = useScreenId();
     return /* @__PURE__ */ React.createElement("div", { className: "order-shell" }, /* @__PURE__ */ React.createElement("aside", { className: "order-shell__sidebar" }, /* @__PURE__ */ React.createElement("strong", { className: "order-shell__brand" }, "\u8BA2\u5355\u7BA1\u7406"), /* @__PURE__ */ React.createElement(
@@ -2415,7 +2415,7 @@
     )), /* @__PURE__ */ React.createElement(Column, { gap: 16, className: "order-main order-shell__main" }, children));
   }
 
-  // ../demo/order-admin/src/screens/order-cancel.jsx
+  // demo/order-admin/src/screens/order-cancel.jsx
   function OrderCancelScreen() {
     const [open, setOpen] = React.useState(false);
     return /* @__PURE__ */ React.createElement(AdminLayout, null, /* @__PURE__ */ React.createElement(Column, { id: "order-cancel-page", className: "order-cancel__page", gap: 16 }, /* @__PURE__ */ React.createElement(PageHeader, { id: "order-cancel-header", titleId: "order-cancel-title", className: "order-cancel__header", title: "\u53D6\u6D88\u8BA2\u5355", subtitle: "\u8BA2\u5355 SO-1001" }), /* @__PURE__ */ React.createElement(Card, { id: "order-cancel-form-card", className: "order-cancel__form-card" }, /* @__PURE__ */ React.createElement(Column, { className: "order-cancel__form", gap: 16 }, /* @__PURE__ */ React.createElement(FormField, { className: "order-cancel__reason-field", label: "\u53D6\u6D88\u539F\u56E0", htmlFor: "order-cancel-reason" }, /* @__PURE__ */ React.createElement(Select, { id: "order-cancel-reason", className: "order-cancel__reason-select", defaultValue: "customer" }, /* @__PURE__ */ React.createElement("option", { className: "order-cancel__reason-option", value: "customer" }, "\u5BA2\u6237\u7533\u8BF7"), /* @__PURE__ */ React.createElement("option", { className: "order-cancel__reason-option", value: "inventory" }, "\u5E93\u5B58\u4E0D\u8DB3"))), /* @__PURE__ */ React.createElement(FormField, { className: "order-cancel__note-field", label: "\u5907\u6CE8", htmlFor: "order-cancel-note" }, /* @__PURE__ */ React.createElement(TextArea, { id: "order-cancel-note", className: "order-cancel__note-input", placeholder: "\u586B\u5199\u8865\u5145\u8BF4\u660E" })), /* @__PURE__ */ React.createElement(Button, { id: "order-cancel-submit", className: "order-cancel__submit", variant: "primary", onClick: () => setOpen(true) }, "\u63D0\u4EA4\u53D6\u6D88"))), /* @__PURE__ */ React.createElement(
@@ -2432,7 +2432,7 @@
     )));
   }
 
-  // ../demo/order-admin/src/screens/order-detail.jsx
+  // demo/order-admin/src/screens/order-detail.jsx
   function OrderDetailScreen() {
     return /* @__PURE__ */ React.createElement(AdminLayout, null, /* @__PURE__ */ React.createElement(Column, { id: "order-detail-page", className: "order-detail__page", gap: 16 }, /* @__PURE__ */ React.createElement(
       PageHeader,
@@ -2447,7 +2447,7 @@
     ), /* @__PURE__ */ React.createElement(Grid, { id: "order-detail-summary", className: "order-detail__summary", columns: 2, gap: 16 }, /* @__PURE__ */ React.createElement(Card, { id: "order-detail-customer-card", className: "order-detail__customer-card" }, /* @__PURE__ */ React.createElement(Column, { className: "order-detail__customer-content", gap: 8 }, /* @__PURE__ */ React.createElement("strong", { className: "order-detail__section-title" }, "\u5BA2\u6237\u4FE1\u606F"), /* @__PURE__ */ React.createElement(Text, { className: "order-detail__customer-name" }, "\u793A\u4F8B\u5BA2\u6237\u7532"), /* @__PURE__ */ React.createElement(Text, { className: "order-detail__customer-type" }, "\u4F01\u4E1A\u5BA2\u6237"))), /* @__PURE__ */ React.createElement(Card, { id: "order-detail-amount-card", className: "order-detail__amount-card" }, /* @__PURE__ */ React.createElement(Column, { className: "order-detail__amount-content", gap: 8 }, /* @__PURE__ */ React.createElement("strong", { className: "order-detail__section-title" }, "\u8BA2\u5355\u91D1\u989D"), /* @__PURE__ */ React.createElement(Text, { className: "order-detail__amount-value" }, "1,280.00"), /* @__PURE__ */ React.createElement(Text, { className: "order-detail__payment-status" }, "\u5F85\u652F\u4ED8"))))));
   }
 
-  // ../demo/order-admin/src/screens/order-list.jsx
+  // demo/order-admin/src/screens/order-list.jsx
   var rows = [
     {
       id: "SO-1001",
@@ -2514,7 +2514,7 @@
     return /* @__PURE__ */ React.createElement(AdminLayout, null, /* @__PURE__ */ React.createElement(Column, { id: "order-list-page", className: "order-list__page", gap: 16 }, /* @__PURE__ */ React.createElement(PageHeader, { id: "order-list-header", titleId: "order-list-title", className: "order-list__header", title: "\u8BA2\u5355\u5217\u8868", subtitle: "\u5171 3 \u6761\u6F14\u793A\u6570\u636E \xB7 \u5BBD\u8868\u6A2A\u5411\u6EDA\u52A8" }), /* @__PURE__ */ React.createElement(Card, { id: "order-list-featured-order", className: "order-list__featured-order", to: "order-detail" }, /* @__PURE__ */ React.createElement(Heading, { className: "order-list__featured-title", level: 3 }, "\u5F85\u5904\u7406\u8BA2\u5355"), /* @__PURE__ */ React.createElement(Text, { className: "order-list__featured-description" }, "\u6253\u5F00 SO-1001 \u8BE6\u60C5")), /* @__PURE__ */ React.createElement(DataTable, { id: "order-list-table", className: "demo-wide-table order-list__table", columns, rows })));
   }
 
-  // ../demo/order-admin/src/project.js
+  // demo/order-admin/src/project.js
   var project = {
     name: "\u8BA2\u5355\u7BA1\u7406\u540E\u53F0",
     viewports: {
@@ -2554,7 +2554,7 @@
     ]
   };
 
-  // ../demo/order-admin/src/app.jsx
+  // demo/order-admin/src/app.jsx
   validateProject(project);
   ReactDOM.createRoot(document.getElementById("root")).render(
     /* @__PURE__ */ React.createElement(ErrorBoundary, { scope: "board" }, /* @__PURE__ */ React.createElement(PrototypeProvider, { project }, /* @__PURE__ */ React.createElement(Board, { project })))

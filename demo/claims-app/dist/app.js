@@ -1,6 +1,6 @@
 /* GENERATED FILE. EDIT src/, THEN RUN BUILD. */
 (() => {
-  // framework/lib/core/PrototypeContext.jsx
+  // starter/framework/lib/core/PrototypeContext.jsx
   var PrototypeContext = React.createContext(null);
   function getInitialScreenId(project2) {
     var _a;
@@ -108,7 +108,7 @@
     return context;
   }
 
-  // framework/lib/board/navigation.js
+  // starter/framework/lib/board/navigation.js
   function clampScale(scale) {
     return Math.min(2, Math.max(0.2, scale));
   }
@@ -223,7 +223,7 @@
     return !!(event.ctrlKey || event.metaKey);
   }
 
-  // framework/lib/core/ErrorBoundary.jsx
+  // starter/framework/lib/core/ErrorBoundary.jsx
   var ErrorBoundary = class extends React.Component {
     constructor(props) {
       super(props);
@@ -247,7 +247,7 @@
     }
   };
 
-  // framework/lib/core/ScreenIdentity.jsx
+  // starter/framework/lib/core/ScreenIdentity.jsx
   var ScreenIdentityContext = React.createContext(null);
   function ScreenIdentityProvider({ screenId, children }) {
     if (!screenId) throw new Error("ScreenIdentityProvider requires screenId");
@@ -261,7 +261,7 @@
     return screenId;
   }
 
-  // framework/lib/ui/flow-target.js
+  // starter/framework/lib/ui/flow-target.js
   function findFlowTargetId(startEl, rootEl) {
     if (!startEl || typeof startEl.closest !== "function") return null;
     const el = startEl.closest("[data-flow-to]");
@@ -280,7 +280,7 @@
     return true;
   }
 
-  // framework/lib/board/review.js
+  // starter/framework/lib/board/review.js
   var TYPE_LABELS = {
     comment: "\u4FEE\u6539\u5EFA\u8BAE",
     text: "\u4FEE\u6539\u6587\u5B57",
@@ -466,7 +466,7 @@
   }
   var REVIEW_TYPE_LABELS = TYPE_LABELS;
 
-  // framework/lib/board/expand.js
+  // starter/framework/lib/board/expand.js
   var STYLE_KEYS = [
     "width",
     "height",
@@ -591,7 +591,7 @@
     return [...allIds];
   }
 
-  // framework/lib/board/ScreenFrame.jsx
+  // starter/framework/lib/board/ScreenFrame.jsx
   function ScreenFrame({
     screen,
     viewport,
@@ -767,7 +767,7 @@
     );
   }
 
-  // framework/lib/board/useWheelZoom.js
+  // starter/framework/lib/board/useWheelZoom.js
   function bindWheelZoom(el, getScale, setScale, getLocked = () => false) {
     if (!el) return () => {
     };
@@ -795,12 +795,12 @@
     );
   }
 
-  // framework/lib/board/validation.js
+  // starter/framework/lib/board/validation.js
   function canUseDemo(screens) {
     return Array.isArray(screens) && screens.some((screen) => screen.entry === true);
   }
 
-  // framework/lib/board/CanvasMode.jsx
+  // starter/framework/lib/board/CanvasMode.jsx
   async function runExportWithFeedback(task, setError) {
     setError(null);
     try {
@@ -1071,7 +1071,7 @@
     ), copyToast ? /* @__PURE__ */ React.createElement("div", { className: "wf-board-toast", role: "status" }, copyToast) : null);
   }
 
-  // framework/lib/board/DemoMode.jsx
+  // starter/framework/lib/board/DemoMode.jsx
   var BLANK_EXIT_HINT = "\u53CC\u51FB\u7A7A\u767D\u5904\u9000\u51FA\u6F14\u793A";
   function readContentBox(el) {
     const style = window.getComputedStyle(el);
@@ -1202,7 +1202,7 @@
     ), /* @__PURE__ */ React.createElement("p", { className: "wf-demo-hint" }, "\u70B9\u51FB\u9875\u9762\u5185\u6309\u94AE / \u94FE\u63A5\u8DF3\u8F6C\uFF1B\u53EF\u5728\u5DE5\u5177\u680F\u5F00\u5173\u70ED\u533A\u9AD8\u4EAE\uFF1B\u6807\u9898\u680F\u53EF\u4E34\u65F6\u5C55\u5F00\u770B\u5168\u8C8C"));
   }
 
-  // framework/lib/board/export.js
+  // starter/framework/lib/board/export.js
   var exportLibrariesPromise;
   var libraries = [
     { file: "html2canvas.min.js", ready: () => typeof window.html2canvas === "function" },
@@ -1324,7 +1324,7 @@
     window.saveAs(blob, `${slug(screens[0].projectName)}.zip`);
   }
 
-  // framework/lib/board/ReviewPanel.jsx
+  // starter/framework/lib/board/ReviewPanel.jsx
   function copyText2(text) {
     if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
     const area = document.createElement("textarea");
@@ -1452,7 +1452,7 @@
     ), /* @__PURE__ */ React.createElement("button", { type: "button", className: "wf-review-copy", onClick: copyPrompt }, copied ? "\u5DF2\u590D\u5236" : "\u590D\u5236 Prompt"))));
   }
 
-  // framework/lib/board/ReviewMarkers.jsx
+  // starter/framework/lib/board/ReviewMarkers.jsx
   function samePositions(left, right) {
     if (left.length !== right.length) return false;
     return left.every((item, index) => {
@@ -1573,7 +1573,7 @@
     ) : null);
   }
 
-  // framework/lib/board/Board.jsx
+  // starter/framework/lib/board/Board.jsx
   var VIEWPORT_LABELS = {
     mobile: "\u624B\u673A",
     desktop: "\u684C\u9762"
@@ -2118,7 +2118,7 @@
     );
   }
 
-  // framework/lib/core/validateProject.js
+  // starter/framework/lib/core/validateProject.js
   function fail(path, message) {
     throw new Error(`${path} ${message}`);
   }
@@ -2169,7 +2169,7 @@
     });
   }
 
-  // framework/lib/ui/flow.js
+  // starter/framework/lib/ui/flow.js
   function createFlowProps(to, onClick, navigate) {
     return {
       "data-flow-to": to || void 0,
@@ -2186,7 +2186,7 @@
     return createFlowProps(to, onClick, navigate);
   }
 
-  // framework/lib/ui/layout.jsx
+  // starter/framework/lib/ui/layout.jsx
   function joinClass(base, extra) {
     return extra ? `${base} ${extra}` : base;
   }
@@ -2266,7 +2266,7 @@
     );
   }
 
-  // framework/lib/ui/content.jsx
+  // starter/framework/lib/ui/content.jsx
   function Heading({ level = 2, className = "", children, ...rest }) {
     const tag = `h${Math.min(6, Math.max(1, level))}`;
     return React.createElement(tag, { className: `wf-heading ${className}`.trim(), ...rest }, children);
@@ -2300,7 +2300,7 @@
     );
   }
 
-  // framework/lib/ui/forms.jsx
+  // starter/framework/lib/ui/forms.jsx
   function Button({ to, onClick, variant = "default", className = "", children, ...rest }) {
     const flow = useFlowTarget(to, onClick);
     return /* @__PURE__ */ React.createElement(
@@ -2348,7 +2348,7 @@
     return /* @__PURE__ */ React.createElement("div", { className: `wf-form-field ${className}`.trim(), ...rest }, /* @__PURE__ */ React.createElement("label", { className: "wf-field-label", htmlFor }, label), children, hint && !error ? /* @__PURE__ */ React.createElement("span", { className: "wf-field-hint" }, hint) : null, error ? /* @__PURE__ */ React.createElement("span", { className: "wf-field-error", role: "alert" }, error) : null);
   }
 
-  // framework/lib/ui/navigation.jsx
+  // starter/framework/lib/ui/navigation.jsx
   function TabBar({ items = [], activeId, className = "", ...rest }) {
     const { navigate } = usePrototype();
     return /* @__PURE__ */ React.createElement("nav", { className: `wf-tab-bar ${className}`.trim(), ...rest }, items.map((item) => /* @__PURE__ */ React.createElement(
@@ -2367,7 +2367,7 @@
     return /* @__PURE__ */ React.createElement("div", { className: `wf-mobile-shell ${className}`.trim(), ...rest }, /* @__PURE__ */ React.createElement("main", { className: "wf-mobile-shell-body" }, children), tabs2.length > 0 ? /* @__PURE__ */ React.createElement(TabBar, { items: tabs2, activeId }) : null);
   }
 
-  // framework/lib/ui/data.jsx
+  // starter/framework/lib/ui/data.jsx
   function Cell({ to, onClick, title, subtitle, value, className = "", children, ...rest }) {
     const flow = useFlowTarget(to, onClick);
     return /* @__PURE__ */ React.createElement(
@@ -2407,7 +2407,7 @@
     return /* @__PURE__ */ React.createElement("div", { className: `wf-empty-state ${className}`.trim(), ...rest }, /* @__PURE__ */ React.createElement("span", { className: "wf-empty-icon", "aria-hidden": "true" }), title ? /* @__PURE__ */ React.createElement("strong", { className: "wf-empty-title" }, title) : null, description ? /* @__PURE__ */ React.createElement("p", { className: "wf-empty-desc" }, description) : null, action ? /* @__PURE__ */ React.createElement("div", { className: "wf-empty-action" }, action) : null);
   }
 
-  // ../demo/claims-app/src/layouts/MobileLayout.jsx
+  // demo/claims-app/src/layouts/MobileLayout.jsx
   var tabs = [
     { label: "\u9996\u9875", to: "home" },
     { label: "\u7406\u8D54", to: "claims" },
@@ -2418,7 +2418,7 @@
     return /* @__PURE__ */ React.createElement(MobileShell, { className: "claims-shell claims-layout", tabs, activeId: screenId, "aria-label": "\u7406\u8D54\u5E94\u7528" }, children);
   }
 
-  // ../demo/claims-app/src/screens/claim-apply.jsx
+  // demo/claims-app/src/screens/claim-apply.jsx
   function ClaimApplyScreen() {
     return /* @__PURE__ */ React.createElement(MobileLayout, null, /* @__PURE__ */ React.createElement(Column, { id: "claim-apply-page", gap: 16, className: "claims-page claim-apply__page" }, /* @__PURE__ */ React.createElement(Heading, { id: "claim-apply-title", className: "claim-apply__title", level: 1 }, "\u7406\u8D54\u7533\u8BF7"), /* @__PURE__ */ React.createElement(
       Steps,
@@ -2435,7 +2435,7 @@
     ), /* @__PURE__ */ React.createElement(FormField, { className: "claim-apply__type-field", label: "\u7406\u8D54\u7C7B\u578B", htmlFor: "claim-apply-type" }, /* @__PURE__ */ React.createElement(Select, { id: "claim-apply-type", className: "claim-apply__type-select", defaultValue: "medical" }, /* @__PURE__ */ React.createElement("option", { className: "claim-apply__type-option", value: "medical" }, "\u533B\u7597\u8D39\u7528"), /* @__PURE__ */ React.createElement("option", { className: "claim-apply__type-option", value: "accident" }, "\u610F\u5916\u4F24\u5BB3"))), /* @__PURE__ */ React.createElement(FormField, { className: "claim-apply__date-field", label: "\u53D1\u751F\u65E5\u671F", htmlFor: "claim-apply-date" }, /* @__PURE__ */ React.createElement(TextInput, { id: "claim-apply-date", className: "claim-apply__date-input", placeholder: "YYYY-MM-DD" })), /* @__PURE__ */ React.createElement(FormField, { className: "claim-apply__description-field", label: "\u60C5\u51B5\u8BF4\u660E", htmlFor: "claim-apply-description" }, /* @__PURE__ */ React.createElement(TextArea, { id: "claim-apply-description", className: "claim-apply__description-input", placeholder: "\u7B80\u8981\u8BF4\u660E\u7ECF\u8FC7" })), /* @__PURE__ */ React.createElement(Checkbox, { className: "claim-apply__confirmation", label: "\u6211\u5DF2\u786E\u8BA4\u4FE1\u606F\u771F\u5B9E" }), /* @__PURE__ */ React.createElement(Button, { id: "claim-apply-submit", className: "claim-apply__submit", variant: "primary", to: "claims" }, "\u63D0\u4EA4\u7533\u8BF7")));
   }
 
-  // ../demo/claims-app/src/screens/claims.jsx
+  // demo/claims-app/src/screens/claims.jsx
   var claims = [];
   function ClaimsScreen() {
     return /* @__PURE__ */ React.createElement(MobileLayout, null, /* @__PURE__ */ React.createElement(Column, { id: "claims-list-page", gap: 20, className: "claims-page claims-list__page" }, /* @__PURE__ */ React.createElement(Heading, { id: "claims-list-title", className: "claims-list__title", level: 1 }, "\u6211\u7684\u7406\u8D54"), claims.length === 0 ? /* @__PURE__ */ React.createElement(
@@ -2460,17 +2460,17 @@
     )))));
   }
 
-  // ../demo/claims-app/src/screens/home.jsx
+  // demo/claims-app/src/screens/home.jsx
   function HomeScreen() {
     return /* @__PURE__ */ React.createElement(MobileLayout, null, /* @__PURE__ */ React.createElement(Column, { id: "claims-home-page", gap: 16, className: "claims-page claims-home__page" }, /* @__PURE__ */ React.createElement(Row, { id: "claims-home-header", className: "claims-home__header", alignItems: "center", justifyContent: "space-between" }, /* @__PURE__ */ React.createElement("div", { className: "claims-home__greeting" }, /* @__PURE__ */ React.createElement(Text, { className: "claims-home__eyebrow" }, "\u4E0A\u5348\u597D"), /* @__PURE__ */ React.createElement(Heading, { id: "claims-home-title", className: "claims-home__title", level: 1 }, "\u7406\u8D54\u670D\u52A1")), /* @__PURE__ */ React.createElement("span", { className: "claims-avatar-placeholder claims-home__avatar", "aria-hidden": "true" })), /* @__PURE__ */ React.createElement(Card, { id: "claims-home-apply-card", className: "claims-home__apply-card", to: "claim-apply" }, /* @__PURE__ */ React.createElement(Heading, { className: "claims-home__apply-title", level: 3 }, "\u53D1\u8D77\u7406\u8D54"), /* @__PURE__ */ React.createElement(Text, { className: "claims-home__apply-description" }, "\u51C6\u5907\u6750\u6599\u5E76\u586B\u5199\u7533\u8BF7\u3002")), /* @__PURE__ */ React.createElement(Column, { id: "claims-home-shortcuts", className: "claims-home__shortcuts", gap: 0 }, /* @__PURE__ */ React.createElement(Cell, { className: "claims-home__shortcut claims-home__claims-shortcut", to: "claims", title: "\u6211\u7684\u7406\u8D54", subtitle: "\u67E5\u770B\u5168\u90E8\u7533\u8BF7", value: "0" }), /* @__PURE__ */ React.createElement(Cell, { className: "claims-home__shortcut claims-home__profile-shortcut", to: "profile", title: "\u4E2A\u4EBA\u4FE1\u606F", subtitle: "\u7BA1\u7406\u8054\u7CFB\u65B9\u5F0F" }))));
   }
 
-  // ../demo/claims-app/src/screens/login.jsx
+  // demo/claims-app/src/screens/login.jsx
   function LoginScreen() {
     return /* @__PURE__ */ React.createElement(Column, { id: "claims-login-page", gap: 20, className: "claims-login claims-login__page" }, /* @__PURE__ */ React.createElement("span", { id: "claims-login-logo", className: "claims-logo-placeholder claims-login__logo", "aria-hidden": "true" }), /* @__PURE__ */ React.createElement(Heading, { id: "claims-login-title", className: "claims-login__title", level: 1 }, "\u7406\u8D54\u670D\u52A1"), /* @__PURE__ */ React.createElement(Text, { className: "claims-login__description" }, "\u767B\u5F55\u540E\u67E5\u770B\u548C\u63D0\u4EA4\u7406\u8D54\u7533\u8BF7\u3002"), /* @__PURE__ */ React.createElement(FormField, { className: "claims-login__phone-field", label: "\u624B\u673A\u53F7", htmlFor: "claims-login-phone" }, /* @__PURE__ */ React.createElement(TextInput, { id: "claims-login-phone", className: "claims-login__phone-input", inputMode: "tel", placeholder: "\u8BF7\u8F93\u5165\u624B\u673A\u53F7" })), /* @__PURE__ */ React.createElement(FormField, { className: "claims-login__code-field", label: "\u9A8C\u8BC1\u7801", htmlFor: "claims-login-code" }, /* @__PURE__ */ React.createElement(TextInput, { id: "claims-login-code", className: "claims-login__code-input", inputMode: "numeric", placeholder: "\u8BF7\u8F93\u5165\u9A8C\u8BC1\u7801" })), /* @__PURE__ */ React.createElement(Button, { id: "claims-login-submit", className: "claims-login__submit", variant: "primary", to: "home" }, "\u767B\u5F55"));
   }
 
-  // ../demo/claims-app/src/screens/profile.jsx
+  // demo/claims-app/src/screens/profile.jsx
   function ProfileScreen() {
     const [notifications, setNotifications] = React.useState(true);
     return /* @__PURE__ */ React.createElement(MobileLayout, null, /* @__PURE__ */ React.createElement(Column, { id: "claims-profile-page", gap: 20, className: "claims-page claims-profile__page" }, /* @__PURE__ */ React.createElement(Heading, { id: "claims-profile-title", className: "claims-profile__title", level: 1 }, "\u6211\u7684"), /* @__PURE__ */ React.createElement(Row, { id: "claims-profile-summary", className: "claims-profile__summary", gap: 12, alignItems: "center" }, /* @__PURE__ */ React.createElement(Avatar, { className: "claims-profile__avatar", size: 56, label: "\u7528\u6237\u5934\u50CF\u5360\u4F4D" }), /* @__PURE__ */ React.createElement("div", { className: "claims-profile__identity" }, /* @__PURE__ */ React.createElement("strong", { className: "claims-profile__name" }, "\u793A\u4F8B\u7528\u6237"), /* @__PURE__ */ React.createElement(Text, { className: "claims-profile__verification" }, "\u5DF2\u5B8C\u6210\u5B9E\u540D\u8BA4\u8BC1"))), /* @__PURE__ */ React.createElement(Cell, { id: "claims-profile-contact", className: "claims-profile__contact", title: "\u8054\u7CFB\u65B9\u5F0F", subtitle: "138 0000 0000" }), /* @__PURE__ */ React.createElement(
@@ -2485,7 +2485,7 @@
     )));
   }
 
-  // ../demo/claims-app/src/project.js
+  // demo/claims-app/src/project.js
   var project = {
     name: "\u7406\u8D54\u670D\u52A1\u5E94\u7528",
     viewports: {
@@ -2532,7 +2532,7 @@
     ]
   };
 
-  // ../demo/claims-app/src/app.jsx
+  // demo/claims-app/src/app.jsx
   validateProject(project);
   ReactDOM.createRoot(document.getElementById("root")).render(
     /* @__PURE__ */ React.createElement(ErrorBoundary, { scope: "board" }, /* @__PURE__ */ React.createElement(PrototypeProvider, { project }, /* @__PURE__ */ React.createElement(Board, { project })))
