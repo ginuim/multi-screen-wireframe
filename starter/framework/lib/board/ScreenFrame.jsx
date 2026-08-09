@@ -62,7 +62,7 @@ export function ScreenFrame({
   }, [expanded, screen?.id, viewport.width, viewport.height])
 
   React.useEffect(() => {
-    if (!reviewEnabled) {
+    if (!reviewEnabled || canvasLocked) {
       hoverReviewElementRef.current?.classList.remove('is-review-hovered')
       hoverReviewElementRef.current = null
     }
@@ -70,7 +70,7 @@ export function ScreenFrame({
       hoverReviewElementRef.current?.classList.remove('is-review-hovered')
       hoverReviewElementRef.current = null
     }
-  }, [reviewEnabled, screen?.id])
+  }, [canvasLocked, reviewEnabled, screen?.id])
 
   if (!screen) return null
 
@@ -99,7 +99,7 @@ export function ScreenFrame({
   }
 
   const onPointerMove = (event) => {
-    if (reviewEnabled) {
+    if (reviewEnabled && !canvasLocked) {
       const target = findReviewTarget(event.target, contentRef.current)
       if (target === hoverReviewElementRef.current) return
       hoverReviewElementRef.current?.classList.remove('is-review-hovered')
@@ -126,7 +126,7 @@ export function ScreenFrame({
   }
 
   const onReviewClick = (event) => {
-    if (!reviewEnabled) return
+    if (!reviewEnabled || canvasLocked) return
     const target = findReviewTarget(event.target, contentRef.current)
     if (!target) return
     event.preventDefault()
@@ -189,7 +189,7 @@ export function ScreenFrame({
       </div>
       <div
         ref={contentRef}
-        className={`wf-screen-content${dragScrolling ? ' is-drag-scrolling' : ''}${expanded ? ' is-expanded' : ''}${reviewEnabled ? ' is-reviewing' : ''}`}
+        className={`wf-screen-content${dragScrolling ? ' is-drag-scrolling' : ''}${expanded ? ' is-expanded' : ''}${reviewEnabled && !canvasLocked ? ' is-reviewing' : ''}`}
         style={contentStyle}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}

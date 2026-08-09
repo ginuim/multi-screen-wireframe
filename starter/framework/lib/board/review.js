@@ -170,11 +170,11 @@ export function buildReviewPrompt(project, items) {
     '- 通过 DOM 选择器在 JSX 中搜索对应的 id、className 或 data-wf-key。',
     '- 保留所有语义 class、关键节点 id 和重复数据节点的 data-wf-key；新增节点也遵守同一命名规则。',
     '- 修改 screens/layouts 时保留「创建基于」，并把「修改基于」及 @wireframe-skill 更新为当前 skill 版本。',
-    '- 保持 project.links 为页面流的唯一边数据；完成后重新构建并验证画板、演示和审阅模式。',
+    '- 保持 project.links 为页面流的唯一边数据；完成后重新构建并验证画板、演示和修改模式。',
   ]
 
   if (!items?.length) {
-    lines.push('', '当前没有审阅意见。')
+    lines.push('', '当前没有修改意见。')
     return lines.join('\n')
   }
 

@@ -28,7 +28,7 @@ function ZoomControls({ scale, setScale, onReset }) {
 /** Lucide 风格工具栏图标。仅用于框架 chrome。 */
 function ToolbarIcon({ name }) {
   const paths = {
-    review: <><rect x="8" y="2" width="8" height="4" rx="1" /><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><path d="m9 14 2 2 4-4" /></>,
+    edit: <><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" /></>,
     fullscreen: <><path d="M8 3H5a2 2 0 0 0-2 2v3" /><path d="M21 8V5a2 2 0 0 0-2-2h-3" /><path d="M3 16v3a2 2 0 0 0 2 2h3" /><path d="M16 21h3a2 2 0 0 0 2-2v-3" /></>,
     expand: <><path d="m17 11-5-5-5 5" /><path d="m17 18-5-5-5 5" /></>,
     collapse: <><path d="m7 13 5 5 5-5" /><path d="m7 6 5 5 5-5" /></>,
@@ -143,7 +143,7 @@ export function Board({ project }) {
   const boardRef = React.useRef(null)
   const selectedReviewElementsRef = React.useRef(new Set())
 
-  const canvasLocked = reviewEnabled ? spaceHeld : !interactive || spaceHeld
+  const canvasLocked = !interactive || spaceHeld
   const allScreenIds = project.screens.map((screen) => screen.id)
   const isDemo = mode === 'demo' && demoAvailable
   const activeScale = isDemo ? demoScale : canvasScale
@@ -461,13 +461,13 @@ export function Board({ project }) {
             type="button"
             className={reviewEnabled ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
             aria-pressed={reviewEnabled}
-            aria-label={reviewEnabled ? `审阅中（${reviewItems.length} 条意见）` : `审阅（${reviewItems.length} 条意见）`}
-            title="审阅：点选页面节点并整理成可编辑的 AI 修改 Prompt"
+            aria-label={reviewEnabled ? `修改中（${reviewItems.length} 条意见）` : `修改（${reviewItems.length} 条意见）`}
+            title="修改：点选页面节点并整理成可编辑的 AI 修改 Prompt"
             onClick={toggleReview}
           >
-            <ToolbarIcon name="review" />
+            <ToolbarIcon name="edit" />
             <span className="wf-toolbar-icon-count">{reviewItems.length}</span>
-            <span className="wf-visually-hidden">审阅</span>
+            <span className="wf-visually-hidden">修改</span>
           </button>
           <button
             type="button"

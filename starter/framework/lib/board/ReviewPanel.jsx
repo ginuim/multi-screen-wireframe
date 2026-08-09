@@ -87,10 +87,10 @@ export function ReviewPanel({
         : '给 AI 的修改建议'
 
   return (
-    <aside className="wf-review-panel" aria-label="原型审阅">
+    <aside className="wf-review-panel" aria-label="修改原型">
       <header className="wf-review-panel-header">
         <div className="wf-review-panel-heading">
-          <strong className="wf-review-panel-title">审阅原型</strong>
+          <strong className="wf-review-panel-title">修改原型</strong>
           <span className="wf-review-panel-count">{items.length} 条修改</span>
         </div>
         <button type="button" className="wf-review-close" onClick={onClose}>关闭</button>

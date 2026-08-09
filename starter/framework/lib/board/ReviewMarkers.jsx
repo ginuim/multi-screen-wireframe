@@ -108,7 +108,7 @@ export function ReviewMarkers({ boardRef, items }) {
   const bubbleTop = active ? Math.max(12, Math.min(active.top + 24, boardHeight - 180)) : 0
 
   return (
-    <div className="wf-review-markers" aria-label="审阅标记">
+    <div className="wf-review-markers" aria-label="修改标记">
       {positions.map((position) => (
         <button
           type="button"
