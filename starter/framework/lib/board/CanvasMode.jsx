@@ -50,6 +50,7 @@ export function CanvasMode({
   const { currentScreenId, navigate, viewport, viewportKey, enterDemo: enterDemoMode } = usePrototype()
   const [view, setView] = React.useState(() => ({ ...resetCanvasViewport(), scale }))
   const [dragging, setDragging] = React.useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false)
   const [copiedKey, setCopiedKey] = React.useState(null)
   const [copyToast, setCopyToast] = React.useState(null)
   const drag = React.useRef(null)
@@ -169,16 +170,31 @@ export function CanvasMode({
 
   return (
     <div className="wf-canvas-shell">
-      <aside className="wf-screen-sidebar">
+      <aside className={`wf-screen-sidebar${sidebarCollapsed ? ' is-collapsed' : ''}`} aria-hidden={sidebarCollapsed}>
         <div className="wf-sidebar-header">
           <label>
             <input
               type="checkbox"
               checked={selectedIds.size === project.screens.length && project.screens.length > 0}
               onChange={toggleAll}
+              tabIndex={sidebarCollapsed ? -1 : undefined}
             />
             全选
           </label>
+          <button
+            type="button"
+            className="wf-sidebar-toggle"
+            aria-label="收起侧栏"
+            title="收起侧栏"
+            tabIndex={sidebarCollapsed ? -1 : undefined}
+            onClick={() => setSidebarCollapsed(true)}
+          >
+            <svg className="wf-sidebar-toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect width="18" height="18" x="3" y="3" rx="2" />
+              <path d="M9 3v18" />
+              <path d="m16 15-3-3 3-3" />
+            </svg>
+          </button>
         </div>
         <ul className="wf-screen-list">
           {project.screens.map((screen, index) => (
@@ -198,6 +214,7 @@ export function CanvasMode({
                 }}
                 onClick={(event) => event.stopPropagation()}
                 aria-label={`选择 ${screen.title}`}
+                tabIndex={sidebarCollapsed ? -1 : undefined}
               />
               <span className="wf-screen-index-num">{index + 1}</span>
               <span className="wf-screen-title">{screen.title}</span>
@@ -213,6 +230,21 @@ export function CanvasMode({
           </div>
         </div>
       </aside>
+      {sidebarCollapsed ? (
+        <button
+          type="button"
+          className="wf-sidebar-expand"
+          aria-label="展开侧栏"
+          title="展开侧栏"
+          onClick={() => setSidebarCollapsed(false)}
+        >
+          <svg className="wf-sidebar-toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect width="18" height="18" x="3" y="3" rx="2" />
+            <path d="M9 3v18" />
+            <path d="m14 9 3 3-3 3" />
+          </svg>
+        </button>
+      ) : null}
       <main
         ref={canvasRef}
         className={`wf-canvas${dragging ? ' is-dragging' : ''}${canvasLocked ? ' is-locked' : ''}`}

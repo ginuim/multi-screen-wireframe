@@ -149,7 +149,8 @@ button:disabled {
 
 .wf-board.is-immersive .wf-board-toolbar,
 .wf-board.is-immersive .wf-toolbar-error,
-.wf-board.is-immersive .wf-screen-sidebar {
+.wf-board.is-immersive .wf-screen-sidebar,
+.wf-board.is-immersive .wf-sidebar-expand {
   display: none;
 }
 
@@ -449,12 +450,25 @@ button:disabled {
   width: 240px;
   flex: 0 0 240px;
   flex-direction: column;
+  overflow: hidden;
   border-right: 1px solid var(--board-border);
   background: var(--board-surface);
+  transition: width 0.15s ease, flex-basis 0.15s ease, border-color 0.15s ease;
+}
+
+.wf-screen-sidebar.is-collapsed {
+  width: 0;
+  flex-basis: 0;
+  border-right-color: transparent;
+  pointer-events: none;
 }
 
 .wf-sidebar-header {
-  padding: 12px 14px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 10px 10px 14px;
   border-bottom: 1px solid var(--board-border);
   color: var(--board-muted);
   font-size: 12px;
@@ -463,10 +477,49 @@ button:disabled {
 
 .wf-sidebar-header label {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 8px;
   cursor: pointer;
   user-select: none;
+}
+
+.wf-sidebar-toggle,
+.wf-sidebar-expand {
+  display: inline-grid;
+  width: var(--board-control-h);
+  height: var(--board-control-h);
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--board-border);
+  border-radius: var(--board-radius);
+  background: var(--board-surface);
+  color: var(--board-text);
+  cursor: pointer;
+}
+
+.wf-sidebar-toggle:hover,
+.wf-sidebar-expand:hover {
+  background: var(--board-fill);
+}
+
+.wf-sidebar-expand {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 5;
+  box-shadow: 0 4px 12px rgba(20, 24, 28, 0.08);
+}
+
+.wf-sidebar-toggle-icon {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .wf-sidebar-header input,
