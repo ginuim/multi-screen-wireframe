@@ -264,6 +264,11 @@ button:disabled {
   cursor: pointer;
 }
 
+.wf-board-setting-row + .wf-board-setting-row,
+.wf-board-setting-row + .wf-board-setting-range {
+  margin-top: 14px;
+}
+
 .wf-board-setting-row > span,
 .wf-board-setting-row strong,
 .wf-board-setting-row small {
@@ -280,11 +285,50 @@ button:disabled {
   font-size: 10px;
 }
 
-.wf-board-setting-row input {
+.wf-board-setting-row input[type="checkbox"] {
   width: 18px;
   height: 18px;
   flex: 0 0 auto;
   accent-color: var(--board-text);
+}
+
+.wf-board-setting-range {
+  display: block;
+  cursor: pointer;
+}
+
+.wf-board-setting-range > span,
+.wf-board-setting-range > small {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.wf-board-setting-range strong,
+.wf-board-setting-range output {
+  font-size: 12px;
+}
+
+.wf-board-setting-range output {
+  color: var(--board-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.wf-board-setting-range input {
+  width: 100%;
+  margin: 9px 0 3px;
+  accent-color: var(--board-text);
+}
+
+.wf-board-setting-range small {
+  color: var(--board-muted);
+  font-size: 10px;
+}
+
+.wf-board-setting-range.is-disabled {
+  cursor: default;
+  opacity: 0.45;
 }
 
 .wf-toolbar-error {

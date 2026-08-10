@@ -24,6 +24,7 @@ export function DemoMode({
   project,
   hotspotsVisible,
   canvasLocked,
+  wheelZoomOptions,
   scale,
   setScale,
   viewResetKey,
@@ -90,7 +91,7 @@ export function DemoMode({
     return () => observer.disconnect()
   }, [applyFit, viewport, viewportKey, currentScreenId, viewResetKey, currentExpanded])
 
-  useWheelZoom(viewportRef, scale, setScale, canvasLocked)
+  useWheelZoom(viewportRef, scale, setScale, canvasLocked, wheelZoomOptions)
 
   const startPan = (event) => {
     if (!canvasLocked) return

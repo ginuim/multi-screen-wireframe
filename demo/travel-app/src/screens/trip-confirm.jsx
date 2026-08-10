@@ -1,7 +1,7 @@
 /**
- * @wireframe-skill multi-screen-wireframe@1.6.0
+ * @wireframe-skill multi-screen-wireframe@1.7.0
  * 创建基于 v1.5.1
- * 修改基于 v1.6.0
+ * 修改基于 v1.7.0
  */
 import {
   Badge,

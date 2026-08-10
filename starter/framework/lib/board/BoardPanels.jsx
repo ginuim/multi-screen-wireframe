@@ -28,7 +28,16 @@ function PanelShell({ id, title, ariaLabel, onClose, children }) {
   )
 }
 
-export function ShortcutHelp({ demoAvailable, showCanvasIndex, onShowCanvasIndexChange, onClose }) {
+export function ShortcutHelp({
+  demoAvailable,
+  showCanvasIndex,
+  onShowCanvasIndexChange,
+  trackpadZoom,
+  onTrackpadZoomChange,
+  zoomSensitivity,
+  onZoomSensitivityChange,
+  onClose,
+}) {
   const shortcuts = getBoardShortcuts()
   return (
     <PanelShell id="wf-board-utility" title="帮助 / 快捷键 / 设置" ariaLabel="帮助、快捷键与设置" onClose={onClose}>
@@ -53,6 +62,34 @@ export function ShortcutHelp({ demoAvailable, showCanvasIndex, onShowCanvasIndex
             checked={showCanvasIndex}
             onChange={(event) => onShowCanvasIndexChange(event.target.checked)}
           />
+        </label>
+        <label className="wf-board-setting-row">
+          <span>
+            <strong>触摸板缩放</strong>
+            <small>按双指手势幅度连续缩放，避免固定档位跳变</small>
+          </span>
+          <input
+            type="checkbox"
+            checked={trackpadZoom}
+            onChange={(event) => onTrackpadZoomChange(event.target.checked)}
+          />
+        </label>
+        <label className={`wf-board-setting-range${trackpadZoom ? '' : ' is-disabled'}`}>
+          <span>
+            <strong>缩放灵敏度</strong>
+            <output>{Math.round(zoomSensitivity * 100)}%</output>
+          </span>
+          <input
+            type="range"
+            min="0.25"
+            max="2"
+            step="0.05"
+            value={zoomSensitivity}
+            disabled={!trackpadZoom}
+            onChange={(event) => onZoomSensitivityChange(Number(event.target.value))}
+            aria-label="触摸板缩放灵敏度"
+          />
+          <small><span>更细腻</span><span>更灵敏</span></small>
         </label>
       </section>
     </PanelShell>

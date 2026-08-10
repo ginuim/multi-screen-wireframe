@@ -8,6 +8,7 @@ import {
 } from '../starter/framework/lib/board/shortcuts.js'
 import {
   boardSettingsStorageKey,
+  normalizeZoomSensitivity,
   readBoardSettings,
   saveBoardSettings,
 } from '../starter/framework/lib/board/board-settings.js'
@@ -62,17 +63,40 @@ const storage = {
   getItem: (name) => values.get(name) ?? null,
   setItem: (name, value) => values.set(name, value),
 }
-assert.deepEqual(readBoardSettings(storage, '订单原型'), { showCanvasIndex: true })
-assert.equal(saveBoardSettings(storage, '订单原型', { showCanvasIndex: false }), true)
-assert.deepEqual(readBoardSettings(storage, '订单原型'), { showCanvasIndex: false })
-assert.deepEqual(JSON.parse(values.get(boardSettingsStorageKey('订单原型'))), { showCanvasIndex: false })
+assert.deepEqual(readBoardSettings(storage, '订单原型'), {
+  showCanvasIndex: true,
+  trackpadZoom: false,
+  zoomSensitivity: 0.6,
+})
+assert.equal(saveBoardSettings(storage, '订单原型', {
+  showCanvasIndex: false,
+  trackpadZoom: true,
+  zoomSensitivity: 0.45,
+}), true)
+assert.deepEqual(readBoardSettings(storage, '订单原型'), {
+  showCanvasIndex: false,
+  trackpadZoom: true,
+  zoomSensitivity: 0.45,
+})
+assert.deepEqual(JSON.parse(values.get(boardSettingsStorageKey('订单原型'))), {
+  showCanvasIndex: false,
+  trackpadZoom: true,
+  zoomSensitivity: 0.45,
+})
 assert.equal(Object.hasOwn(JSON.parse(values.get(boardSettingsStorageKey('订单原型'))), 'position'), false)
+assert.equal(normalizeZoomSensitivity(0), 0.25)
+assert.equal(normalizeZoomSensitivity(3), 2)
+assert.equal(normalizeZoomSensitivity('bad'), 0.6)
 
 const brokenStorage = {
   getItem: () => { throw new Error('blocked') },
   setItem: () => { throw new Error('blocked') },
 }
-assert.deepEqual(readBoardSettings(brokenStorage, '本地文件'), { showCanvasIndex: true })
+assert.deepEqual(readBoardSettings(brokenStorage, '本地文件'), {
+  showCanvasIndex: true,
+  trackpadZoom: false,
+  zoomSensitivity: 0.6,
+})
 assert.equal(saveBoardSettings(brokenStorage, '本地文件', { showCanvasIndex: false }), false)
 
 assert.deepEqual(
@@ -137,6 +161,8 @@ assert.match(canvasSource, /closest\?\.?\('\.wf-canvas-index'\)/)
 assert.match(canvasSource, /if \(!demoAvailable\) return/)
 assert.doesNotMatch(canvasSource, /if \(!demoAvailable \|\| canvasLocked\) return/)
 assert.match(panelSource, /显示画板索引/)
+assert.match(panelSource, /触摸板缩放/)
+assert.match(panelSource, /缩放灵敏度/)
 assert.match(panelSource, /帮助 \/ 快捷键/)
 assert.match(boardSource, /wf-immersive-action-button is-active/)
 assert.match(cssSource, /\.wf-board-panel-layer/)

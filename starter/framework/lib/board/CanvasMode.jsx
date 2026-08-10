@@ -204,6 +204,7 @@ export function CanvasMode({
   scale,
   setScale,
   canvasLocked,
+  wheelZoomOptions,
   selectedIds,
   setSelectedIds,
   expandedIds = new Set(),
@@ -280,7 +281,7 @@ export function CanvasMode({
     if (copiedTimer.current) window.clearTimeout(copiedTimer.current)
   }, [])
 
-  useWheelZoom(canvasRef, scale, setScale, canvasLocked)
+  useWheelZoom(canvasRef, scale, setScale, canvasLocked, wheelZoomOptions)
 
   const startPan = (event) => {
     if (!canvasLocked) return

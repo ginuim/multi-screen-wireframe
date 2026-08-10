@@ -1,6 +1,6 @@
 # Multi-Screen Wireframe
 
-**Skill 版本 / Version：`1.6.0`**（见 `VERSION`）
+**Skill 版本 / Version：`1.7.0`**（见 `VERSION`）
 
 从产品需求或视觉参考，生成**可双击打开**的多屏线框原型。
 
@@ -28,6 +28,32 @@ The deliverable ships with source, React, esbuild, and export utilities. Runtime
   Draggable canvas index with a per-project visibility preference
 - **可继续改**：改 `src/`，本地 `./build.command`（macOS）或 `build.cmd`（Windows）重建  
   Keep editing `src/` and rebuild locally
+
+### 功能示意 / Screenshots
+
+多屏画板总览（桌面 demo）：
+
+![多屏画板总览](docs/screenshots/01-api-client-board.png)
+
+演示模式跳转：
+
+![演示模式](docs/screenshots/04-api-client-demo.png)
+
+修改模式：点选节点、整理修改清单并生成 Prompt：
+
+![修改模式](docs/screenshots/02-api-client-modify.png)
+
+帮助 / 快捷键 / 设置与画板索引：
+
+![帮助与设置](docs/screenshots/03-api-client-help.png)
+
+移动端多屏画板：
+
+![移动端画板](docs/screenshots/05-travel-app-board.png)
+
+移动端演示：
+
+![移动端演示](docs/screenshots/06-travel-app-demo.png)
 
 ## 不适合 / Not for
 
@@ -102,8 +128,8 @@ build.cmd
 
 打开（需能解析到共享的 `starter/`）：
 
-- `demo/api-client/index.html` — desktop API Client（SideNav、DataTable、Tabs、表单）
-- `demo/travel-app/index.html` — mobile 旅行助手（长页面展开、地图、TabBar、完整表单、弹层与反馈）
+- `demo/api-client/index.html` — desktop API Client（SideNav、DataTable、Tabs、表单）；见上方画板 / 演示 / 修改截图
+- `demo/travel-app/index.html` — mobile 旅行助手（长页面展开、地图、TabBar、完整表单、弹层与反馈）；见上方移动端截图
 
 维护者修改公共源码后，在仓库根目录运行：
 

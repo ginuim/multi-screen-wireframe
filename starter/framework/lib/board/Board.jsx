@@ -11,7 +11,12 @@ import { ReviewLauncher } from './ReviewLauncher.jsx'
 import { describeReviewElement } from './review.js'
 import { preventUnsavedReviewExit } from './before-unload.js'
 import { ShortcutHelp } from './BoardPanels.jsx'
-import { getBoardStorage, readBoardSettings, saveBoardSettings } from './board-settings.js'
+import {
+  getBoardStorage,
+  normalizeZoomSensitivity,
+  readBoardSettings,
+  saveBoardSettings,
+} from './board-settings.js'
 import { isEditableShortcutTarget, shortcutIdForEvent, shortcutModifierLabel } from './shortcuts.js'
 
 const VIEWPORT_LABELS = {
@@ -157,6 +162,12 @@ export function Board({ project }) {
   const [canvasIndexVisible, setCanvasIndexVisible] = React.useState(
     () => readBoardSettings(getBoardStorage(), project.name).showCanvasIndex,
   )
+  const [trackpadZoom, setTrackpadZoom] = React.useState(
+    () => readBoardSettings(getBoardStorage(), project.name).trackpadZoom,
+  )
+  const [zoomSensitivity, setZoomSensitivity] = React.useState(
+    () => readBoardSettings(getBoardStorage(), project.name).zoomSensitivity,
+  )
   const [canvasIndexPosition, setCanvasIndexPosition] = React.useState(null)
   const boardRef = React.useRef(null)
   const selectedReviewElementsRef = React.useRef(new Set())
@@ -167,6 +178,7 @@ export function Board({ project }) {
   const isDemo = mode === 'demo' && demoAvailable
   const activeScale = isDemo ? demoScale : canvasScale
   const setActiveScale = isDemo ? setDemoScale : setCanvasScale
+  const wheelZoomOptions = { trackpadMode: trackpadZoom, sensitivity: zoomSensitivity }
 
   const clearReviewSelection = React.useCallback(() => {
     for (const element of selectedReviewElementsRef.current) {
@@ -318,8 +330,31 @@ export function Board({ project }) {
 
   const updateCanvasIndexVisible = React.useCallback((visible) => {
     setCanvasIndexVisible(visible)
-    saveBoardSettings(getBoardStorage(), project.name, { showCanvasIndex: visible })
-  }, [project.name])
+    saveBoardSettings(getBoardStorage(), project.name, {
+      showCanvasIndex: visible,
+      trackpadZoom,
+      zoomSensitivity,
+    })
+  }, [project.name, trackpadZoom, zoomSensitivity])
+
+  const updateTrackpadZoom = React.useCallback((enabled) => {
+    setTrackpadZoom(enabled)
+    saveBoardSettings(getBoardStorage(), project.name, {
+      showCanvasIndex: canvasIndexVisible,
+      trackpadZoom: enabled,
+      zoomSensitivity,
+    })
+  }, [canvasIndexVisible, project.name, zoomSensitivity])
+
+  const updateZoomSensitivity = React.useCallback((value) => {
+    const normalized = normalizeZoomSensitivity(value)
+    setZoomSensitivity(normalized)
+    saveBoardSettings(getBoardStorage(), project.name, {
+      showCanvasIndex: canvasIndexVisible,
+      trackpadZoom,
+      zoomSensitivity: normalized,
+    })
+  }, [canvasIndexVisible, project.name, trackpadZoom])
 
   // 只在切换项目时清位置。首屏 useEffect 若也 set null，会盖掉 CanvasIndex
   // useLayoutEffect 刚算好的坐标，索引会一直 visibility:hidden。
@@ -327,6 +362,8 @@ export function Board({ project }) {
   React.useEffect(() => {
     const settings = readBoardSettings(getBoardStorage(), project.name)
     setCanvasIndexVisible(settings.showCanvasIndex)
+    setTrackpadZoom(settings.trackpadZoom)
+    setZoomSensitivity(settings.zoomSensitivity)
     const previousName = canvasIndexSettingsProjectRef.current
     canvasIndexSettingsProjectRef.current = project.name
     if (previousName != null && previousName !== project.name) {
@@ -741,6 +778,7 @@ export function Board({ project }) {
           scale={canvasScale}
           setScale={setCanvasScale}
           canvasLocked={canvasLocked}
+          wheelZoomOptions={wheelZoomOptions}
           selectedIds={selectedIds}
           setSelectedIds={setSelectedIds}
           expandedIds={expandedIds}
@@ -761,6 +799,7 @@ export function Board({ project }) {
           canvasLocked={canvasLocked}
           scale={demoScale}
           setScale={setDemoScale}
+          wheelZoomOptions={wheelZoomOptions}
           viewResetKey={demoViewResetKey}
           expandedIds={expandedIds}
           onToggleExpand={toggleExpand}
@@ -783,6 +822,10 @@ export function Board({ project }) {
           demoAvailable={demoAvailable}
           showCanvasIndex={canvasIndexVisible}
           onShowCanvasIndexChange={updateCanvasIndexVisible}
+          trackpadZoom={trackpadZoom}
+          onTrackpadZoomChange={updateTrackpadZoom}
+          zoomSensitivity={zoomSensitivity}
+          onZoomSensitivityChange={updateZoomSensitivity}
           onClose={() => setHelpVisible(false)}
         />
       ) : null}

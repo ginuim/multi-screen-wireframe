@@ -10,9 +10,9 @@
 
 ```jsx
 /**
- * @wireframe-skill multi-screen-wireframe@1.6.0
- * 创建基于 v1.6.0
- * 修改基于 v1.6.0
+ * @wireframe-skill multi-screen-wireframe@1.7.0
+ * 创建基于 v1.7.0
+ * 修改基于 v1.7.0
  */
 import { Column, Heading, Text } from '../../framework/lib/ui/index.js'
 
@@ -30,9 +30,9 @@ export function AboutScreen() {
 
 ```jsx
 /**
- * @wireframe-skill multi-screen-wireframe@1.6.0
- * 创建基于 v1.6.0
- * 修改基于 v1.6.0
+ * @wireframe-skill multi-screen-wireframe@1.7.0
+ * 创建基于 v1.7.0
+ * 修改基于 v1.7.0
  */
 import { Card, Column, Grid, Heading, Row, Text } from '../../framework/lib/ui/index.js'
 
@@ -57,9 +57,9 @@ export function DashboardScreen() {
 
 ```jsx
 /**
- * @wireframe-skill multi-screen-wireframe@1.6.0
- * 创建基于 v1.6.0
- * 修改基于 v1.6.0
+ * @wireframe-skill multi-screen-wireframe@1.7.0
+ * 创建基于 v1.7.0
+ * 修改基于 v1.7.0
  */
 import { Card, Column, Heading, Row } from '../../framework/lib/ui/index.js'
 
@@ -92,9 +92,9 @@ App / 小程序带底栏时，用 `MobileShell`（或全高 Column 末尾放 `Ta
 
 ```jsx
 /**
- * @wireframe-skill multi-screen-wireframe@1.6.0
- * 创建基于 v1.6.0
- * 修改基于 v1.6.0
+ * @wireframe-skill multi-screen-wireframe@1.7.0
+ * 创建基于 v1.7.0
+ * 修改基于 v1.7.0
  */
 import { Column, Heading, MobileShell, Text } from '../../framework/lib/ui/index.js'
 import { useScreenId } from '../../framework/lib/core/ScreenIdentity.jsx'
@@ -122,9 +122,9 @@ export function DiscoverScreen() {
 
 ```jsx
 /**
- * @wireframe-skill multi-screen-wireframe@1.6.0
- * 创建基于 v1.6.0
- * 修改基于 v1.6.0
+ * @wireframe-skill multi-screen-wireframe@1.7.0
+ * 创建基于 v1.7.0
+ * 修改基于 v1.7.0
  */
 import { Button, Column, ConfirmDialog, Heading } from '../../framework/lib/ui/index.js'
 
