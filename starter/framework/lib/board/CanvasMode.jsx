@@ -41,12 +41,15 @@ function CanvasIndex({
       : clampCanvasIndexPosition(nextPosition, container, item)
   }, [canvasRef])
 
+  // position == null 表示尚未落点（或项目切换被清掉）；必须再跑一遍布局，
+  // 否则会一直卡在 visibility:hidden。
+  const needsDefaultPosition = position == null
   React.useLayoutEffect(() => {
     let disconnectResize = () => {}
     const stopWaiting = waitForCanvasIndexElements(
       () => ({ container: canvasRef.current, item: indexRef.current }),
       ({ container: canvas, item: index }) => {
-        const update = () => onPositionChange((current) => constrain(current, !current))
+        const update = () => onPositionChange((current) => constrain(current, current == null))
         update()
 
         if (typeof ResizeObserver === 'function') {
@@ -69,7 +72,7 @@ function CanvasIndex({
       stopWaiting()
       disconnectResize()
     }
-  }, [canvasRef, constrain, onPositionChange])
+  }, [canvasRef, constrain, needsDefaultPosition, onPositionChange])
 
   const finishDrag = (event) => {
     const drag = dragRef.current
@@ -282,6 +285,8 @@ export function CanvasMode({
   const startPan = (event) => {
     if (!canvasLocked) return
     if (event.button != null && event.button !== 0) return
+    // 画板索引是框架 chrome，锁交互只禁屏内内容，不抢索引点击 / 拖拽
+    if (event.target.closest?.('.wf-canvas-index')) return
     drag.current = { x: event.clientX, y: event.clientY, panX: view.panX, panY: view.panY }
     setDragging(true)
     event.currentTarget.setPointerCapture(event.pointerId)
@@ -301,7 +306,8 @@ export function CanvasMode({
   }
 
   const enterDemo = (screenId) => {
-    if (!demoAvailable || canvasLocked) return
+    // 锁交互时 stage 已 pointer-events:none；索引仍可双击进演示
+    if (!demoAvailable) return
     enterDemoMode(screenId)
   }
 

@@ -321,10 +321,17 @@ export function Board({ project }) {
     saveBoardSettings(getBoardStorage(), project.name, { showCanvasIndex: visible })
   }, [project.name])
 
+  // 只在切换项目时清位置。首屏 useEffect 若也 set null，会盖掉 CanvasIndex
+  // useLayoutEffect 刚算好的坐标，索引会一直 visibility:hidden。
+  const canvasIndexSettingsProjectRef = React.useRef(null)
   React.useEffect(() => {
     const settings = readBoardSettings(getBoardStorage(), project.name)
     setCanvasIndexVisible(settings.showCanvasIndex)
-    setCanvasIndexPosition(null)
+    const previousName = canvasIndexSettingsProjectRef.current
+    canvasIndexSettingsProjectRef.current = project.name
+    if (previousName != null && previousName !== project.name) {
+      setCanvasIndexPosition(null)
+    }
   }, [project.name])
 
   React.useEffect(() => {

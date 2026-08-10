@@ -1389,7 +1389,29 @@ button:disabled {
   -webkit-user-select: none !important;
 }
 
-/* 锁住时事件穿透到画布，禁止屏内点击/滚动 */
+/* 索引是框架 chrome：锁交互时仍可点选 / 拖拽，恢复自身光标 */
+.wf-canvas.is-locked .wf-canvas-index,
+.wf-canvas.is-locked .wf-canvas-index * {
+  cursor: auto !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.wf-canvas.is-locked .wf-canvas-index-handle {
+  cursor: grab !important;
+}
+
+.wf-canvas.is-locked .wf-canvas-index.is-dragging,
+.wf-canvas.is-locked .wf-canvas-index.is-dragging * {
+  cursor: grabbing !important;
+}
+
+.wf-canvas.is-locked .wf-canvas-index-dot,
+.wf-canvas.is-locked .wf-canvas-index-close {
+  cursor: pointer !important;
+}
+
+/* 锁住时事件穿透到画布，禁止屏内点击/滚动（不含索引等 chrome） */
 .wf-canvas.is-locked .wf-canvas-stage,
 .wf-canvas.is-locked .wf-canvas-stage * {
   pointer-events: none !important;
