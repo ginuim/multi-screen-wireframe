@@ -172,7 +172,7 @@ assert.equal(beforeUnloadEvent.defaultPrevented, true)
 assert.equal(beforeUnloadEvent.returnValue, UNSAVED_REVIEW_MESSAGE)
 assert.match(UNSAVED_REVIEW_MESSAGE, /修改内容.*丢失.*是否继续/)
 
-assert.match(skill, /DOM 可审阅性（必须）/)
+assert.match(skill, /DOM 修改定位（必须）/)
 assert.match(skill, /所有业务 JSX 节点都写语义 class/)
 assert.match(skill, /关键节点写全局唯一 id/)
 assert.match(skill, /data-wf-key/)

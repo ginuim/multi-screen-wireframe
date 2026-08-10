@@ -65,9 +65,9 @@ Board 快捷键：`Ctrl+1` 画板、`Ctrl+2` 演示、`Ctrl+I` 交互锁、`Ctrl
 
 画板索引支持拖拽和关闭；拖拽位置只保留到当前页面会话结束。“帮助 / 快捷键 / 设置”面板可开关索引，显示状态以项目名为键保存在 `localStorage`；存储不可用时默认显示且不影响离线运行。
 
-## 审阅与 DOM 定位
+## 修改与 DOM 定位
 
-Board 的「审阅」模式会拦截屏内交互。用户可以点选节点、沿面包屑切换到父节点，添加「修改建议 / 修改文字 / 调整顺序 / 删除节点」，再把修改清单生成可手动编辑和复制的 AI Prompt。开启多选或按住 Shift / Command / Ctrl 点击，可把多个节点绑定到同一条意见；所有目标旁显示同一个半透明黄色序号，点击序号浮动显示意见，并可通过「查看更多」展开完整审阅面板。有修改项后，画板会显示带数量的可拖拽评论入口；点击入口展开审阅面板，拖拽位置按项目保存在浏览器本地。按住空格时临时切换为画布拖动，松开后恢复审阅；输入框和 Prompt textarea 内的空格不触发画布。批注编号和浮层只高于画布业务内容，低于侧栏、顶栏、画布索引、沉浸控件和审阅面板等框架 chrome。审阅意见只存在于当前页面会话，不修改 JSX，也不生成 sidecar 文件。
+Board 的「修改」模式会拦截屏内交互。用户可以点选节点、沿面包屑切换到父节点，添加「修改建议 / 修改文字 / 调整顺序 / 删除节点」，再把修改清单生成可手动编辑和复制的 AI Prompt。开启多选或按住 Shift / Command / Ctrl 点击，可把多个节点绑定到同一条意见；所有目标旁显示同一个半透明黄色序号，点击序号浮动显示意见，并可通过「查看更多」展开完整修改面板。有修改项后，画板会显示带数量的可拖拽修改入口；点击入口展开修改面板，拖拽位置按项目保存在浏览器本地。按住空格时临时切换为画布拖动，松开后恢复修改；输入框和 Prompt textarea 内的空格不触发画布。批注编号和浮层只高于画布业务内容，低于侧栏、顶栏、画布索引、沉浸控件和修改面板等框架 chrome。修改意见只存在于当前页面会话，不改 JSX，也不生成 sidecar 文件。
 
 选择器优先级：关键节点 id → screen 作用域内的业务 class → `data-wf-key` → 带框架 class 的 DOM 路径兜底。生成业务源码时必须主动提供前三级稳定锚点：
 
@@ -99,7 +99,7 @@ Board 的「审阅」模式会拦截屏内交互。用户可以点选节点、�
 - 内容：`Heading`、`Text`、`Card`、`Badge`、`Avatar`、`ImagePlaceholder`
 - 表单：`Button`、`TextInput`、`TextArea`、`Select`、`Checkbox`、`Radio`、`Toggle`、`FormField`
 
-`PageHeader` 的页面标题需要精确审阅定位时传 `titleId`，副标题可传 `subtitleId`；header 自身仍用普通 `id`。例如 `<PageHeader id="order-detail-header" titleId="order-detail-title" ... />`。
+`PageHeader` 的页面标题需要精确修改定位时传 `titleId`，副标题可传 `subtitleId`；header 自身仍用普通 `id`。例如 `<PageHeader id="order-detail-header" titleId="order-detail-title" ... />`。
 
 `Avatar` 只表达圆形几何占位。`ImagePlaceholder` 只表达矩形尺寸、比例和圆角。
 

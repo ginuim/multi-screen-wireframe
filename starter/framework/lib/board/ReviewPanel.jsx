@@ -184,7 +184,7 @@ export function ReviewPanel({
               </button>
             </>
           ) : (
-            <p className="wf-review-empty">点击页面中的节点开始评论。点击面包屑可切换到父级组件。</p>
+            <p className="wf-review-empty">点击页面中的节点开始修改。点击面包屑可切换到父级组件。</p>
           )}
         </section>
 

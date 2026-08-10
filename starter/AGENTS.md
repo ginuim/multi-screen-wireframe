@@ -29,7 +29,7 @@
 - 新页面从 `src/screens/_template.jsx` 复制，使用标准 JSX 与 ESM import/export。
 - UI 组件从 `../../framework/lib/ui/index.js` 导入（layouts 同层级）。
 - **版本注释**：每个 `src/screens/*.jsx`、`src/layouts/*.jsx` 文件顶部保留 `@wireframe-skill` 注释块。新建时填写当前 skill 版本；修改时保留「创建基于」，更新「修改基于」为本次 skill 版本。
-- **审阅定位**：所有业务 JSX 节点写语义 `className`；页面根、header / 标题、主内容、关键卡片 / 表单 / 表格、主操作和弹层写以 screen id 开头的全局唯一 `id`；重复数据节点写稳定 `data-wf-key`。不得用文字、状态 class、DOM 层级或 `nth-child` 作为业务定位协议。
+- **修改定位**：所有业务 JSX 节点写语义 `className`；页面根、header / 标题、主内容、关键卡片 / 表单 / 表格、主操作和弹层写以 screen id 开头的全局唯一 `id`；重复数据节点写稳定 `data-wf-key`。不得用文字、状态 class、DOM 层级或 `nth-child` 作为业务定位协议。
 
 禁止修改 `dist/app.js`。它是构建产物。禁止改 `framework/vendor/`、`framework/tools/` 和构建脚本来绕过源码错误。
 
@@ -47,6 +47,6 @@
 3. 只用 `links` 声明页面流；交互组件使用 `to="target-id"`。
 4. 运行构建。
 5. 构建成功后双击 `index.html`，检查画布、演示、导航和目标视口。
-6. 打开「审阅」，分别点选关键 id、普通业务 class 和重复数据节点；多选两个节点加入同一条修改，确认两个目标显示同一黄色编号且点击可查看意见；验证 Prompt 可编辑、可复制，并确认按住空格可拖动画布。
+6. 打开「修改」，分别点选关键 id、普通业务 class 和重复数据节点；多选两个节点加入同一条修改，确认两个目标显示同一黄色编号且点击可查看意见；验证 Prompt 可编辑、可复制，并确认按住空格可拖动画布。
 
 完整可复制写法见 `EDITING.md`。

@@ -20,8 +20,8 @@ The deliverable ships with source, React, esbuild, and export utilities. Runtime
   Grayscale wireframes; measure-then-layout when references exist
 - **导出**：单页 PNG / 多页 ZIP  
   Export single-page PNG or multi-page ZIP
-- **审阅 Prompt**：单选 / 多选 DOM 节点添加意见，以黄色编号标记并浮动查看，生成可继续编辑和复制给 AI 的 Prompt
-  Review DOM nodes and turn scoped comments into an editable AI prompt
+- **修改 Prompt**：单选 / 多选 DOM 节点添加意见，以黄色编号标记并浮动查看，生成可继续编辑和复制给 AI 的 Prompt
+  Select DOM nodes and turn scoped comments into an editable AI prompt
 - **帮助与快捷操作**：键盘切换画板、演示、交互锁、修改、沉浸、全屏与热区；按 `?` 查看完整清单
   Keyboard shortcuts for board modes, interaction lock, review, immersive/fullscreen, and hotspots
 - **可配置索引**：画板索引可拖拽、关闭，并按项目记住显示开关
@@ -66,13 +66,13 @@ Clone this repo and point your AI agent at it (or place it in whatever skills fo
 - `EDITING.md`：页面、布局、导航、弹窗四个完整 JSX 示例
 - `src/screens/_template.jsx`：唯一页面模板
 
-业务修改只放在 `src/`。库代码在 `framework/lib/`；升级库时整夹覆盖 `framework/`，不要覆盖 `src/`。`dist/app.js` 是生成物，不要手改。业务 JSX 节点保留语义 class，关键节点保留全局唯一 id，重复数据节点保留 `data-wf-key`，这样审阅 Prompt 中的 DOM 选择器才能稳定映射回源码。
+业务修改只放在 `src/`。库代码在 `framework/lib/`；升级库时整夹覆盖 `framework/`，不要覆盖 `src/`。`dist/app.js` 是生成物，不要手改。业务 JSX 节点保留语义 class，关键节点保留全局唯一 id，重复数据节点保留 `data-wf-key`，这样修改 Prompt 中的 DOM 选择器才能稳定映射回源码。
 
-## 审阅并生成 Prompt / Review to prompt
+## 修改并生成 Prompt / Modify to prompt
 
-打开原型后点击工具栏「审阅」：点选屏内节点，通过层级面包屑切换到父组件，添加修改建议、文字替换、顺序调整或删除要求。开启「多选」或按住 Shift / Command / Ctrl 点击，可以把多个节点绑定到同一条意见。每条意见会在所有目标旁显示同一个半透明黄色编号；点击编号浮动查看意见。按住空格可临时拖动画布，松开后继续审阅。修改清单会生成 Prompt；Prompt 可继续手动编辑，再一键复制给 AI。
+打开原型后点击工具栏「修改」：点选屏内节点，通过层级面包屑切换到父组件，添加修改建议、文字替换、顺序调整或删除要求。开启「多选」或按住 Shift / Command / Ctrl 点击，可以把多个节点绑定到同一条意见。每条意见会在所有目标旁显示同一个半透明黄色编号；点击编号浮动查看意见。按住空格可临时拖动画布，松开后继续修改。修改清单会生成 Prompt；Prompt 可继续手动编辑，再一键复制给 AI。
 
-审阅记录只保留在当前页面会话中，不会直接修改 JSX，也不会生成额外状态文件。AI 应按 Prompt 中的 id / class / `data-wf-key` 搜索 `src/`，修改源码后重新构建。
+修改记录只保留在当前页面会话中，不会直接改 JSX，也不会生成额外状态文件。AI 应按 Prompt 中的 id / class / `data-wf-key` 搜索 `src/`，修改源码后重新构建。
 
 ## 快捷键与画板设置 / Shortcuts and board settings
 

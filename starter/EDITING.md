@@ -4,7 +4,7 @@
 
 组件从 `../../framework/lib/ui/index.js` 导入（`src/layouts/` 同层级）。
 
-为了让 Board 的「审阅」意见能用 DOM 选择器准确定位源码，所有业务 JSX 节点都写语义 `className`；页面根、标题、主内容、关键卡片 / 表单 / 表格 / 操作 / 弹层写以 screen id 开头的全局唯一 `id`；重复数据节点写稳定 `data-wf-key`。
+为了让 Board 的「修改」意见能用 DOM 选择器准确定位源码，所有业务 JSX 节点都写语义 `className`；页面根、标题、主内容、关键卡片 / 表单 / 表格 / 操作 / 弹层写以 screen id 开头的全局唯一 `id`；重复数据节点写稳定 `data-wf-key`。
 
 ## 页面示例
 

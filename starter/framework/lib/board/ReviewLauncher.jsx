@@ -95,8 +95,8 @@ export function ReviewLauncher({ boardRef, count, projectName, onOpen }) {
       type="button"
       className={dragging ? 'wf-review-launcher is-dragging' : 'wf-review-launcher'}
       style={position ? { left: position.x, top: position.y } : { right: LAUNCHER_MARGIN, bottom: LAUNCHER_MARGIN }}
-      aria-label={`展开评论，共 ${count} 条修改`}
-      data-tooltip="展开评论"
+      aria-label={`展开修改清单，共 ${count} 条修改`}
+      data-tooltip="展开修改清单"
       onPointerDown={(event) => {
         if (event.button !== 0) return
         const origin = positionRef.current || defaultPosition(boardRef.current)
