@@ -174,8 +174,8 @@ assert.match(skill, /按住空格可拖动画布/)
 for (const directory of [
   join(root, 'demo/api-client/src/screens'),
   join(root, 'demo/api-client/src/layouts'),
-  join(root, 'demo/claims-app/src/screens'),
-  join(root, 'demo/claims-app/src/layouts'),
+  join(root, 'demo/travel-app/src/screens'),
+  join(root, 'demo/travel-app/src/layouts'),
 ]) {
   for (const name of readdirSync(directory).filter((file) => file.endsWith('.jsx'))) {
     const source = readFileSync(join(directory, name), 'utf8')
@@ -187,7 +187,7 @@ for (const directory of [
 for (const directory of [
   join(root, 'starter/src/screens'),
   join(root, 'demo/api-client/src/screens'),
-  join(root, 'demo/claims-app/src/screens'),
+  join(root, 'demo/travel-app/src/screens'),
 ]) {
   for (const name of readdirSync(directory).filter((file) => file.endsWith('.jsx'))) {
     const source = readFileSync(join(directory, name), 'utf8')

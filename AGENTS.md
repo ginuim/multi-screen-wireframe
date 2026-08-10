@@ -30,6 +30,6 @@
 ## 维护
 
 - 修改 `framework/` 公共实现后，重新构建 starter 和两个 demo。
-- demo 构建：`scripts/build-demo.sh demo/api-client` 或 `scripts/build-demo.sh demo/claims-app`。
+- demo 构建：`scripts/build-demo.sh demo/api-client` 或 `scripts/build-demo.sh demo/travel-app`。
 - 运行 `tests/*.test.mjs`，再做浏览器回归。
 - bump 版本时同步：`VERSION`、`package.json`、`SKILL.md` frontmatter、`starter/src/screens/_template.jsx` 注释中的版本号。

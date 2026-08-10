@@ -132,4 +132,4 @@ version: 1.5.1
 - 维护公共组件或 Board 时才修改 `starter/framework/`，随后构建 starter 和两个 demo 并运行测试。
 - `starter/AGENTS.md` 与 `starter/EDITING.md` 是交付后的编辑依据；不要要求后续编辑者重新加载源 skill。
 
-组件、project schema 和不变量见 `reference.md`。完整覆盖示例见 `demo/api-client` 与 `demo/claims-app`。
+组件、project schema 和不变量见 `reference.md`。完整覆盖示例见 `demo/api-client` 与 `demo/travel-app`。

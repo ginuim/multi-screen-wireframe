@@ -93,13 +93,13 @@ build.cmd
 打开（需能解析到共享的 `starter/`）：
 
 - `demo/api-client/index.html` — desktop API Client（SideNav、DataTable、Tabs、表单）
-- `demo/claims-app/index.html` — mobile（TabBar、Cell、Steps、EmptyState、表单）
+- `demo/travel-app/index.html` — mobile 旅行助手（长页面展开、地图、TabBar、完整表单、弹层与反馈）
 
 维护者修改公共源码后，在仓库根目录运行：
 
 ```sh
 scripts/build-demo.sh demo/api-client
-scripts/build-demo.sh demo/claims-app
+scripts/build-demo.sh demo/travel-app
 ```
 
 demo 不携带编译器，只在维护时使用 `starter/framework/tools/`。

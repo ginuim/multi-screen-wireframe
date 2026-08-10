@@ -40,8 +40,8 @@ const businessFiles = [
   ...filesUnder(join(root, 'starter', 'src')),
   ...filesUnder(join(root, 'demo', 'api-client', 'src')),
   ...filesUnder(join(root, 'demo', 'api-client', 'styles')),
-  ...filesUnder(join(root, 'demo', 'claims-app', 'src')),
-  ...filesUnder(join(root, 'demo', 'claims-app', 'styles')),
+  ...filesUnder(join(root, 'demo', 'travel-app', 'src')),
+  ...filesUnder(join(root, 'demo', 'travel-app', 'styles')),
 ].filter((file) => ['.js', '.jsx', '.css'].includes(extname(file)))
 
 const frameworkFiles = [
@@ -110,7 +110,7 @@ for (const file of sourceFiles) {
   assert.doesNotMatch(source, /position\s*:\s*fixed/i, `${file} contains fixed positioning`)
 }
 
-for (const demo of ['api-client', 'claims-app']) {
+for (const demo of ['api-client', 'travel-app']) {
   assert.equal(existsSync(join(root, 'demo', demo, 'tools')), false)
   const dist = readFileSync(join(root, 'demo', demo, 'dist', 'app.js'), 'utf8')
   assert.match(dist, /^\/\* GENERATED FILE\. EDIT src\/, THEN RUN BUILD\. \*\//)
@@ -126,7 +126,7 @@ assert.match(starterHtml, /framework\/styles\/prototype\.css/)
 for (const [indexPath, vendorPath] of [
   [join(root, 'starter', 'index.html'), 'framework/vendor/'],
   [join(root, 'demo', 'api-client', 'index.html'), '../../starter/framework/vendor/'],
-  [join(root, 'demo', 'claims-app', 'index.html'), '../../starter/framework/vendor/'],
+  [join(root, 'demo', 'travel-app', 'index.html'), '../../starter/framework/vendor/'],
 ]) {
   const vendorBase = new URL(vendorPath, pathToFileURL(indexPath))
   for (const file of ['html2canvas.min.js', 'jszip.min.js', 'FileSaver.min.js']) {
@@ -140,8 +140,8 @@ assert.match(readme, /1\.3\.0|Skill 版本/)
 assert.match(readme, /framework/)
 
 const apiClientProject = readFileSync(join(root, 'demo', 'api-client', 'src', 'project.js'), 'utf8')
-const claimsProject = readFileSync(join(root, 'demo', 'claims-app', 'src', 'project.js'), 'utf8')
+const claimsProject = readFileSync(join(root, 'demo', 'travel-app', 'src', 'project.js'), 'utf8')
 assert.equal((apiClientProject.match(/\bid:\s*'/g) || []).length, 6)
-assert.equal((claimsProject.match(/\bid:\s*'/g) || []).length, 5)
+assert.equal((claimsProject.match(/\bid:\s*'/g) || []).length, 10)
 
 console.log('static-contract: pass')

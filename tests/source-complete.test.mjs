@@ -42,7 +42,7 @@ function assertScreensComplete(label, projectDir) {
 
 assertScreensComplete('starter', join(root, 'starter'))
 assertScreensComplete('demo/api-client', join(root, 'demo', 'api-client'))
-assertScreensComplete('demo/claims-app', join(root, 'demo', 'claims-app'))
+assertScreensComplete('demo/travel-app', join(root, 'demo', 'travel-app'))
 
 const skill = readFileSync(join(root, 'SKILL.md'), 'utf8')
 assert.match(skill, /源码齐全/)
