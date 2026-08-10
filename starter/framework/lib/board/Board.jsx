@@ -7,7 +7,9 @@ import { canUseDemo } from './validation.js'
 import { clampScale } from './navigation.js'
 import { ReviewPanel } from './ReviewPanel.jsx'
 import { ReviewMarkers } from './ReviewMarkers.jsx'
+import { ReviewLauncher } from './ReviewLauncher.jsx'
 import { describeReviewElement } from './review.js'
+import { preventUnsavedReviewExit } from './before-unload.js'
 
 const VIEWPORT_LABELS = {
   mobile: '手机',
@@ -227,6 +229,12 @@ export function Board({ project }) {
     setReviewEnabled(true)
   }
 
+  const openReviewPanel = () => {
+    setInteractive(true)
+    setReviewEnabled(true)
+    setReviewPanelVisible(true)
+  }
+
   const addReviewItem = (item) => {
     setReviewItems((current) => [
       ...current,
@@ -250,7 +258,13 @@ export function Board({ project }) {
     clearReviewSelection()
     hoverReviewBreadcrumb(null)
     setReviewPanelVisible(false)
-  }, [clearReviewSelection, hoverReviewBreadcrumb, mode, reviewEnabled, viewportKey])
+  }, [clearReviewSelection, hoverReviewBreadcrumb, mode, viewportKey])
+
+  React.useEffect(() => {
+    if (reviewItems.length === 0) return undefined
+    window.addEventListener('beforeunload', preventUnsavedReviewExit)
+    return () => window.removeEventListener('beforeunload', preventUnsavedReviewExit)
+  }, [reviewItems.length])
 
   const exitImmersive = React.useCallback(() => {
     setImmersive(false)
@@ -478,14 +492,11 @@ export function Board({ project }) {
             type="button"
             className={reviewEnabled ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
             aria-pressed={reviewEnabled}
-            aria-label={reviewEnabled ? `修改中（${reviewItems.length} 条意见）` : `修改（${reviewItems.length} 条意见）`}
+            aria-label={reviewEnabled ? '修改中' : '修改'}
             title="修改：点选页面节点并整理成可编辑的 AI 修改 Prompt"
             onClick={toggleReview}
           >
             <ToolbarIcon name="edit" />
-            {reviewItems.length > 0 ? (
-              <span className="wf-toolbar-icon-count">{reviewItems.length}</span>
-            ) : null}
             <span className="wf-visually-hidden">修改</span>
           </button>
           <button
@@ -613,8 +624,14 @@ export function Board({ project }) {
         />
       )}
       {reviewEnabled ? (
-        <ReviewMarkers boardRef={boardRef} items={reviewItems} />
+        <ReviewMarkers boardRef={boardRef} items={reviewItems} onOpenPanel={openReviewPanel} />
       ) : null}
+      <ReviewLauncher
+        boardRef={boardRef}
+        count={reviewItems.length}
+        projectName={project.name}
+        onOpen={openReviewPanel}
+      />
       {reviewEnabled && reviewPanelVisible ? (
         <ReviewPanel
           project={project}

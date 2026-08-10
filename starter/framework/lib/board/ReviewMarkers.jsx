@@ -60,7 +60,7 @@ function resolvePositions(board, items) {
   return positions
 }
 
-export function ReviewMarkers({ boardRef, items }) {
+export function ReviewMarkers({ boardRef, items, onOpenPanel }) {
   const [positions, setPositions] = React.useState([])
   const [activeKey, setActiveKey] = React.useState(null)
   const frameRef = React.useRef(null)
@@ -145,6 +145,16 @@ export function ReviewMarkers({ boardRef, items }) {
               <code className="wf-review-marker-popover-selector" key={target.selector}>{target.selector}</code>
             ))}
           </div>
+          <button
+            className="wf-review-marker-popover-more"
+            type="button"
+            onClick={() => {
+              setActiveKey(null)
+              onOpenPanel?.()
+            }}
+          >
+            查看更多
+          </button>
         </aside>
       ) : null}
     </div>

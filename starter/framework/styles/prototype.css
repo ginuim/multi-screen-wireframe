@@ -551,6 +551,94 @@ button:disabled {
   color: var(--board-text);
 }
 
+.wf-review-launcher {
+  position: absolute;
+  z-index: 25;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(26, 29, 33, 0.14);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 6px 22px rgba(26, 29, 33, 0.16);
+  color: var(--board-text);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.wf-review-launcher:hover,
+.wf-review-launcher:focus-visible {
+  border-color: rgba(37, 99, 235, 0.42);
+  color: #2563eb;
+  box-shadow: 0 8px 26px rgba(26, 29, 33, 0.2);
+}
+
+.wf-review-launcher.is-dragging {
+  cursor: grabbing;
+  box-shadow: 0 10px 30px rgba(26, 29, 33, 0.24);
+}
+
+.wf-review-launcher::before {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #24272b;
+  color: #fff;
+  content: attr(data-tooltip);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(4px, -50%);
+  transition: opacity 0.12s, transform 0.12s;
+  white-space: nowrap;
+}
+
+.wf-review-launcher:hover::before,
+.wf-review-launcher:focus-visible::before {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+.wf-review-launcher.is-dragging::before {
+  opacity: 0;
+}
+
+.wf-review-launcher-icon {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.wf-review-launcher-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  display: grid;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  place-items: center;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
 .wf-board.is-immersive .wf-review-panel {
   top: 0;
 }
@@ -947,6 +1035,23 @@ button:disabled {
   color: #785b0b;
   font-size: 9px;
   line-height: 1.4;
+}
+
+.wf-review-marker-popover-more {
+  width: 100%;
+  margin-top: 10px;
+  padding: 7px 10px;
+  border: 1px solid rgba(161, 98, 7, 0.38);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #6b4f00;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.wf-review-marker-popover-more:hover {
+  border-color: rgba(161, 98, 7, 0.7);
+  background: #fff;
 }
 
 .wf-screen-list > li {
