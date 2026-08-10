@@ -10,6 +10,9 @@ import { ReviewMarkers } from './ReviewMarkers.jsx'
 import { ReviewLauncher } from './ReviewLauncher.jsx'
 import { describeReviewElement } from './review.js'
 import { preventUnsavedReviewExit } from './before-unload.js'
+import { BoardSettings, ShortcutHelp } from './BoardPanels.jsx'
+import { getBoardStorage, readBoardSettings, saveBoardSettings } from './board-settings.js'
+import { isEditableShortcutTarget, shortcutIdForEvent } from './shortcuts.js'
 
 const VIEWPORT_LABELS = {
   mobile: '手机',
@@ -37,6 +40,8 @@ function ToolbarIcon({ name }) {
     toolbarExpand: <><path d="M5 5v14" /><path d="m15 18-6-6 6-6" /></>,
     toolbarCollapse: <><path d="M19 5v14" /><path d="m9 18 6-6-6-6" /></>,
     download: <><path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M5 21h14" /></>,
+    settings: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.2.37.52.7 1 .9.32.13.68.2 1.1.2h.09v4h-.09a1.7 1.7 0 0 0-2.1.9Z" /></>,
+    help: <><circle cx="12" cy="12" r="9" /><path d="M9.7 9a2.4 2.4 0 1 1 3.7 2c-.9.6-1.4 1.1-1.4 2" /><path d="M12 17h.01" /></>,
   }
 
   return (
@@ -82,8 +87,8 @@ function InteractionLock({ interactive, onToggle }) {
       onClick={onToggle}
       aria-pressed={!interactive}
       title={interactive
-        ? '当前可交互页面。点击锁住后：拖拽平移画布，滚轮缩放；也可按住空格临时锁住'
-        : '当前已锁住。拖拽平移、滚轮缩放；页面内点击与滚动已禁用。点击恢复可交互'}
+        ? '当前可交互页面。点击锁住后：拖拽平移画布，滚轮缩放；快捷键 Ctrl+I'
+        : '当前已锁住。点击恢复可交互；快捷键 Ctrl+I'}
     >
       <LockIcon open={interactive} />
       <span>{interactive ? '可交互' : '不可交互'}</span>
@@ -146,6 +151,12 @@ export function Board({ project }) {
   const [reviewSelections, setReviewSelections] = React.useState([])
   const [reviewMultiSelect, setReviewMultiSelect] = React.useState(false)
   const [reviewItems, setReviewItems] = React.useState([])
+  const [helpVisible, setHelpVisible] = React.useState(false)
+  const [settingsVisible, setSettingsVisible] = React.useState(false)
+  const [canvasIndexVisible, setCanvasIndexVisible] = React.useState(
+    () => readBoardSettings(getBoardStorage(), project.name).showCanvasIndex,
+  )
+  const [canvasIndexPosition, setCanvasIndexPosition] = React.useState(null)
   const boardRef = React.useRef(null)
   const selectedReviewElementsRef = React.useRef(new Set())
   const breadcrumbHoverElementRef = React.useRef(null)
@@ -222,7 +233,7 @@ export function Board({ project }) {
     breadcrumbHoverElementRef.current?.classList.add('is-review-hovered')
   }, [])
 
-  const toggleReview = () => {
+  const toggleReview = React.useCallback(() => {
     if (reviewEnabled) {
       closeReview()
       return
@@ -230,7 +241,7 @@ export function Board({ project }) {
     setInteractive(true)
     setReviewPanelVisible(false)
     setReviewEnabled(true)
-  }
+  }, [closeReview, reviewEnabled])
 
   const openReviewPanel = () => {
     setInteractive(true)
@@ -275,13 +286,42 @@ export function Board({ project }) {
     exitBoardFullscreen()
   }, [])
 
-  const toggleBrowserFullscreen = () => {
+  const enterImmersive = React.useCallback(() => {
+    closeReview()
+    setHelpVisible(false)
+    setSettingsVisible(false)
+    setImmersiveToolbarExpanded(true)
+    setImmersive(true)
+  }, [closeReview])
+
+  const toggleImmersive = React.useCallback(() => {
+    if (immersive) exitImmersive()
+    else enterImmersive()
+  }, [enterImmersive, exitImmersive, immersive])
+
+  const toggleBrowserFullscreen = React.useCallback(() => {
     if (getFullscreenElement()) {
       exitBoardFullscreen()
       return
     }
+    closeReview()
+    setHelpVisible(false)
+    setSettingsVisible(false)
+    setImmersiveToolbarExpanded(true)
+    setImmersive(true)
     requestBoardFullscreen(boardRef.current)
-  }
+  }, [closeReview])
+
+  const updateCanvasIndexVisible = React.useCallback((visible) => {
+    setCanvasIndexVisible(visible)
+    saveBoardSettings(getBoardStorage(), project.name, { showCanvasIndex: visible })
+  }, [project.name])
+
+  React.useEffect(() => {
+    const settings = readBoardSettings(getBoardStorage(), project.name)
+    setCanvasIndexVisible(settings.showCanvasIndex)
+    setCanvasIndexPosition(null)
+  }, [project.name])
 
   React.useEffect(() => {
     setExpandedIds(new Set())
@@ -310,13 +350,38 @@ export function Board({ project }) {
 
   React.useEffect(() => {
     const down = (event) => {
-      if (event.code !== 'Space' || event.repeat) return
-      const tag = event.target && event.target.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || event.target.isContentEditable) {
+      if (event.code === 'Space' && !event.repeat && !isEditableShortcutTarget(event.target)) {
+        event.preventDefault()
+        setSpaceHeld(true)
         return
       }
+
+      const shortcut = shortcutIdForEvent(event)
+      if (!shortcut) return
+      if (shortcut !== 'escape' && isEditableShortcutTarget(event.target)) return
+
+      if (shortcut === 'demo' && !demoAvailable) return
+      if (shortcut === 'hotspots' && !isDemo) return
+      if (shortcut === 'escape' && getFullscreenElement()) return
       event.preventDefault()
-      setSpaceHeld(true)
+
+      if (shortcut === 'canvas') setMode('canvas')
+      if (shortcut === 'demo') setMode('demo')
+      if (shortcut === 'interaction') setInteractive((value) => !value)
+      if (shortcut === 'review') toggleReview()
+      if (shortcut === 'immersive') toggleImmersive()
+      if (shortcut === 'browser-fullscreen') toggleBrowserFullscreen()
+      if (shortcut === 'hotspots') setHotspotsVisible((value) => !value)
+      if (shortcut === 'help') {
+        setSettingsVisible(false)
+        setHelpVisible((value) => !value)
+      }
+      if (shortcut === 'escape') {
+        if (helpVisible) setHelpVisible(false)
+        else if (settingsVisible) setSettingsVisible(false)
+        else if (reviewEnabled) closeReview()
+        else if (immersive) exitImmersive()
+      }
     }
     const up = (event) => {
       if (event.code === 'Space') setSpaceHeld(false)
@@ -327,7 +392,20 @@ export function Board({ project }) {
       window.removeEventListener('keydown', down)
       window.removeEventListener('keyup', up)
     }
-  }, [])
+  }, [
+    closeReview,
+    demoAvailable,
+    exitImmersive,
+    helpVisible,
+    immersive,
+    isDemo,
+    reviewEnabled,
+    setMode,
+    settingsVisible,
+    toggleBrowserFullscreen,
+    toggleImmersive,
+    toggleReview,
+  ])
 
   React.useEffect(() => {
     if (mode !== 'demo') setHotspotsVisible(false)
@@ -342,18 +420,6 @@ export function Board({ project }) {
       document.removeEventListener('webkitfullscreenchange', sync)
     }
   }, [])
-
-  React.useEffect(() => {
-    if (!immersive) return undefined
-    const onKey = (event) => {
-      if (event.key !== 'Escape') return
-      if (getFullscreenElement()) return
-      event.preventDefault()
-      setImmersive(false)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [immersive])
 
   const exportIds = (ids) => runExportWithFeedback(async () => {
     setExporting(true)
@@ -404,6 +470,7 @@ export function Board({ project }) {
                 type="button"
                 className={mode === 'canvas' ? 'is-active' : ''}
                 onClick={() => setMode('canvas')}
+                title="画板模式（Ctrl+1）"
               >
                 画板
               </button>
@@ -411,6 +478,7 @@ export function Board({ project }) {
                 type="button"
                 className={mode === 'demo' ? 'is-active' : ''}
                 onClick={() => setMode('demo')}
+                title="演示模式（Ctrl+2）"
               >
                 演示
               </button>
@@ -459,6 +527,7 @@ export function Board({ project }) {
                 type="button"
                 className={hotspotsVisible ? 'wf-board-button is-active' : 'wf-board-button'}
                 onClick={() => setHotspotsVisible((value) => !value)}
+                title="显示或隐藏演示热区（Ctrl+H）"
               >
                 {hotspotsVisible ? '热区 ON' : '热区 OFF'}
               </button>
@@ -494,10 +563,40 @@ export function Board({ project }) {
         <div className="wf-toolbar-right">
           <button
             type="button"
+            className={settingsVisible ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
+            aria-label="打开画板设置"
+            aria-expanded={settingsVisible}
+            aria-controls="wf-board-settings"
+            title="设置"
+            onClick={() => {
+              setHelpVisible(false)
+              setSettingsVisible((value) => !value)
+            }}
+          >
+            <ToolbarIcon name="settings" />
+            <span className="wf-visually-hidden">设置</span>
+          </button>
+          <button
+            type="button"
+            className={helpVisible ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
+            aria-label="打开快捷键帮助"
+            aria-expanded={helpVisible}
+            aria-controls="wf-shortcut-help"
+            title="快捷键帮助（?）"
+            onClick={() => {
+              setSettingsVisible(false)
+              setHelpVisible((value) => !value)
+            }}
+          >
+            <ToolbarIcon name="help" />
+            <span className="wf-visually-hidden">快捷键帮助</span>
+          </button>
+          <button
+            type="button"
             className={reviewEnabled ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
             aria-pressed={reviewEnabled}
             aria-label={reviewEnabled ? '修改中' : '修改'}
-            title="修改：点选页面节点并整理成可编辑的 AI 修改 Prompt"
+            title="修改：点选页面节点并整理成可编辑的 AI 修改 Prompt（Ctrl+M）"
             onClick={toggleReview}
           >
             <ToolbarIcon name="edit" />
@@ -506,13 +605,9 @@ export function Board({ project }) {
           <button
             type="button"
             className="wf-toolbar-icon-button"
-            aria-label="进入沉浸模式"
-            title="进入沉浸：隐藏顶栏与侧栏"
-            onClick={() => {
-              closeReview()
-              setImmersiveToolbarExpanded(true)
-              setImmersive(true)
-            }}
+            aria-label={immersive ? '退出沉浸模式' : '进入沉浸模式'}
+            title="切换沉浸模式（Ctrl+F）"
+            onClick={toggleImmersive}
           >
             <ToolbarIcon name="fullscreen" />
             <span className="wf-visually-hidden">全屏</span>
@@ -575,7 +670,7 @@ export function Board({ project }) {
               <button
                 type="button"
                 className={browserFullscreen ? 'wf-board-button is-active' : 'wf-board-button'}
-                title={browserFullscreen ? '退出浏览器全屏' : '浏览器全屏'}
+                title={browserFullscreen ? '退出浏览器全屏（Ctrl+Shift+F）' : '浏览器全屏（Ctrl+Shift+F）'}
                 onClick={toggleBrowserFullscreen}
               >
                 {browserFullscreen ? '浏览器全屏 ON' : '浏览器全屏'}
@@ -616,6 +711,7 @@ export function Board({ project }) {
                     type="button"
                     className={hotspotsVisible ? 'wf-board-button is-active' : 'wf-board-button'}
                     onClick={() => setHotspotsVisible((value) => !value)}
+                    title="显示或隐藏演示热区（Ctrl+H）"
                   >
                     {hotspotsVisible ? '热区 ON' : '热区 OFF'}
                   </button>
@@ -649,6 +745,10 @@ export function Board({ project }) {
           onExportIds={exportIds}
           reviewEnabled={reviewEnabled}
           onReviewSelect={selectReviewElement}
+          canvasIndexVisible={canvasIndexVisible}
+          canvasIndexPosition={canvasIndexPosition}
+          onCanvasIndexPositionChange={setCanvasIndexPosition}
+          onCloseCanvasIndex={() => updateCanvasIndexVisible(false)}
         />
       ) : (
         <DemoMode
@@ -673,6 +773,16 @@ export function Board({ project }) {
         projectName={project.name}
         onOpen={openReviewPanel}
       />
+      {helpVisible ? (
+        <ShortcutHelp demoAvailable={demoAvailable} onClose={() => setHelpVisible(false)} />
+      ) : null}
+      {settingsVisible ? (
+        <BoardSettings
+          showCanvasIndex={canvasIndexVisible}
+          onShowCanvasIndexChange={updateCanvasIndexVisible}
+          onClose={() => setSettingsVisible(false)}
+        />
+      ) : null}
       {reviewEnabled && reviewPanelVisible ? (
         <ReviewPanel
           project={project}

@@ -3,6 +3,168 @@ import { focusCanvasScreen, resetCanvasViewport, panFromDragSnapshot } from './n
 import { ScreenFrame } from './ScreenFrame.jsx'
 import { useWheelZoom } from './useWheelZoom.js'
 import { canUseDemo } from './validation.js'
+import {
+  clampCanvasIndexPosition,
+  defaultCanvasIndexPosition,
+  waitForCanvasIndexElements,
+} from './canvas-index.js'
+
+const INDEX_DRAG_THRESHOLD = 4
+
+function elementSize(element) {
+  return { width: element?.offsetWidth || 0, height: element?.offsetHeight || 0 }
+}
+
+function CanvasIndex({
+  canvasRef,
+  project,
+  currentScreenId,
+  demoAvailable,
+  position,
+  onPositionChange,
+  onClose,
+  navigate,
+  enterDemo,
+}) {
+  const indexRef = React.useRef(null)
+  const dragRef = React.useRef(null)
+  const [dragging, setDragging] = React.useState(false)
+
+  const constrain = React.useCallback((nextPosition, useDefault = false) => {
+    const canvas = canvasRef.current
+    const index = indexRef.current
+    if (!canvas || !index) return nextPosition
+    const container = { width: canvas.clientWidth, height: canvas.clientHeight }
+    const item = elementSize(index)
+    return useDefault
+      ? defaultCanvasIndexPosition(container, item)
+      : clampCanvasIndexPosition(nextPosition, container, item)
+  }, [canvasRef])
+
+  React.useLayoutEffect(() => {
+    let disconnectResize = () => {}
+    const stopWaiting = waitForCanvasIndexElements(
+      () => ({ container: canvasRef.current, item: indexRef.current }),
+      ({ container: canvas, item: index }) => {
+        const update = () => onPositionChange((current) => constrain(current, !current))
+        update()
+
+        if (typeof ResizeObserver === 'function') {
+          const observer = new ResizeObserver(update)
+          observer.observe(canvas)
+          observer.observe(index)
+          disconnectResize = () => observer.disconnect()
+          return
+        }
+        window.addEventListener('resize', update)
+        disconnectResize = () => window.removeEventListener('resize', update)
+      },
+      {
+        request: (callback) => window.requestAnimationFrame(callback),
+        cancel: (frame) => window.cancelAnimationFrame(frame),
+      },
+    )
+
+    return () => {
+      stopWaiting()
+      disconnectResize()
+    }
+  }, [canvasRef, constrain, onPositionChange])
+
+  const finishDrag = (event) => {
+    const drag = dragRef.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+    dragRef.current = null
+    setDragging(false)
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+    event.stopPropagation()
+  }
+
+  return (
+    <div
+      ref={indexRef}
+      className={dragging ? 'wf-canvas-index is-dragging' : 'wf-canvas-index'}
+      style={position ? { left: position.x, top: position.y } : { visibility: 'hidden' }}
+    >
+      <button
+        type="button"
+        className="wf-canvas-index-handle"
+        aria-label="拖动画板索引"
+        title="拖动画板索引"
+        onPointerDown={(event) => {
+          if (event.button !== 0) return
+          const origin = position || constrain(null, true)
+          dragRef.current = {
+            pointerId: event.pointerId,
+            startX: event.clientX,
+            startY: event.clientY,
+            origin,
+            moved: false,
+          }
+          event.currentTarget.setPointerCapture(event.pointerId)
+          event.preventDefault()
+          event.stopPropagation()
+        }}
+        onPointerMove={(event) => {
+          const drag = dragRef.current
+          if (!drag || drag.pointerId !== event.pointerId) return
+          const deltaX = event.clientX - drag.startX
+          const deltaY = event.clientY - drag.startY
+          if (!drag.moved && Math.hypot(deltaX, deltaY) < INDEX_DRAG_THRESHOLD) return
+          drag.moved = true
+          setDragging(true)
+          onPositionChange(constrain({ x: drag.origin.x + deltaX, y: drag.origin.y + deltaY }))
+          event.preventDefault()
+          event.stopPropagation()
+        }}
+        onPointerUp={finishDrag}
+        onPointerCancel={finishDrag}
+      >
+        <span className="wf-canvas-index-grip" aria-hidden="true"><i /><i /><i /></span>
+        <span>索引</span>
+      </button>
+      <div className="wf-canvas-index-list">
+        {project.screens.map((screen, index) => (
+          <button
+            type="button"
+            key={screen.id}
+            className={screen.id === currentScreenId ? 'wf-canvas-index-dot is-active' : 'wf-canvas-index-dot'}
+            onClick={(event) => {
+              event.stopPropagation()
+              navigate(screen.id)
+            }}
+            onDoubleClick={(event) => {
+              event.stopPropagation()
+              enterDemo(screen.id)
+            }}
+            aria-label={`${index + 1}. ${screen.title}`}
+            title={demoAvailable ? '双击进入演示' : undefined}
+          >
+            <span>{index + 1}</span>
+            <span className="wf-canvas-index-tooltip" aria-hidden="true">
+              <span className="wf-canvas-index-tooltip-title">{screen.title}</span>
+              <span className="wf-canvas-index-tooltip-file">src/screens/{screen.id}.jsx</span>
+            </span>
+          </button>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="wf-canvas-index-close"
+        aria-label="关闭画板索引"
+        title="关闭画板索引"
+        onClick={(event) => {
+          event.stopPropagation()
+          onClose()
+        }}
+      >
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" /></svg>
+      </button>
+    </div>
+  )
+}
 
 export async function runExportWithFeedback(task, setError) {
   setError(null)
@@ -46,6 +208,10 @@ export function CanvasMode({
   onExportIds,
   reviewEnabled = false,
   onReviewSelect,
+  canvasIndexVisible = true,
+  canvasIndexPosition,
+  onCanvasIndexPositionChange,
+  onCloseCanvasIndex,
 }) {
   const { currentScreenId, navigate, viewport, viewportKey, enterDemo: enterDemoMode } = usePrototype()
   const [view, setView] = React.useState(() => ({ ...resetCanvasViewport(), scale }))
@@ -315,28 +481,19 @@ export function CanvasMode({
             )
           })}
         </div>
-        <div className="wf-canvas-index">
-          <span className="wf-canvas-index-label">索引</span>
-          <div className="wf-canvas-index-list">
-            {project.screens.map((screen, index) => (
-              <button
-                type="button"
-                key={screen.id}
-                className={screen.id === currentScreenId ? 'wf-canvas-index-dot is-active' : 'wf-canvas-index-dot'}
-                onClick={() => navigate(screen.id)}
-                onDoubleClick={() => enterDemo(screen.id)}
-                aria-label={`${index + 1}. ${screen.title}`}
-                title={demoAvailable ? '双击进入演示' : undefined}
-              >
-                <span>{index + 1}</span>
-                <span className="wf-canvas-index-tooltip" aria-hidden="true">
-                  <span className="wf-canvas-index-tooltip-title">{screen.title}</span>
-                  <span className="wf-canvas-index-tooltip-file">src/screens/{screen.id}.jsx</span>
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
+        {canvasIndexVisible ? (
+          <CanvasIndex
+            canvasRef={canvasRef}
+            project={project}
+            currentScreenId={currentScreenId}
+            demoAvailable={demoAvailable}
+            position={canvasIndexPosition}
+            onPositionChange={onCanvasIndexPositionChange}
+            onClose={onCloseCanvasIndex}
+            navigate={navigate}
+            enterDemo={enterDemo}
+          />
+        ) : null}
       </main>
       {copyToast ? (
         <div className="wf-board-toast" role="status">{copyToast}</div>

@@ -2,7 +2,7 @@
 
 本目录是独立的多屏线框 skill。生成流程见 `SKILL.md`，组件与数据协议见 `reference.md`，人类使用说明见 `README.md`。
 
-**当前版本**：见根目录 `VERSION`（现 `1.5.1`）。`SKILL.md` frontmatter 的 `version` 与 `package.json` 必须与之一致。
+**当前版本**：见根目录 `VERSION`（现 `1.6.0`）。`SKILL.md` frontmatter 的 `version` 与 `package.json` 必须与之一致。
 
 ## 维护边界
 

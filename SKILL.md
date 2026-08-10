@@ -1,14 +1,14 @@
 ---
 name: multi-screen-wireframe
 description: Use when creating or revising an offline multi-page wireframe, multi-screen prototype, page-flow board, desktop admin flow, or mobile app flow from product requirements or visual references.
-version: 1.5.1
+version: 1.6.0
 ---
 
 # Multi-Screen Wireframe
 
 生成可双击打开、可继续编辑和构建的 JSX 多屏线框交付物。
 
-**Skill 版本**：`1.5.1`（与仓库根目录 `VERSION`、`package.json` 保持一致；升级 skill 时三处同步 bump）。
+**Skill 版本**：`1.6.0`（与仓库根目录 `VERSION`、`package.json` 保持一致；升级 skill 时三处同步 bump）。
 
 ## 生成流程
 
@@ -90,13 +90,13 @@ version: 1.5.1
 
 ## 版本注释（必须）
 
-生成或修改业务页面时，在文件最顶部（`import` 之前）写如下块注释，版本号取自本 skill 当前 `version`（现为 `1.5.1`）：
+生成或修改业务页面时，在文件最顶部（`import` 之前）写如下块注释，版本号取自本 skill 当前 `version`（现为 `1.6.0`）：
 
 ```jsx
 /**
- * @wireframe-skill multi-screen-wireframe@1.5.1
- * 创建基于 v1.5.1
- * 修改基于 v1.5.1
+ * @wireframe-skill multi-screen-wireframe@1.6.0
+ * 创建基于 v1.6.0
+ * 修改基于 v1.6.0
  */
 ```
 

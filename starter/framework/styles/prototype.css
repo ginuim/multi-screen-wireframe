@@ -139,6 +139,142 @@ button:disabled {
   flex-shrink: 0;
 }
 
+.wf-board-panel-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 60px 12px 12px;
+  background: rgba(26, 29, 33, 0.08);
+}
+
+.wf-board-panel {
+  width: min(360px, 100%);
+  max-height: calc(100% - 60px);
+  overflow: auto;
+  border: 1px solid var(--board-border);
+  border-radius: 10px;
+  background: var(--board-surface);
+  box-shadow: 0 18px 48px rgba(26, 29, 33, 0.18);
+  color: var(--board-text);
+}
+
+.wf-board-panel-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--board-border);
+  background: var(--board-surface);
+}
+
+.wf-board-panel-header strong {
+  font-size: 14px;
+}
+
+.wf-board-panel-close {
+  padding: 4px 8px;
+  border: 1px solid var(--board-border);
+  border-radius: 5px;
+  background: var(--board-fill);
+  color: var(--board-muted);
+  font-size: 11px;
+}
+
+.wf-board-panel-body {
+  padding: 14px;
+}
+
+.wf-shortcut-list {
+  margin: 0;
+}
+
+.wf-shortcut-list > div {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--board-fill);
+}
+
+.wf-shortcut-list > div:last-child {
+  border-bottom: 0;
+}
+
+.wf-shortcut-list > div.is-disabled {
+  opacity: 0.45;
+}
+
+.wf-shortcut-list dt,
+.wf-shortcut-list dd {
+  margin: 0;
+}
+
+.wf-shortcut-list kbd {
+  display: inline-flex;
+  min-width: 30px;
+  justify-content: center;
+  padding: 3px 7px;
+  border: 1px solid var(--board-border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--board-fill);
+  color: var(--board-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.wf-shortcut-list dd {
+  color: var(--board-muted);
+  font-size: 12px;
+}
+
+.wf-board-panel-note {
+  margin: 12px 0 0;
+  color: var(--board-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.wf-board-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  cursor: pointer;
+}
+
+.wf-board-setting-row > span,
+.wf-board-setting-row strong,
+.wf-board-setting-row small {
+  display: block;
+}
+
+.wf-board-setting-row strong {
+  font-size: 12px;
+}
+
+.wf-board-setting-row small {
+  margin-top: 3px;
+  color: var(--board-muted);
+  font-size: 10px;
+}
+
+.wf-board-setting-row input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  accent-color: var(--board-text);
+}
+
 .wf-toolbar-error {
   padding: 8px 16px;
   border-bottom: 1px solid #f0c7c0;
@@ -1423,8 +1559,6 @@ button:disabled {
 
 .wf-canvas-index {
   position: absolute;
-  bottom: 16px;
-  left: 50%;
   z-index: 10;
   display: flex;
   max-width: calc(100% - 32px);
@@ -1435,18 +1569,74 @@ button:disabled {
   border-radius: 999px;
   background: rgba(250, 251, 252, 0.92);
   box-shadow: 0 4px 20px rgba(26, 29, 33, 0.1);
-  transform: translateX(-50%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  user-select: none;
 }
 
-.wf-canvas-index-label {
+.wf-canvas-index.is-dragging {
+  box-shadow: 0 8px 28px rgba(26, 29, 33, 0.2);
+}
+
+.wf-canvas-index-handle {
+  display: inline-flex;
   flex-shrink: 0;
-  padding: 0 4px;
+  align-items: center;
+  gap: 5px;
+  padding: 4px;
+  border: 0;
+  background: transparent;
   color: var(--board-muted);
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
+  cursor: grab;
+  touch-action: none;
+}
+
+.wf-canvas-index.is-dragging .wf-canvas-index-handle {
+  cursor: grabbing;
+}
+
+.wf-canvas-index-grip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wf-canvas-index-grip i {
+  display: block;
+  width: 9px;
+  height: 1px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.wf-canvas-index-close {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--board-muted);
+}
+
+.wf-canvas-index-close:hover {
+  background: var(--board-fill);
+  color: var(--board-text);
+}
+
+.wf-canvas-index-close svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.8;
 }
 
 .wf-canvas-index-list {

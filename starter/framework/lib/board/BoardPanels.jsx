@@ -1,0 +1,63 @@
+import { BOARD_SHORTCUTS } from './shortcuts.js'
+
+function PanelShell({ id, title, ariaLabel, onClose, children }) {
+  const closeRef = React.useRef(null)
+  const returnFocusRef = React.useRef(null)
+
+  React.useEffect(() => {
+    returnFocusRef.current = document.activeElement
+    closeRef.current?.focus()
+    return () => returnFocusRef.current?.focus?.()
+  }, [])
+
+  return (
+    <div
+      className="wf-board-panel-layer"
+      onPointerDown={(event) => {
+        if (event.target === event.currentTarget) onClose()
+      }}
+    >
+      <section id={id} className="wf-board-panel" role="dialog" aria-modal="true" aria-label={ariaLabel}>
+        <header className="wf-board-panel-header">
+          <strong>{title}</strong>
+          <button ref={closeRef} type="button" className="wf-board-panel-close" onClick={onClose} aria-label={`关闭${title}`}>关闭</button>
+        </header>
+        <div className="wf-board-panel-body">{children}</div>
+      </section>
+    </div>
+  )
+}
+
+export function ShortcutHelp({ demoAvailable, onClose }) {
+  return (
+    <PanelShell id="wf-shortcut-help" title="快捷键" ariaLabel="快捷键帮助" onClose={onClose}>
+      <dl className="wf-shortcut-list">
+        {BOARD_SHORTCUTS.map((shortcut) => (
+          <div className={shortcut.id === 'demo' && !demoAvailable ? 'is-disabled' : ''} key={shortcut.id}>
+            <dt><kbd>{shortcut.keys}</kbd></dt>
+            <dd>{shortcut.label}{shortcut.id === 'demo' && !demoAvailable ? '（当前不可用）' : ''}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="wf-board-panel-note">在输入框、文本域、下拉框和可编辑内容中不会触发普通快捷键。</p>
+    </PanelShell>
+  )
+}
+
+export function BoardSettings({ showCanvasIndex, onShowCanvasIndexChange, onClose }) {
+  return (
+    <PanelShell id="wf-board-settings" title="设置" ariaLabel="画板设置" onClose={onClose}>
+      <label className="wf-board-setting-row">
+        <span>
+          <strong>显示画板索引</strong>
+          <small>在画板上显示可拖拽的页面索引</small>
+        </span>
+        <input
+          type="checkbox"
+          checked={showCanvasIndex}
+          onChange={(event) => onShowCanvasIndexChange(event.target.checked)}
+        />
+      </label>
+    </PanelShell>
+  )
+}

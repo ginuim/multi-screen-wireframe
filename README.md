@@ -1,6 +1,6 @@
 # Multi-Screen Wireframe
 
-**Skill 版本 / Version：`1.5.1`**（见 `VERSION`）
+**Skill 版本 / Version：`1.6.0`**（见 `VERSION`）
 
 从产品需求或视觉参考，生成**可双击打开**的多屏线框原型。
 
@@ -22,6 +22,10 @@ The deliverable ships with source, React, esbuild, and export utilities. Runtime
   Export single-page PNG or multi-page ZIP
 - **审阅 Prompt**：单选 / 多选 DOM 节点添加意见，以黄色编号标记并浮动查看，生成可继续编辑和复制给 AI 的 Prompt
   Review DOM nodes and turn scoped comments into an editable AI prompt
+- **快捷操作**：键盘切换画板、演示、交互锁、修改、沉浸、全屏与热区；按 `?` 查看完整清单
+  Keyboard shortcuts for board modes, interaction lock, review, immersive/fullscreen, and hotspots
+- **可配置索引**：画板索引可拖拽、关闭，并按项目记住显示开关
+  Draggable canvas index with a per-project visibility preference
 - **可继续改**：改 `src/`，本地 `./build.command`（macOS）或 `build.cmd`（Windows）重建  
   Keep editing `src/` and rebuild locally
 
@@ -69,6 +73,12 @@ Clone this repo and point your AI agent at it (or place it in whatever skills fo
 打开原型后点击工具栏「审阅」：点选屏内节点，通过层级面包屑切换到父组件，添加修改建议、文字替换、顺序调整或删除要求。开启「多选」或按住 Shift / Command / Ctrl 点击，可以把多个节点绑定到同一条意见。每条意见会在所有目标旁显示同一个半透明黄色编号；点击编号浮动查看意见。按住空格可临时拖动画布，松开后继续审阅。修改清单会生成 Prompt；Prompt 可继续手动编辑，再一键复制给 AI。
 
 审阅记录只保留在当前页面会话中，不会直接修改 JSX，也不会生成额外状态文件。AI 应按 Prompt 中的 id / class / `data-wf-key` 搜索 `src/`，修改源码后重新构建。
+
+## 快捷键与画板设置 / Shortcuts and board settings
+
+按 `Ctrl+1` / `Ctrl+2` 切换画板与演示，`Ctrl+I` 切换交互锁，`Ctrl+M` 切换修改模式，`Ctrl+F` 切换沉浸，`Ctrl+Shift+F` 切换浏览器全屏，`Ctrl+H` 切换演示热区。按住 `Space` 临时拖动画布，按 `Esc` 关闭当前面板或退出模式，按 `?` 打开完整快捷键帮助。输入框和可编辑内容不会响应普通快捷键。
+
+画板底部索引可通过独立把手拖动，也可直接关闭。工具栏「设置」中的“显示画板索引”可重新开启索引；显示状态按项目保存在浏览器本地，拖拽位置只在当前页面会话中保留。
 
 ## 构建 / Build
 
