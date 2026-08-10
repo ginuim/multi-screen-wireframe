@@ -46,6 +46,29 @@
   min-height: 480px;
 }
 
+.shanghai-map {
+  isolation: isolate;
+  background-color: var(--wf-200);
+  background-image: url('../assets/shanghai-map.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.shanghai-map > .wf-map-line {
+  display: none;
+}
+
+.shanghai-map .wf-map-marker {
+  z-index: 5;
+  background: var(--wf-white);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7);
+}
+
+.shanghai-map .wf-map-overlay {
+  z-index: 6;
+}
+
 .route-detail__hero {
   margin: 0 -18px;
   width: calc(100% + 36px) !important;

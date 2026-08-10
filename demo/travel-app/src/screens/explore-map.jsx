@@ -13,8 +13,8 @@ import {
   PageHeader,
   Row,
   Text,
-  WireMap,
 } from '../../../../starter/framework/lib/ui/index.js'
+import { ShanghaiMap } from '../components/ShanghaiMap.jsx'
 import { MobileLayout } from '../layouts/MobileLayout.jsx'
 
 export function ExploreMapScreen() {
@@ -35,21 +35,21 @@ export function ExploreMapScreen() {
           <Badge className="explore-map__filter">骑行</Badge>
           <Badge className="explore-map__filter">室内</Badge>
         </Row>
-        <WireMap id="explore-map-canvas" className="weekend-map explore-map__canvas">
-          <MapMarker className="explore-map__marker" data-wf-key="marker-canal" x={27} y={36} label="运河边的一天" to="route-detail" />
-          <MapMarker className="explore-map__marker" data-wf-key="marker-hills" x={68} y={20} label="城北轻徒步" to="route-detail" />
-          <MapMarker className="explore-map__marker" data-wf-key="marker-lanes" x={58} y={58} label="老街慢游" to="route-detail" />
-          <MapMarker className="explore-map__marker" data-wf-key="marker-lake" x={22} y={72} label="环湖骑行半日" to="route-detail" />
+        <ShanghaiMap id="explore-map-canvas" className="weekend-map explore-map__canvas">
+          <MapMarker className="explore-map__marker" data-wf-key="marker-suzhou-creek" x={51} y={40} label="苏州河滨水漫步" to="route-detail" />
+          <MapMarker className="explore-map__marker" data-wf-key="marker-bund" x={62} y={47} label="外滩建筑漫游" to="route-detail" />
+          <MapMarker className="explore-map__marker" data-wf-key="marker-xuhui" x={49} y={55} label="衡复风貌骑行" to="route-detail" />
+          <MapMarker className="explore-map__marker" data-wf-key="marker-pudong" x={75} y={43} label="陆家嘴城市漫步" to="route-detail" />
           <MapOverlay className="explore-map__overlay" position="bottom">
             <Card className="explore-map__route-preview" to="route-detail">
               <Column className="explore-map__preview-body" gap={6}>
                 <Text className="explore-map__preview-eyebrow">距离你 2.4 km</Text>
-                <strong className="explore-map__preview-title">运河边的一天</strong>
+                <strong className="explore-map__preview-title">苏州河滨水漫步</strong>
                 <Text className="explore-map__preview-meta">8.6 km · 约 6 小时 · 轻松</Text>
               </Column>
             </Card>
           </MapOverlay>
-        </WireMap>
+        </ShanghaiMap>
       </Column>
     </MobileLayout>
   )

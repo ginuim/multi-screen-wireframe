@@ -1225,18 +1225,23 @@ button:disabled {
   width: max-content;
   align-items: flex-start;
   gap: 48px;
-  padding: 48px;
+  /* 元信息向上生长，预留三行说明空间，页面框共享同一条顶边基线。 */
+  padding: 116px 48px 48px;
   transform-origin: 0 0;
 }
 
 .wf-canvas-screen {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 10px;
 }
 
 .wf-screen-meta {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  left: 0;
   display: flex;
   width: 100%;
   flex-direction: column;

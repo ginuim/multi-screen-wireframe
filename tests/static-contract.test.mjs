@@ -97,6 +97,8 @@ assert.match(css, /\.wf-tab-bar\s*\{[^}]*margin-top:\s*auto/s)
 assert.match(css, /\.wf-mobile-shell\s*\{/)
 assert.match(css, /\.wf-board\.is-immersive/)
 assert.match(css, /\.wf-immersive-chrome/)
+assert.match(css, /\.wf-canvas-screen\s*\{[^}]*position:\s*relative/s)
+assert.match(css, /\.wf-screen-meta\s*\{[^}]*position:\s*absolute[^}]*bottom:\s*calc\(100% \+ 10px\)/s)
 assert.doesNotMatch(css, /\.wf-lock-icon::before/)
 
 for (const file of businessFiles) {
