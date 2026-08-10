@@ -74,15 +74,56 @@ The deliverable ships with source, React, esbuild, and export utilities. Runtime
 
 ## 安装 / Install
 
-克隆本仓库，把目录交给支持 Skills / 项目约定的 AI Agent（或按你的工具习惯放到 skills 目录）。
+本仓库本身就是一个 Agent Skill（根目录有 `SKILL.md`）。任选一种方式接入支持 Skills 的 AI Agent（Cursor、Claude Code、Codex、OpenCode 等）。
+
+This repo is an Agent Skill (`SKILL.md` at the root). Use any option below with a Skills-capable agent.
+
+### 1. 用 Skills CLI 安装（推荐） / `npx skills`
+
+需要本机有 Node.js / npm：
+
+```sh
+# 当前项目安装（可随仓库提交，团队共享）
+npx skills add ginuim/multi-screen-wireframe
+
+# 全局安装（本机所有项目可用）
+npx skills add ginuim/multi-screen-wireframe -g
+
+# 跳过确认；也可指定 Agent，例如 cursor / claude-code / codex
+npx skills add ginuim/multi-screen-wireframe -g -y
+npx skills add ginuim/multi-screen-wireframe -a cursor -g -y
+```
+
+也可用完整仓库地址：
+
+```sh
+npx skills add https://github.com/ginuim/multi-screen-wireframe
+```
+
+安装后可用 `npx skills check` / `npx skills update` 检查与更新。更多用法见 [skills CLI](https://github.com/vercel-labs/skills) 与 [skills.sh](https://skills.sh/)。
+
+### 2. 把链接直接交给 AI Agent / Point the agent at the repo
+
+在对话里贴上仓库地址，让 Agent 按 Skill 执行即可，例如：
+
+> 请按这个 skill 生成多屏线框：https://github.com/ginuim/multi-screen-wireframe  
+> 先读 `SKILL.md`，再按流程复制 `starter/` 并只改业务 `src/`。
+
+多数支持 Skills / 可读取 GitHub 的 Agent 会据此拉取约定并生成原型。
+
+### 3. 手动克隆到 skills 目录 / Manual clone
 
 ```sh
 git clone https://github.com/ginuim/multi-screen-wireframe.git
 ```
 
-生成新原型时：确认输出路径 → 整目录复制 `starter/` → 只改业务 `src/` → 构建 → 双击 `index.html`。
+把克隆目录放到你所用工具的 skills 路径（例如 Cursor / Claude / Codex 各自的 `skills` 目录），或在项目里用符号链接指向该目录。
 
-Clone this repo and point your AI agent at it (or place it in whatever skills folder your tool uses). To generate a prototype: confirm the output path → copy all of `starter/` → edit only business `src/` → build → open `index.html`.
+### 生成新原型 / Generate a prototype
+
+确认输出路径 → 整目录复制 `starter/` → 只改业务 `src/` → 构建 → 双击 `index.html`。
+
+Confirm the output path → copy all of `starter/` → edit only business `src/` → build → open `index.html`.
 
 ## 修改交付物 / Edit a deliverable
 
