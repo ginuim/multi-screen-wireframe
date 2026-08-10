@@ -2,6 +2,8 @@
 
 **Skill 版本 / Version：`1.7.0`**（见 `VERSION`）
 
+**作者 / Author**：[reaidea](https://reaidea.com/)
+
 从产品需求或视觉参考，生成**可双击打开**的多屏线框原型。
 
 Generate **double-clickable** multi-screen wireframe prototypes from product requirements or visual references.
@@ -192,3 +194,9 @@ Follow `SKILL.md`: confirm output path → copy `starter/` → edit only busines
 携带 esbuild 0.28.1 的 macOS arm64、macOS x64、Windows x64 官方二进制。来源、版本、许可证和 SHA-256 位于 `starter/framework/tools/`。第三方浏览器库的版本与许可证位于 `starter/framework/vendor/`。
 
 Ships official esbuild 0.28.1 binaries for macOS arm64, macOS x64, and Windows x64. Provenance, versions, licenses, and SHA-256 sums live under `starter/framework/tools/`. Browser vendor libs are under `starter/framework/vendor/`.
+
+## 作者 / Author
+
+由 [reaidea](https://reaidea.com/) 维护，更多作品与文章见 [reaidea Studio](https://reaidea.com/)。
+
+Maintained by [reaidea](https://reaidea.com/). More projects and writing: [reaidea.com](https://reaidea.com/).
