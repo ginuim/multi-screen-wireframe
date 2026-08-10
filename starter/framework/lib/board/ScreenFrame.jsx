@@ -1,7 +1,7 @@
 import { usePrototype } from '../core/PrototypeContext.jsx'
 import { ErrorBoundary } from '../core/ErrorBoundary.jsx'
 import { ScreenIdentityProvider } from '../core/ScreenIdentity.jsx'
-import { handleDelegatedFlowClick } from '../ui/flow-target.js'
+import { findFlowTargetId } from '../ui/flow-target.js'
 import { findReviewTarget } from './review.js'
 import {
   collapseScreenContent,
@@ -31,6 +31,7 @@ export function ScreenFrame({
   const { navigate } = usePrototype()
   const contentRef = React.useRef(null)
   const dragRef = React.useRef(null)
+  const pointerDownTargetRef = React.useRef(null)
   const expandSnapshotRef = React.useRef(null)
   const hoverReviewElementRef = React.useRef(null)
   const [dragScrolling, setDragScrolling] = React.useState(false)
@@ -83,6 +84,7 @@ export function ScreenFrame({
   ].filter(Boolean).join(' ')
 
   const onPointerDown = (event) => {
+    pointerDownTargetRef.current = event.target
     if (reviewEnabled) return
     // 画布锁定时不接管屏内拖拽滚动，让事件落到画布平移
     if (canvasLocked) {
@@ -94,8 +96,8 @@ export function ScreenFrame({
     const state = beginContentDragScroll(event, contentRef.current, { locked: canvasLocked, scale })
     if (!state) return
     dragRef.current = state
-    setDragScrolling(true)
-    event.currentTarget.setPointerCapture(event.pointerId)
+    // 等真正拖过阈值再 capture。过早 setPointerCapture 会把 click 重定向到
+    // .wf-screen-content，导致 data-flow-to 委托与组件 onClick 全部失效。
   }
 
   const onPointerMove = (event) => {
@@ -109,7 +111,16 @@ export function ScreenFrame({
     }
     const state = dragRef.current
     if (!state) return
+    const wasMoved = state.moved
     moveContentDragScroll(state, event)
+    if (!wasMoved && state.moved) {
+      setDragScrolling(true)
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId)
+      } catch {
+        // ignore: 部分环境在 pointerup 后调用会抛
+      }
+    }
   }
 
   const onPointerEnd = (event) => {
@@ -122,7 +133,16 @@ export function ScreenFrame({
 
   const onContentClick = (event) => {
     if (reviewEnabled) return
-    handleDelegatedFlowClick(event, contentRef.current, navigate)
+    const root = contentRef.current
+    const downTarget = pointerDownTargetRef.current
+    pointerDownTargetRef.current = null
+    // pointer capture 仍可能把 click.target 改成内容根；回退到 pointerdown 目标
+    const startEl = downTarget && root?.contains(downTarget) ? downTarget : event.target
+    const to = findFlowTargetId(startEl, root)
+    if (!to) return
+    event.preventDefault?.()
+    event.stopPropagation?.()
+    navigate(to)
   }
 
   const onReviewClick = (event) => {
