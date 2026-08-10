@@ -2,11 +2,19 @@ export const MIN_ZOOM_SENSITIVITY = 0.25
 export const MAX_ZOOM_SENSITIVITY = 2
 export const DEFAULT_ZOOM_SENSITIVITY = 0.6
 
-const DEFAULT_SETTINGS = Object.freeze({
-  showCanvasIndex: true,
-  trackpadZoom: false,
-  zoomSensitivity: DEFAULT_ZOOM_SENSITIVITY,
-})
+export function detectMacOS(navigatorLike = typeof navigator === 'undefined' ? null : navigator) {
+  const platform = navigatorLike?.userAgentData?.platform || navigatorLike?.platform || ''
+  if (/^mac/i.test(platform)) return true
+  return /Macintosh|Mac OS X/i.test(navigatorLike?.userAgent || '')
+}
+
+function defaultSettings(navigatorLike) {
+  return {
+    showCanvasIndex: true,
+    trackpadZoom: detectMacOS(navigatorLike),
+    zoomSensitivity: DEFAULT_ZOOM_SENSITIVITY,
+  }
+}
 
 export function normalizeZoomSensitivity(value) {
   const number = Number(value)
@@ -26,20 +34,27 @@ export function boardSettingsStorageKey(projectName) {
   return `wf-board-settings:${projectName}`
 }
 
-export function readBoardSettings(storage, projectName) {
+export function readBoardSettings(
+  storage,
+  projectName,
+  navigatorLike = typeof navigator === 'undefined' ? null : navigator,
+) {
+  const defaults = defaultSettings(navigatorLike)
   try {
     const parsed = JSON.parse(storage?.getItem(boardSettingsStorageKey(projectName)))
     if (parsed && typeof parsed === 'object') {
       return {
         showCanvasIndex: parsed.showCanvasIndex !== false,
-        trackpadZoom: parsed.trackpadZoom === true,
+        trackpadZoom: typeof parsed.trackpadZoom === 'boolean'
+          ? parsed.trackpadZoom
+          : defaults.trackpadZoom,
         zoomSensitivity: normalizeZoomSensitivity(parsed.zoomSensitivity),
       }
     }
   } catch {
     // file:// storage can be unavailable or contain stale data.
   }
-  return { ...DEFAULT_SETTINGS }
+  return defaults
 }
 
 export function saveBoardSettings(storage, projectName, settings) {

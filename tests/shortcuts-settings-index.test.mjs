@@ -8,6 +8,7 @@ import {
 } from '../starter/framework/lib/board/shortcuts.js'
 import {
   boardSettingsStorageKey,
+  detectMacOS,
   normalizeZoomSensitivity,
   readBoardSettings,
   saveBoardSettings,
@@ -63,9 +64,17 @@ const storage = {
   getItem: (name) => values.get(name) ?? null,
   setItem: (name, value) => values.set(name, value),
 }
-assert.deepEqual(readBoardSettings(storage, '订单原型'), {
+assert.deepEqual(readBoardSettings(storage, '订单原型', { platform: 'Linux x86_64' }), {
   showCanvasIndex: true,
   trackpadZoom: false,
+  zoomSensitivity: 0.6,
+})
+assert.equal(detectMacOS({ userAgentData: { platform: 'macOS' } }), true)
+assert.equal(detectMacOS({ platform: 'MacIntel' }), true)
+assert.equal(detectMacOS({ platform: 'Linux x86_64', userAgent: 'Mozilla/5.0' }), false)
+assert.deepEqual(readBoardSettings(storage, 'Mac 新项目', { platform: 'MacIntel' }), {
+  showCanvasIndex: true,
+  trackpadZoom: true,
   zoomSensitivity: 0.6,
 })
 assert.equal(saveBoardSettings(storage, '订单原型', {
@@ -84,6 +93,15 @@ assert.deepEqual(JSON.parse(values.get(boardSettingsStorageKey('订单原型')))
   zoomSensitivity: 0.45,
 })
 assert.equal(Object.hasOwn(JSON.parse(values.get(boardSettingsStorageKey('订单原型'))), 'position'), false)
+assert.equal(saveBoardSettings(storage, 'Mac 手动关闭', {
+  showCanvasIndex: true,
+  trackpadZoom: false,
+  zoomSensitivity: 0.6,
+}), true)
+assert.equal(
+  readBoardSettings(storage, 'Mac 手动关闭', { platform: 'MacIntel' }).trackpadZoom,
+  false,
+)
 assert.equal(normalizeZoomSensitivity(0), 0.25)
 assert.equal(normalizeZoomSensitivity(3), 2)
 assert.equal(normalizeZoomSensitivity('bad'), 0.6)
@@ -92,7 +110,7 @@ const brokenStorage = {
   getItem: () => { throw new Error('blocked') },
   setItem: () => { throw new Error('blocked') },
 }
-assert.deepEqual(readBoardSettings(brokenStorage, '本地文件'), {
+assert.deepEqual(readBoardSettings(brokenStorage, '本地文件', { platform: 'Linux x86_64' }), {
   showCanvasIndex: true,
   trackpadZoom: false,
   zoomSensitivity: 0.6,

@@ -66,7 +66,7 @@ export function ShortcutHelp({
         <label className="wf-board-setting-row">
           <span>
             <strong>触摸板缩放</strong>
-            <small>按双指手势幅度连续缩放，避免固定档位跳变</small>
+            <small>Mac 首次默认开启；按双指手势幅度连续缩放</small>
           </span>
           <input
             type="checkbox"
