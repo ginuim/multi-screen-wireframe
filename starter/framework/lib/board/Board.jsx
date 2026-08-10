@@ -10,7 +10,7 @@ import { ReviewMarkers } from './ReviewMarkers.jsx'
 import { ReviewLauncher } from './ReviewLauncher.jsx'
 import { describeReviewElement } from './review.js'
 import { preventUnsavedReviewExit } from './before-unload.js'
-import { BoardSettings, ShortcutHelp } from './BoardPanels.jsx'
+import { ShortcutHelp } from './BoardPanels.jsx'
 import { getBoardStorage, readBoardSettings, saveBoardSettings } from './board-settings.js'
 import { isEditableShortcutTarget, shortcutIdForEvent } from './shortcuts.js'
 
@@ -152,7 +152,6 @@ export function Board({ project }) {
   const [reviewMultiSelect, setReviewMultiSelect] = React.useState(false)
   const [reviewItems, setReviewItems] = React.useState([])
   const [helpVisible, setHelpVisible] = React.useState(false)
-  const [settingsVisible, setSettingsVisible] = React.useState(false)
   const [canvasIndexVisible, setCanvasIndexVisible] = React.useState(
     () => readBoardSettings(getBoardStorage(), project.name).showCanvasIndex,
   )
@@ -289,7 +288,6 @@ export function Board({ project }) {
   const enterImmersive = React.useCallback(() => {
     closeReview()
     setHelpVisible(false)
-    setSettingsVisible(false)
     setImmersiveToolbarExpanded(true)
     setImmersive(true)
   }, [closeReview])
@@ -306,7 +304,6 @@ export function Board({ project }) {
     }
     closeReview()
     setHelpVisible(false)
-    setSettingsVisible(false)
     setImmersiveToolbarExpanded(true)
     setImmersive(true)
     requestBoardFullscreen(boardRef.current)
@@ -373,12 +370,10 @@ export function Board({ project }) {
       if (shortcut === 'browser-fullscreen') toggleBrowserFullscreen()
       if (shortcut === 'hotspots') setHotspotsVisible((value) => !value)
       if (shortcut === 'help') {
-        setSettingsVisible(false)
         setHelpVisible((value) => !value)
       }
       if (shortcut === 'escape') {
         if (helpVisible) setHelpVisible(false)
-        else if (settingsVisible) setSettingsVisible(false)
         else if (reviewEnabled) closeReview()
         else if (immersive) exitImmersive()
       }
@@ -401,7 +396,6 @@ export function Board({ project }) {
     isDemo,
     reviewEnabled,
     setMode,
-    settingsVisible,
     toggleBrowserFullscreen,
     toggleImmersive,
     toggleReview,
@@ -563,33 +557,15 @@ export function Board({ project }) {
         <div className="wf-toolbar-right">
           <button
             type="button"
-            className={settingsVisible ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
-            aria-label="打开画板设置"
-            aria-expanded={settingsVisible}
-            aria-controls="wf-board-settings"
-            title="设置"
-            onClick={() => {
-              setHelpVisible(false)
-              setSettingsVisible((value) => !value)
-            }}
-          >
-            <ToolbarIcon name="settings" />
-            <span className="wf-visually-hidden">设置</span>
-          </button>
-          <button
-            type="button"
             className={helpVisible ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
-            aria-label="打开快捷键帮助"
+            aria-label="打开帮助、快捷键与设置"
             aria-expanded={helpVisible}
-            aria-controls="wf-shortcut-help"
-            title="快捷键帮助（?）"
-            onClick={() => {
-              setSettingsVisible(false)
-              setHelpVisible((value) => !value)
-            }}
+            aria-controls="wf-board-utility"
+            title="帮助 / 快捷键 / 设置（?）"
+            onClick={() => setHelpVisible((value) => !value)}
           >
             <ToolbarIcon name="help" />
-            <span className="wf-visually-hidden">快捷键帮助</span>
+            <span className="wf-visually-hidden">帮助 / 快捷键 / 设置</span>
           </button>
           <button
             type="button"
@@ -686,6 +662,17 @@ export function Board({ project }) {
               />
               <button
                 type="button"
+                className={helpVisible ? 'wf-toolbar-icon-button wf-immersive-action-button is-active' : 'wf-toolbar-icon-button wf-immersive-action-button'}
+                aria-label="打开帮助、快捷键与设置"
+                aria-expanded={helpVisible}
+                aria-controls="wf-board-utility"
+                title="帮助 / 快捷键 / 设置（?）"
+                onClick={() => setHelpVisible((value) => !value)}
+              >
+                <ToolbarIcon name="help" />
+              </button>
+              <button
+                type="button"
                 className="wf-toolbar-icon-button wf-immersive-action-button"
                 aria-label={selectedIds.size > 0 ? '展开已勾选的屏' : '展开全部屏'}
                 title={selectedIds.size > 0 ? '展开已勾选的屏；无勾选时展开全部' : '展开全部屏'}
@@ -774,13 +761,11 @@ export function Board({ project }) {
         onOpen={openReviewPanel}
       />
       {helpVisible ? (
-        <ShortcutHelp demoAvailable={demoAvailable} onClose={() => setHelpVisible(false)} />
-      ) : null}
-      {settingsVisible ? (
-        <BoardSettings
+        <ShortcutHelp
+          demoAvailable={demoAvailable}
           showCanvasIndex={canvasIndexVisible}
           onShowCanvasIndexChange={updateCanvasIndexVisible}
-          onClose={() => setSettingsVisible(false)}
+          onClose={() => setHelpVisible(false)}
         />
       ) : null}
       {reviewEnabled && reviewPanelVisible ? (

@@ -8,7 +8,7 @@ export const BOARD_SHORTCUTS = [
   { id: 'hotspots', keys: 'Ctrl+H', label: '显示或隐藏演示热区' },
   { id: 'space', keys: 'Space', label: '按住临时拖动画布' },
   { id: 'escape', keys: 'Esc', label: '关闭当前面板或退出模式' },
-  { id: 'help', keys: '?', label: '打开或关闭快捷键帮助' },
+  { id: 'help', keys: '?', label: '打开或关闭帮助 / 快捷键' },
 ]
 
 export function isEditableShortcutTarget(target) {

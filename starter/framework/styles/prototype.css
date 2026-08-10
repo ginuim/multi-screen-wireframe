@@ -244,6 +244,18 @@ button:disabled {
   line-height: 1.5;
 }
 
+.wf-board-panel-section {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--board-border);
+}
+
+.wf-board-panel-section h2 {
+  margin: 0 0 10px;
+  color: var(--board-text);
+  font-size: 12px;
+}
+
 .wf-board-setting-row {
   display: flex;
   align-items: center;

@@ -28,9 +28,9 @@ function PanelShell({ id, title, ariaLabel, onClose, children }) {
   )
 }
 
-export function ShortcutHelp({ demoAvailable, onClose }) {
+export function ShortcutHelp({ demoAvailable, showCanvasIndex, onShowCanvasIndexChange, onClose }) {
   return (
-    <PanelShell id="wf-shortcut-help" title="快捷键" ariaLabel="快捷键帮助" onClose={onClose}>
+    <PanelShell id="wf-board-utility" title="帮助 / 快捷键 / 设置" ariaLabel="帮助、快捷键与设置" onClose={onClose}>
       <dl className="wf-shortcut-list">
         {BOARD_SHORTCUTS.map((shortcut) => (
           <div className={shortcut.id === 'demo' && !demoAvailable ? 'is-disabled' : ''} key={shortcut.id}>
@@ -40,24 +40,20 @@ export function ShortcutHelp({ demoAvailable, onClose }) {
         ))}
       </dl>
       <p className="wf-board-panel-note">在输入框、文本域、下拉框和可编辑内容中不会触发普通快捷键。</p>
-    </PanelShell>
-  )
-}
-
-export function BoardSettings({ showCanvasIndex, onShowCanvasIndexChange, onClose }) {
-  return (
-    <PanelShell id="wf-board-settings" title="设置" ariaLabel="画板设置" onClose={onClose}>
-      <label className="wf-board-setting-row">
-        <span>
-          <strong>显示画板索引</strong>
-          <small>在画板上显示可拖拽的页面索引</small>
-        </span>
-        <input
-          type="checkbox"
-          checked={showCanvasIndex}
-          onChange={(event) => onShowCanvasIndexChange(event.target.checked)}
-        />
-      </label>
+      <section className="wf-board-panel-section" aria-labelledby="wf-board-index-setting-title">
+        <h2 id="wf-board-index-setting-title">画板设置</h2>
+        <label className="wf-board-setting-row">
+          <span>
+            <strong>显示画板索引</strong>
+            <small>在画板上显示可拖拽的页面索引</small>
+          </span>
+          <input
+            type="checkbox"
+            checked={showCanvasIndex}
+            onChange={(event) => onShowCanvasIndexChange(event.target.checked)}
+          />
+        </label>
+      </section>
     </PanelShell>
   )
 }
