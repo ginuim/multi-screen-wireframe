@@ -130,18 +130,26 @@ export function ReviewPanel({
             <>
               <div className="wf-review-screen-name">{selected.screenTitle} · {selected.screenId}</div>
               <div className="wf-review-breadcrumbs" aria-label="节点层级">
-                {selected.ancestors.map((ancestor) => (
-                  <button
-                    className="wf-review-breadcrumb"
-                    type="button"
-                    key={ancestor.selector}
-                    title={ancestor.selector}
-                    onMouseEnter={() => onHoverElement?.(ancestor.element)}
-                    onMouseLeave={() => onHoverElement?.(null)}
-                    onClick={() => onSelectElement(ancestor.element)}
-                  >
-                    {ancestor.label}
-                  </button>
+                {selected.ancestors.map((ancestor, index) => (
+                  <React.Fragment key={ancestor.selector}>
+                    {index > 0 ? (
+                      <span className="wf-review-breadcrumb-sep" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d="m9 18 6-6-6-6" />
+                        </svg>
+                      </span>
+                    ) : null}
+                    <button
+                      className="wf-review-breadcrumb"
+                      type="button"
+                      title={ancestor.selector}
+                      onMouseEnter={() => onHoverElement?.(ancestor.element)}
+                      onMouseLeave={() => onHoverElement?.(null)}
+                      onClick={() => onSelectElement(ancestor.element)}
+                    >
+                      {ancestor.label}
+                    </button>
+                  </React.Fragment>
                 ))}
               </div>
               <code className="wf-review-selector">{selected.selector}</code>

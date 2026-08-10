@@ -775,8 +775,26 @@ button:disabled {
 .wf-review-breadcrumbs {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  align-items: center;
+  gap: 2px 4px;
   margin-bottom: 8px;
+}
+
+.wf-review-breadcrumb-sep {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--board-muted);
+}
+
+.wf-review-breadcrumb-sep svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .wf-review-breadcrumbs button {
