@@ -182,6 +182,34 @@ button:disabled {
   -webkit-backdrop-filter: blur(10px);
 }
 
+.wf-immersive-chrome.is-collapsed {
+  padding: 4px;
+}
+
+.wf-immersive-controls {
+  display: inline-flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.wf-immersive-chrome .wf-immersive-toolbar-toggle,
+.wf-immersive-chrome .wf-immersive-action-button {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.wf-immersive-toolbar-toggle .wf-toolbar-icon,
+.wf-immersive-action-button .wf-toolbar-icon {
+  width: 14px;
+  height: 14px;
+}
+
 .wf-immersive-chrome .wf-zoom-controls,
 .wf-immersive-chrome .wf-interaction-lock,
 .wf-immersive-chrome .wf-board-button {

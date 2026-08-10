@@ -34,6 +34,8 @@ function ToolbarIcon({ name }) {
     fullscreen: <><path d="M8 3H5a2 2 0 0 0-2 2v3" /><path d="M21 8V5a2 2 0 0 0-2-2h-3" /><path d="M3 16v3a2 2 0 0 0 2 2h3" /><path d="M16 21h3a2 2 0 0 0 2-2v-3" /></>,
     expand: <><path d="m7 15 5 5 5-5" /><path d="m7 9 5-5 5 5" /></>,
     collapse: <><path d="m7 20 5-5 5 5" /><path d="m7 4 5 5 5-5" /></>,
+    toolbarExpand: <><path d="M5 5v14" /><path d="m15 18-6-6 6-6" /></>,
+    toolbarCollapse: <><path d="M19 5v14" /><path d="m9 18 6-6-6-6" /></>,
     download: <><path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M5 21h14" /></>,
   }
 
@@ -137,6 +139,7 @@ export function Board({ project }) {
   const [exporting, setExporting] = React.useState(false)
   const [expandedIds, setExpandedIds] = React.useState(() => new Set())
   const [immersive, setImmersive] = React.useState(false)
+  const [immersiveToolbarExpanded, setImmersiveToolbarExpanded] = React.useState(true)
   const [browserFullscreen, setBrowserFullscreen] = React.useState(false)
   const [reviewEnabled, setReviewEnabled] = React.useState(false)
   const [reviewPanelVisible, setReviewPanelVisible] = React.useState(false)
@@ -268,6 +271,7 @@ export function Board({ project }) {
 
   const exitImmersive = React.useCallback(() => {
     setImmersive(false)
+    setImmersiveToolbarExpanded(true)
     exitBoardFullscreen()
   }, [])
 
@@ -506,6 +510,7 @@ export function Board({ project }) {
             title="进入沉浸：隐藏顶栏与侧栏"
             onClick={() => {
               closeReview()
+              setImmersiveToolbarExpanded(true)
               setImmersive(true)
             }}
           >
@@ -552,46 +557,82 @@ export function Board({ project }) {
       ) : null}
 
       {immersive ? (
-        <div className="wf-immersive-chrome" role="toolbar" aria-label="沉浸控件">
-          <button
-            type="button"
-            className="wf-board-button"
-            title="退出沉浸（Esc）"
-            onClick={exitImmersive}
-          >
-            退出
-          </button>
-          <button
-            type="button"
-            className={browserFullscreen ? 'wf-board-button is-active' : 'wf-board-button'}
-            title={browserFullscreen ? '退出浏览器全屏' : '浏览器全屏'}
-            onClick={toggleBrowserFullscreen}
-          >
-            {browserFullscreen ? '浏览器全屏 ON' : '浏览器全屏'}
-          </button>
-          <ZoomControls
-            scale={activeScale}
-            setScale={setActiveScale}
-            onReset={resetActiveView}
-          />
-          <InteractionLock
-            interactive={interactive}
-            onToggle={() => setInteractive((value) => !value)}
-          />
-          {isDemo ? (
-            <>
-              {canGoBack ? (
-                <button type="button" className="wf-board-button" onClick={goBack}>返回</button>
-              ) : null}
+        <div
+          className={`wf-immersive-chrome${immersiveToolbarExpanded ? '' : ' is-collapsed'}`}
+          role="toolbar"
+          aria-label="沉浸控件"
+        >
+          {immersiveToolbarExpanded ? (
+            <div className="wf-immersive-controls">
               <button
                 type="button"
-                className={hotspotsVisible ? 'wf-board-button is-active' : 'wf-board-button'}
-                onClick={() => setHotspotsVisible((value) => !value)}
+                className="wf-board-button"
+                title="退出沉浸（Esc）"
+                onClick={exitImmersive}
               >
-                {hotspotsVisible ? '热区 ON' : '热区 OFF'}
+                退出
               </button>
-            </>
+              <button
+                type="button"
+                className={browserFullscreen ? 'wf-board-button is-active' : 'wf-board-button'}
+                title={browserFullscreen ? '退出浏览器全屏' : '浏览器全屏'}
+                onClick={toggleBrowserFullscreen}
+              >
+                {browserFullscreen ? '浏览器全屏 ON' : '浏览器全屏'}
+              </button>
+              <ZoomControls
+                scale={activeScale}
+                setScale={setActiveScale}
+                onReset={resetActiveView}
+              />
+              <InteractionLock
+                interactive={interactive}
+                onToggle={() => setInteractive((value) => !value)}
+              />
+              <button
+                type="button"
+                className="wf-toolbar-icon-button wf-immersive-action-button"
+                aria-label={selectedIds.size > 0 ? '展开已勾选的屏' : '展开全部屏'}
+                title={selectedIds.size > 0 ? '展开已勾选的屏；无勾选时展开全部' : '展开全部屏'}
+                onClick={() => expandTargets(true)}
+              >
+                <ToolbarIcon name="expand" />
+              </button>
+              <button
+                type="button"
+                className="wf-toolbar-icon-button wf-immersive-action-button"
+                aria-label={selectedIds.size > 0 ? '收起已勾选的屏' : '收起全部屏'}
+                title={selectedIds.size > 0 ? '收起已勾选的屏；无勾选时收起全部' : '收起全部屏'}
+                onClick={() => expandTargets(false)}
+              >
+                <ToolbarIcon name="collapse" />
+              </button>
+              {isDemo ? (
+                <>
+                  {canGoBack ? (
+                    <button type="button" className="wf-board-button" onClick={goBack}>返回</button>
+                  ) : null}
+                  <button
+                    type="button"
+                    className={hotspotsVisible ? 'wf-board-button is-active' : 'wf-board-button'}
+                    onClick={() => setHotspotsVisible((value) => !value)}
+                  >
+                    {hotspotsVisible ? '热区 ON' : '热区 OFF'}
+                  </button>
+                </>
+              ) : null}
+            </div>
           ) : null}
+          <button
+            type="button"
+            className="wf-toolbar-icon-button wf-immersive-toolbar-toggle"
+            aria-expanded={immersiveToolbarExpanded}
+            aria-label={immersiveToolbarExpanded ? '收起精简工具栏' : '展开精简工具栏'}
+            title={immersiveToolbarExpanded ? '收起精简工具栏' : '展开精简工具栏'}
+            onClick={() => setImmersiveToolbarExpanded((value) => !value)}
+          >
+            <ToolbarIcon name={immersiveToolbarExpanded ? 'toolbarCollapse' : 'toolbarExpand'} />
+          </button>
         </div>
       ) : null}
 
