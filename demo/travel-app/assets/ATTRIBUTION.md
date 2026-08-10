@@ -7,7 +7,8 @@ by Peter Fitzgerald and OpenStreetMap contributors.
 - Original map license: [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/)
 - OpenStreetMap data: [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/)
 - Changes: cropped to the central Shanghai area; removed roads, labels, legends,
-  airport annotations, and water decoration; converted to grayscale; compressed
-  into a responsive SVG image container for offline prototype use.
+  airport annotations, and water decoration; extracted the remaining geographic
+  boundaries as grayscale line art; compressed into a responsive SVG image
+  container for offline prototype use.
 
 The derivative map background is distributed under CC BY-SA 2.0.
