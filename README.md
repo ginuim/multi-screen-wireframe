@@ -76,7 +76,7 @@ Clone this repo and point your AI agent at it (or place it in whatever skills fo
 
 ## 快捷键与画板设置 / Shortcuts and board settings
 
-按 `Ctrl+1` / `Ctrl+2` 切换画板与演示，`Ctrl+I` 切换交互锁，`Ctrl+M` 切换修改模式，`Ctrl+F` 切换沉浸，`Ctrl+Shift+F` 切换浏览器全屏，`Ctrl+H` 切换演示热区。按住 `Space` 临时拖动画布，按 `Esc` 关闭当前面板或退出模式，按 `?` 打开“帮助 / 快捷键”面板。输入框和可编辑内容不会响应普通快捷键；沉浸工具栏同样提供帮助和设置入口。
+按 `Command+1` / `Command+2` 切换画板与演示，`Command+I` 切换交互锁，`Command+M` 切换修改模式，`Command+F` 切换沉浸，`Command+Shift+F` 切换浏览器全屏，`Command+H` 切换演示热区。按住 `Space` 临时拖动画布，按 `Esc` 关闭当前面板或退出模式，按 `?` 打开“帮助 / 快捷键”面板。输入框和可编辑内容不会响应普通快捷键；沉浸工具栏同样提供帮助和设置入口。
 
 画板底部索引可通过独立把手拖动，也可直接关闭。工具栏“帮助 / 快捷键 / 设置”面板中的“显示画板索引”可重新开启索引；显示状态按项目保存在浏览器本地，拖拽位置只在当前页面会话中保留。
 

@@ -87,8 +87,8 @@ function InteractionLock({ interactive, onToggle }) {
       onClick={onToggle}
       aria-pressed={!interactive}
       title={interactive
-        ? '当前可交互页面。点击锁住后：拖拽平移画布，滚轮缩放；快捷键 Ctrl+I'
-        : '当前已锁住。点击恢复可交互；快捷键 Ctrl+I'}
+        ? '当前可交互页面。点击锁住后：拖拽平移画布，滚轮缩放；快捷键 Command+I'
+        : '当前已锁住。点击恢复可交互；快捷键 Command+I'}
     >
       <LockIcon open={interactive} />
       <span>{interactive ? '可交互' : '不可交互'}</span>
@@ -469,7 +469,7 @@ export function Board({ project }) {
                 type="button"
                 className={mode === 'canvas' ? 'is-active' : ''}
                 onClick={() => setMode('canvas')}
-                title="画板模式（Ctrl+1）"
+                title="画板模式（Command+1）"
               >
                 画板
               </button>
@@ -477,7 +477,7 @@ export function Board({ project }) {
                 type="button"
                 className={mode === 'demo' ? 'is-active' : ''}
                 onClick={() => setMode('demo')}
-                title="演示模式（Ctrl+2）"
+                title="演示模式（Command+2）"
               >
                 演示
               </button>
@@ -526,7 +526,7 @@ export function Board({ project }) {
                 type="button"
                 className={hotspotsVisible ? 'wf-board-button is-active' : 'wf-board-button'}
                 onClick={() => setHotspotsVisible((value) => !value)}
-                title="显示或隐藏演示热区（Ctrl+H）"
+                title="显示或隐藏演示热区（Command+H）"
               >
                 {hotspotsVisible ? '热区 ON' : '热区 OFF'}
               </button>
@@ -577,7 +577,7 @@ export function Board({ project }) {
             className={reviewEnabled ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
             aria-pressed={reviewEnabled}
             aria-label={reviewEnabled ? '修改中' : '修改'}
-            title="修改：点选页面节点并整理成可编辑的 AI 修改 Prompt（Ctrl+M）"
+            title="修改：点选页面节点并整理成可编辑的 AI 修改 Prompt（Command+M）"
             onClick={toggleReview}
           >
             <ToolbarIcon name="edit" />
@@ -587,7 +587,7 @@ export function Board({ project }) {
             type="button"
             className="wf-toolbar-icon-button"
             aria-label={immersive ? '退出沉浸模式' : '进入沉浸模式'}
-            title="切换沉浸模式（Ctrl+F）"
+            title="切换沉浸模式（Command+F）"
             onClick={toggleImmersive}
           >
             <ToolbarIcon name="fullscreen" />
@@ -651,7 +651,7 @@ export function Board({ project }) {
               <button
                 type="button"
                 className={browserFullscreen ? 'wf-board-button is-active' : 'wf-board-button'}
-                title={browserFullscreen ? '退出浏览器全屏（Ctrl+Shift+F）' : '浏览器全屏（Ctrl+Shift+F）'}
+                title={browserFullscreen ? '退出浏览器全屏（Command+Shift+F）' : '浏览器全屏（Command+Shift+F）'}
                 onClick={toggleBrowserFullscreen}
               >
                 {browserFullscreen ? '浏览器全屏 ON' : '浏览器全屏'}
@@ -703,7 +703,7 @@ export function Board({ project }) {
                     type="button"
                     className={hotspotsVisible ? 'wf-board-button is-active' : 'wf-board-button'}
                     onClick={() => setHotspotsVisible((value) => !value)}
-                    title="显示或隐藏演示热区（Ctrl+H）"
+                    title="显示或隐藏演示热区（Command+H）"
                   >
                     {hotspotsVisible ? '热区 ON' : '热区 OFF'}
                   </button>
@@ -775,24 +775,23 @@ export function Board({ project }) {
           onClose={() => setHelpVisible(false)}
         />
       ) : null}
-      {reviewEnabled && reviewPanelVisible ? (
-        <ReviewPanel
-          project={project}
-          selections={reviewSelections}
-          multiSelect={reviewMultiSelect}
-          items={reviewItems}
-          onToggleMultiSelect={() => setReviewMultiSelect((value) => !value)}
-          onSelectElement={(element) => selectReviewElement(element, null, null, {
-            replaceElement: reviewSelections[reviewSelections.length - 1]?.element,
-          })}
-          onHoverElement={hoverReviewBreadcrumb}
-          onRemoveSelection={removeReviewSelection}
-          onClearSelection={clearReviewSelection}
-          onAddItem={addReviewItem}
-          onRemoveItem={removeReviewItem}
-          onClose={closeReview}
-        />
-      ) : null}
+      <ReviewPanel
+        project={project}
+        visible={reviewPanelVisible && reviewEnabled}
+        selections={reviewSelections}
+        multiSelect={reviewMultiSelect}
+        items={reviewItems}
+        onToggleMultiSelect={() => setReviewMultiSelect((value) => !value)}
+        onSelectElement={(element) => selectReviewElement(element, null, null, {
+          replaceElement: reviewSelections[reviewSelections.length - 1]?.element,
+        })}
+        onHoverElement={hoverReviewBreadcrumb}
+        onRemoveSelection={removeReviewSelection}
+        onClearSelection={clearReviewSelection}
+        onAddItem={addReviewItem}
+        onRemoveItem={removeReviewItem}
+        onClose={closeReview}
+      />
     </div>
   )
 }

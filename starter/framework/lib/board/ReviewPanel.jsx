@@ -19,6 +19,7 @@ function copyText(text) {
 
 export function ReviewPanel({
   project,
+  visible = true,
   selections,
   multiSelect,
   items,
@@ -88,7 +89,7 @@ export function ReviewPanel({
         : '给 AI 的修改建议'
 
   return (
-    <aside className="wf-review-panel" aria-label="修改原型">
+    <aside className="wf-review-panel" aria-label="修改原型" hidden={!visible}>
       <header className="wf-review-panel-header">
         <div className="wf-review-panel-heading">
           <strong className="wf-review-panel-title">修改原型</strong>

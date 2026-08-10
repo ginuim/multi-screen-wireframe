@@ -1,11 +1,11 @@
 export const BOARD_SHORTCUTS = [
-  { id: 'canvas', keys: 'Ctrl+1', label: '切换到画板模式' },
-  { id: 'demo', keys: 'Ctrl+2', label: '切换到演示模式' },
-  { id: 'interaction', keys: 'Ctrl+I', label: '切换可交互 / 不可交互' },
-  { id: 'review', keys: 'Ctrl+M', label: '开启或关闭修改模式' },
-  { id: 'immersive', keys: 'Ctrl+F', label: '切换沉浸模式' },
-  { id: 'browser-fullscreen', keys: 'Ctrl+Shift+F', label: '切换浏览器全屏' },
-  { id: 'hotspots', keys: 'Ctrl+H', label: '显示或隐藏演示热区' },
+  { id: 'canvas', keys: 'Command+1', label: '切换到画板模式' },
+  { id: 'demo', keys: 'Command+2', label: '切换到演示模式' },
+  { id: 'interaction', keys: 'Command+I', label: '切换可交互 / 不可交互' },
+  { id: 'review', keys: 'Command+M', label: '开启或关闭修改模式' },
+  { id: 'immersive', keys: 'Command+F', label: '切换沉浸模式' },
+  { id: 'browser-fullscreen', keys: 'Command+Shift+F', label: '切换浏览器全屏' },
+  { id: 'hotspots', keys: 'Command+H', label: '显示或隐藏演示热区' },
   { id: 'space', keys: 'Space', label: '按住临时拖动画布' },
   { id: 'escape', keys: 'Esc', label: '关闭当前面板或退出模式' },
   { id: 'help', keys: '?', label: '打开或关闭帮助 / 快捷键' },
@@ -22,10 +22,10 @@ export function isEditableShortcutTarget(target) {
 }
 
 export function shortcutIdForEvent(event) {
-  if (!event || event.repeat || event.metaKey || event.altKey) return null
+  if (!event || event.repeat || event.altKey) return null
   const key = String(event.key || '').toLowerCase()
 
-  if (!event.ctrlKey) {
+  if (!event.metaKey) {
     if (!event.shiftKey && key === 'escape') return 'escape'
     if (event.key === '?') return 'help'
     return null
