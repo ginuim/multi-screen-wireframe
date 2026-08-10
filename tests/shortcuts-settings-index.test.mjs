@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import {
+  getBoardShortcuts,
   isEditableShortcutTarget,
+  shortcutModifierLabel,
   shortcutIdForEvent,
 } from '../starter/framework/lib/board/shortcuts.js'
 import {
@@ -27,18 +29,27 @@ function key(key, options = {}) {
   }
 }
 
-assert.equal(shortcutIdForEvent(key('1', { metaKey: true })), 'canvas')
-assert.equal(shortcutIdForEvent(key('2', { metaKey: true })), 'demo')
-assert.equal(shortcutIdForEvent(key('i', { metaKey: true })), 'interaction')
-assert.equal(shortcutIdForEvent(key('M', { metaKey: true })), 'review')
-assert.equal(shortcutIdForEvent(key('f', { metaKey: true })), 'immersive')
-assert.equal(shortcutIdForEvent(key('F', { metaKey: true, shiftKey: true })), 'browser-fullscreen')
-assert.equal(shortcutIdForEvent(key('h', { metaKey: true })), 'hotspots')
+assert.equal(shortcutIdForEvent(key('1', { altKey: true }), false), 'canvas')
+assert.equal(shortcutIdForEvent(key('2', { altKey: true }), false), 'demo')
+assert.equal(shortcutIdForEvent(key('i', { altKey: true }), false), 'interaction')
+assert.equal(shortcutIdForEvent(key('M', { altKey: true }), false), 'review')
+assert.equal(shortcutIdForEvent(key('3', { altKey: true }), false), 'immersive')
+assert.equal(shortcutIdForEvent(key('f', { altKey: true }), false), null)
+assert.equal(shortcutIdForEvent(key('F', { altKey: true, shiftKey: true }), false), 'browser-fullscreen')
+assert.equal(shortcutIdForEvent(key('3', { altKey: true, shiftKey: true }), false), null)
+assert.equal(shortcutIdForEvent(key('h', { altKey: true }), false), 'hotspots')
+assert.equal(shortcutIdForEvent(key('1', { ctrlKey: true }), false), null)
+assert.equal(shortcutIdForEvent(key('1', { metaKey: true }), false), null)
+assert.equal(shortcutIdForEvent(key('1', { ctrlKey: true }), true), 'canvas')
+assert.equal(shortcutIdForEvent(key('1', { metaKey: true }), true), null)
 assert.equal(shortcutIdForEvent(key('?', { shiftKey: true })), 'help')
 assert.equal(shortcutIdForEvent(key('Escape')), 'escape')
-assert.equal(shortcutIdForEvent(key('i', { ctrlKey: true })), null)
-assert.equal(shortcutIdForEvent(key('i', { metaKey: true, altKey: true })), null)
-assert.equal(shortcutIdForEvent(key('i', { metaKey: true, repeat: true })), null)
+assert.equal(shortcutIdForEvent(key('i', { altKey: true, ctrlKey: true }), false), 'interaction')
+assert.equal(shortcutIdForEvent(key('i', { altKey: true, repeat: true }), false), null)
+assert.equal(shortcutModifierLabel(false), 'Alt')
+assert.equal(shortcutModifierLabel(true), 'Ctrl')
+assert.equal(getBoardShortcuts(false).find((shortcut) => shortcut.id === 'review')?.keys, 'Alt+M')
+assert.equal(getBoardShortcuts(true).find((shortcut) => shortcut.id === 'review')?.keys, 'Ctrl+M')
 
 assert.equal(isEditableShortcutTarget({ tagName: 'INPUT' }), true)
 assert.equal(isEditableShortcutTarget({ tagName: 'TEXTAREA' }), true)

@@ -1,4 +1,4 @@
-import { BOARD_SHORTCUTS } from './shortcuts.js'
+import { getBoardShortcuts } from './shortcuts.js'
 
 function PanelShell({ id, title, ariaLabel, onClose, children }) {
   const closeRef = React.useRef(null)
@@ -29,10 +29,11 @@ function PanelShell({ id, title, ariaLabel, onClose, children }) {
 }
 
 export function ShortcutHelp({ demoAvailable, showCanvasIndex, onShowCanvasIndexChange, onClose }) {
+  const shortcuts = getBoardShortcuts()
   return (
     <PanelShell id="wf-board-utility" title="帮助 / 快捷键 / 设置" ariaLabel="帮助、快捷键与设置" onClose={onClose}>
       <dl className="wf-shortcut-list">
-        {BOARD_SHORTCUTS.map((shortcut) => (
+        {shortcuts.map((shortcut) => (
           <div className={shortcut.id === 'demo' && !demoAvailable ? 'is-disabled' : ''} key={shortcut.id}>
             <dt><kbd>{shortcut.keys}</kbd></dt>
             <dd>{shortcut.label}{shortcut.id === 'demo' && !demoAvailable ? '（当前不可用）' : ''}</dd>

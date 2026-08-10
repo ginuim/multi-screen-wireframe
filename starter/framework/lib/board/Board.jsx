@@ -12,7 +12,7 @@ import { describeReviewElement } from './review.js'
 import { preventUnsavedReviewExit } from './before-unload.js'
 import { ShortcutHelp } from './BoardPanels.jsx'
 import { getBoardStorage, readBoardSettings, saveBoardSettings } from './board-settings.js'
-import { isEditableShortcutTarget, shortcutIdForEvent } from './shortcuts.js'
+import { isEditableShortcutTarget, shortcutIdForEvent, shortcutModifierLabel } from './shortcuts.js'
 
 const VIEWPORT_LABELS = {
   mobile: '手机',
@@ -80,6 +80,7 @@ function LockIcon({ open }) {
 
 /** interactive=true 显示开锁「可交互」；false 为上锁，可直接拖拽平移、滚轮缩放 */
 function InteractionLock({ interactive, onToggle }) {
+  const shortcutModifier = shortcutModifierLabel()
   return (
     <button
       type="button"
@@ -87,8 +88,8 @@ function InteractionLock({ interactive, onToggle }) {
       onClick={onToggle}
       aria-pressed={!interactive}
       title={interactive
-        ? '当前可交互页面。点击锁住后：拖拽平移画布，滚轮缩放；快捷键 Command+I'
-        : '当前已锁住。点击恢复可交互；快捷键 Command+I'}
+        ? `当前可交互页面。点击锁住后：拖拽平移画布，滚轮缩放；快捷键 ${shortcutModifier}+I`
+        : `当前已锁住。点击恢复可交互；快捷键 ${shortcutModifier}+I`}
     >
       <LockIcon open={interactive} />
       <span>{interactive ? '可交互' : '不可交互'}</span>
@@ -130,6 +131,7 @@ export function Board({ project }) {
   const demoAvailable = canUseDemo(project.screens)
   const viewportOptions = Object.keys(project.viewports)
   const currentScreen = project.screens.find((screen) => screen.id === currentScreenId)
+  const shortcutModifier = shortcutModifierLabel()
 
   const [selectedIds, setSelectedIds] = React.useState(
     () => new Set(project.screens.map((screen) => screen.id)),
@@ -469,7 +471,7 @@ export function Board({ project }) {
                 type="button"
                 className={mode === 'canvas' ? 'is-active' : ''}
                 onClick={() => setMode('canvas')}
-                title="画板模式（Command+1）"
+                title={`画板模式（${shortcutModifier}+1）`}
               >
                 画板
               </button>
@@ -477,7 +479,7 @@ export function Board({ project }) {
                 type="button"
                 className={mode === 'demo' ? 'is-active' : ''}
                 onClick={() => setMode('demo')}
-                title="演示模式（Command+2）"
+                title={`演示模式（${shortcutModifier}+2）`}
               >
                 演示
               </button>
@@ -526,7 +528,7 @@ export function Board({ project }) {
                 type="button"
                 className={hotspotsVisible ? 'wf-board-button is-active' : 'wf-board-button'}
                 onClick={() => setHotspotsVisible((value) => !value)}
-                title="显示或隐藏演示热区（Command+H）"
+                title={`显示或隐藏演示热区（${shortcutModifier}+H）`}
               >
                 {hotspotsVisible ? '热区 ON' : '热区 OFF'}
               </button>
@@ -577,7 +579,7 @@ export function Board({ project }) {
             className={reviewEnabled ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
             aria-pressed={reviewEnabled}
             aria-label={reviewEnabled ? '修改中' : '修改'}
-            title="修改：点选页面节点并整理成可编辑的 AI 修改 Prompt（Command+M）"
+            title={`修改：点选页面节点并整理成可编辑的 AI 修改 Prompt（${shortcutModifier}+M）`}
             onClick={toggleReview}
           >
             <ToolbarIcon name="edit" />
@@ -587,7 +589,7 @@ export function Board({ project }) {
             type="button"
             className="wf-toolbar-icon-button"
             aria-label={immersive ? '退出沉浸模式' : '进入沉浸模式'}
-            title="切换沉浸模式（Command+F）"
+            title={`切换沉浸模式（${shortcutModifier}+3）`}
             onClick={toggleImmersive}
           >
             <ToolbarIcon name="fullscreen" />
@@ -651,7 +653,9 @@ export function Board({ project }) {
               <button
                 type="button"
                 className={browserFullscreen ? 'wf-board-button is-active' : 'wf-board-button'}
-                title={browserFullscreen ? '退出浏览器全屏（Command+Shift+F）' : '浏览器全屏（Command+Shift+F）'}
+                title={browserFullscreen
+                  ? `退出浏览器全屏（${shortcutModifier}+Shift+F）`
+                  : `浏览器全屏（${shortcutModifier}+Shift+F）`}
                 onClick={toggleBrowserFullscreen}
               >
                 {browserFullscreen ? '浏览器全屏 ON' : '浏览器全屏'}
@@ -703,7 +707,7 @@ export function Board({ project }) {
                     type="button"
                     className={hotspotsVisible ? 'wf-board-button is-active' : 'wf-board-button'}
                     onClick={() => setHotspotsVisible((value) => !value)}
-                    title="显示或隐藏演示热区（Command+H）"
+                    title={`显示或隐藏演示热区（${shortcutModifier}+H）`}
                   >
                     {hotspotsVisible ? '热区 ON' : '热区 OFF'}
                   </button>
