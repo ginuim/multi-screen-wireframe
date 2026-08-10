@@ -92,13 +92,13 @@ build.cmd
 
 打开（需能解析到共享的 `starter/`）：
 
-- `demo/order-admin/index.html` — desktop admin（SideNav、DataTable、Card、ConfirmDialog）
+- `demo/api-client/index.html` — desktop API Client（SideNav、DataTable、Tabs、表单）
 - `demo/claims-app/index.html` — mobile（TabBar、Cell、Steps、EmptyState、表单）
 
 维护者修改公共源码后，在仓库根目录运行：
 
 ```sh
-scripts/build-demo.sh demo/order-admin
+scripts/build-demo.sh demo/api-client
 scripts/build-demo.sh demo/claims-app
 ```
 

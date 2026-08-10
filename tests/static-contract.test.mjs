@@ -38,8 +38,8 @@ for (const leaked of ['board', 'core', 'ui']) {
 
 const businessFiles = [
   ...filesUnder(join(root, 'starter', 'src')),
-  ...filesUnder(join(root, 'demo', 'order-admin', 'src')),
-  ...filesUnder(join(root, 'demo', 'order-admin', 'styles')),
+  ...filesUnder(join(root, 'demo', 'api-client', 'src')),
+  ...filesUnder(join(root, 'demo', 'api-client', 'styles')),
   ...filesUnder(join(root, 'demo', 'claims-app', 'src')),
   ...filesUnder(join(root, 'demo', 'claims-app', 'styles')),
 ].filter((file) => ['.js', '.jsx', '.css'].includes(extname(file)))
@@ -107,7 +107,7 @@ for (const file of sourceFiles) {
   assert.doesNotMatch(source, /position\s*:\s*fixed/i, `${file} contains fixed positioning`)
 }
 
-for (const demo of ['order-admin', 'claims-app']) {
+for (const demo of ['api-client', 'claims-app']) {
   assert.equal(existsSync(join(root, 'demo', demo, 'tools')), false)
   const dist = readFileSync(join(root, 'demo', demo, 'dist', 'app.js'), 'utf8')
   assert.match(dist, /^\/\* GENERATED FILE\. EDIT src\/, THEN RUN BUILD\. \*\//)
@@ -122,7 +122,7 @@ assert.match(starterHtml, /framework\/styles\/prototype\.css/)
 
 for (const [indexPath, vendorPath] of [
   [join(root, 'starter', 'index.html'), 'framework/vendor/'],
-  [join(root, 'demo', 'order-admin', 'index.html'), '../../starter/framework/vendor/'],
+  [join(root, 'demo', 'api-client', 'index.html'), '../../starter/framework/vendor/'],
   [join(root, 'demo', 'claims-app', 'index.html'), '../../starter/framework/vendor/'],
 ]) {
   const vendorBase = new URL(vendorPath, pathToFileURL(indexPath))
@@ -136,9 +136,9 @@ assert.match(readme, /VERSION/)
 assert.match(readme, /1\.3\.0|Skill 版本/)
 assert.match(readme, /framework/)
 
-const orderProject = readFileSync(join(root, 'demo', 'order-admin', 'src', 'project.js'), 'utf8')
+const apiClientProject = readFileSync(join(root, 'demo', 'api-client', 'src', 'project.js'), 'utf8')
 const claimsProject = readFileSync(join(root, 'demo', 'claims-app', 'src', 'project.js'), 'utf8')
-assert.equal((orderProject.match(/\bid:\s*'/g) || []).length, 4)
+assert.equal((apiClientProject.match(/\bid:\s*'/g) || []).length, 6)
 assert.equal((claimsProject.match(/\bid:\s*'/g) || []).length, 5)
 
 console.log('static-contract: pass')

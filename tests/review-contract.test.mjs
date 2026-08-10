@@ -168,8 +168,8 @@ assert.match(skill, /半透明黄色编号/)
 assert.match(skill, /按住空格可拖动画布/)
 
 for (const directory of [
-  join(root, 'demo/order-admin/src/screens'),
-  join(root, 'demo/order-admin/src/layouts'),
+  join(root, 'demo/api-client/src/screens'),
+  join(root, 'demo/api-client/src/layouts'),
   join(root, 'demo/claims-app/src/screens'),
   join(root, 'demo/claims-app/src/layouts'),
 ]) {
@@ -182,7 +182,7 @@ for (const directory of [
 
 for (const directory of [
   join(root, 'starter/src/screens'),
-  join(root, 'demo/order-admin/src/screens'),
+  join(root, 'demo/api-client/src/screens'),
   join(root, 'demo/claims-app/src/screens'),
 ]) {
   for (const name of readdirSync(directory).filter((file) => file.endsWith('.jsx'))) {

@@ -41,7 +41,7 @@ function assertScreensComplete(label, projectDir) {
 }
 
 assertScreensComplete('starter', join(root, 'starter'))
-assertScreensComplete('demo/order-admin', join(root, 'demo', 'order-admin'))
+assertScreensComplete('demo/api-client', join(root, 'demo', 'api-client'))
 assertScreensComplete('demo/claims-app', join(root, 'demo', 'claims-app'))
 
 const skill = readFileSync(join(root, 'SKILL.md'), 'utf8')
@@ -60,7 +60,7 @@ assert.match(starterAgents, /src\/styles\/app\.css/)
 assert.match(starterAgents, /framework\/lib\/ui\/index\.js/)
 
 const proto = readFileSync(join(root, 'starter', 'framework', 'styles', 'prototype.css'), 'utf8')
-for (const banned of ['order-shell', 'demo-wide-table', 'order-login', 'order-main']) {
+for (const banned of ['postman-shell', 'workspace__page', 'request-editor__urlbar']) {
   assert.doesNotMatch(proto, new RegExp(banned), `prototype.css must not contain business class ${banned}`)
 }
 
