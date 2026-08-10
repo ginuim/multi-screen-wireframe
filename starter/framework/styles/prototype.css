@@ -1400,14 +1400,6 @@ button:disabled {
   white-space: nowrap;
 }
 
-.wf-screen-file {
-  flex-shrink: 0;
-  color: #9aa1ab;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 10px;
-  font-weight: 400;
-}
-
 .wf-canvas {
   position: relative;
   min-width: 0;

@@ -178,7 +178,6 @@ export function ScreenFrame({
         <span className="wf-screen-chrome-title">
           <span className="wf-screen-index-num">{index + 1}</span>
           <span className="wf-screen-chrome-screen-title">{screen.title}</span>
-          <span className="wf-screen-file">{screen.id}.jsx</span>
         </span>
         <span className="wf-screen-chrome-actions">
           {onToggleExpand ? (
