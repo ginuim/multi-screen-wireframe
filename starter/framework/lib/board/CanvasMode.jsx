@@ -208,6 +208,7 @@ export function CanvasMode({
   onExportIds,
   reviewEnabled = false,
   onReviewSelect,
+  onCanvasClick,
   canvasIndexVisible = true,
   canvasIndexPosition,
   onCanvasIndexPositionChange,
@@ -418,6 +419,7 @@ export function CanvasMode({
         onPointerMove={movePan}
         onPointerUp={endPan}
         onPointerCancel={endPan}
+        onClick={onCanvasClick}
       >
         <div
           ref={stageRef}

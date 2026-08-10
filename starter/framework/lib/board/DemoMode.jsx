@@ -31,6 +31,7 @@ export function DemoMode({
   onToggleExpand,
   reviewEnabled = false,
   onReviewSelect,
+  onCanvasClick,
 }) {
   const { currentScreenId, viewport, viewportKey, setMode } = usePrototype()
   const screenIndex = project.screens.findIndex((item) => item.id === currentScreenId)
@@ -123,6 +124,7 @@ export function DemoMode({
         onPointerCancel={endPan}
         onMouseMove={syncBlankExitHint}
         onMouseLeave={clearBlankExitHint}
+        onClick={onCanvasClick}
         onDoubleClick={exitOnBlankDoubleClick}
       >
         <div

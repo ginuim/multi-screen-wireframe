@@ -248,6 +248,11 @@ export function Board({ project }) {
     setReviewPanelVisible(true)
   }
 
+  const closeReviewPanel = React.useCallback(() => {
+    setReviewPanelVisible(false)
+    hoverReviewBreadcrumb(null)
+  }, [hoverReviewBreadcrumb])
+
   const addReviewItem = (item) => {
     setReviewItems((current) => [
       ...current,
@@ -732,6 +737,7 @@ export function Board({ project }) {
           onExportIds={exportIds}
           reviewEnabled={reviewEnabled}
           onReviewSelect={selectReviewElement}
+          onCanvasClick={reviewPanelVisible ? closeReviewPanel : undefined}
           canvasIndexVisible={canvasIndexVisible}
           canvasIndexPosition={canvasIndexPosition}
           onCanvasIndexPositionChange={setCanvasIndexPosition}
@@ -749,6 +755,7 @@ export function Board({ project }) {
           onToggleExpand={toggleExpand}
           reviewEnabled={reviewEnabled}
           onReviewSelect={selectReviewElement}
+          onCanvasClick={reviewPanelVisible ? closeReviewPanel : undefined}
         />
       )}
       {reviewEnabled ? (
