@@ -66,6 +66,7 @@ const storage = {
 }
 assert.deepEqual(readBoardSettings(storage, '订单原型', { platform: 'Linux x86_64' }), {
   showCanvasIndex: true,
+  showAnnotationMarkers: true,
   trackpadZoom: false,
   zoomSensitivity: 0.6,
 })
@@ -74,27 +75,32 @@ assert.equal(detectMacOS({ platform: 'MacIntel' }), true)
 assert.equal(detectMacOS({ platform: 'Linux x86_64', userAgent: 'Mozilla/5.0' }), false)
 assert.deepEqual(readBoardSettings(storage, 'Mac 新项目', { platform: 'MacIntel' }), {
   showCanvasIndex: true,
+  showAnnotationMarkers: true,
   trackpadZoom: true,
   zoomSensitivity: 0.6,
 })
 assert.equal(saveBoardSettings(storage, '订单原型', {
   showCanvasIndex: false,
+  showAnnotationMarkers: false,
   trackpadZoom: true,
   zoomSensitivity: 0.45,
 }), true)
 assert.deepEqual(readBoardSettings(storage, '订单原型'), {
   showCanvasIndex: false,
+  showAnnotationMarkers: false,
   trackpadZoom: true,
   zoomSensitivity: 0.45,
 })
 assert.deepEqual(JSON.parse(values.get(boardSettingsStorageKey('订单原型'))), {
   showCanvasIndex: false,
+  showAnnotationMarkers: false,
   trackpadZoom: true,
   zoomSensitivity: 0.45,
 })
 assert.equal(Object.hasOwn(JSON.parse(values.get(boardSettingsStorageKey('订单原型'))), 'position'), false)
 assert.equal(saveBoardSettings(storage, 'Mac 手动关闭', {
   showCanvasIndex: true,
+  showAnnotationMarkers: true,
   trackpadZoom: false,
   zoomSensitivity: 0.6,
 }), true)
@@ -112,6 +118,7 @@ const brokenStorage = {
 }
 assert.deepEqual(readBoardSettings(brokenStorage, '本地文件', { platform: 'Linux x86_64' }), {
   showCanvasIndex: true,
+  showAnnotationMarkers: true,
   trackpadZoom: false,
   zoomSensitivity: 0.6,
 })
@@ -179,6 +186,8 @@ assert.match(canvasSource, /closest\?\.?\('\.wf-canvas-index'\)/)
 assert.match(canvasSource, /if \(!demoAvailable\) return/)
 assert.doesNotMatch(canvasSource, /if \(!demoAvailable \|\| canvasLocked\) return/)
 assert.match(panelSource, /显示画板索引/)
+assert.match(panelSource, /默认显示注释标记/)
+assert.match(boardSource, /showAnnotationMarkers \|\| \(reviewEnabled && reviewTool === 'annotation'\)/)
 assert.match(panelSource, /触摸板缩放/)
 assert.match(panelSource, /缩放灵敏度/)
 assert.match(panelSource, /帮助 \/ 快捷键/)

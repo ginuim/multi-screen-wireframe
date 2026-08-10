@@ -32,6 +32,8 @@ export function ShortcutHelp({
   demoAvailable,
   showCanvasIndex,
   onShowCanvasIndexChange,
+  showAnnotationMarkers,
+  onShowAnnotationMarkersChange,
   trackpadZoom,
   onTrackpadZoomChange,
   zoomSensitivity,
@@ -61,6 +63,17 @@ export function ShortcutHelp({
             type="checkbox"
             checked={showCanvasIndex}
             onChange={(event) => onShowCanvasIndexChange(event.target.checked)}
+          />
+        </label>
+        <label className="wf-board-setting-row">
+          <span>
+            <strong>默认显示注释标记</strong>
+            <small>关闭后仅在进入注释模式时显示</small>
+          </span>
+          <input
+            type="checkbox"
+            checked={showAnnotationMarkers}
+            onChange={(event) => onShowAnnotationMarkersChange(event.target.checked)}
           />
         </label>
         <label className="wf-board-setting-row">

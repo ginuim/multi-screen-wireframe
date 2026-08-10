@@ -1,14 +1,14 @@
 ---
 name: multi-screen-wireframe
 description: Use when creating or revising an offline multi-page wireframe, multi-screen prototype, page-flow board, desktop admin flow, or mobile app flow from product requirements or visual references.
-version: 1.7.0
+version: 1.8.0
 ---
 
 # Multi-Screen Wireframe
 
 生成可双击打开、可继续编辑和构建的 JSX 多屏线框交付物。
 
-**Skill 版本**：`1.7.0`（与仓库根目录 `VERSION`、`package.json` 保持一致；升级 skill 时三处同步 bump）。
+**Skill 版本**：`1.8.0`（与仓库根目录 `VERSION`、`package.json` 保持一致；升级 skill 时三处同步 bump）。
 
 ## 生成流程
 
@@ -19,7 +19,7 @@ version: 1.7.0
 5. **每个新建或改动的 `src/screens/*.jsx`、`src/layouts/*.jsx` 文件顶部必须写 skill 版本注释**（见下节）。
 6. macOS 运行 `./build.command`；Windows x64 运行 `build.cmd`。
 7. **交付前自检**（不通过不得交付）：见「源码齐全」与「样式落点」。
-8. 构建成功后检查 `dist/app.js`，再双击 `index.html` 验证画布、演示、视口、导航、热区、修改模式和错误隔离。
+8. 构建成功后检查 `dist/app.js`，再双击 `index.html` 验证画布、演示、视口、导航、热区、修改模式、注释模式和错误隔离。
 9. 需要导出时实际验证单页 PNG；多页选择实际验证 ZIP 文件数。
 
 ## 目录分界
@@ -88,15 +88,19 @@ version: 1.7.0
 
 交付前在修改模式中至少实际选择：一个关键 id 节点、一个普通业务 class 节点、一个重复数据节点；确认选择器与 `src/` 中的源码可互相定位，并验证「多选两个节点 → 加入修改清单 → 两个目标显示同一黄色编号 → 点击编号查看浮动意见 → 生成 Prompt → 手动编辑 Prompt → 复制 Prompt」。同时验证按住空格可拖动画布，松开后恢复节点修改。
 
+Board 另有「注释」模式：可给整个 screen 或单个 DOM 节点添加说明、问题和设计决策。注释以蓝色编号显示，先自动保存在浏览器本机，再通过同步 Prompt 按稳定 id 合并到 `src/annotations.js`；JSON 导入 / 导出只用于交换与备份。starter 已提供空的 `src/annotations.js` 并由 `src/project.js` 暴露。生成时保留这两个字段；后续同步注释只改业务 `src/annotations.js` / `src/project.js`，不得修改 framework。
+
+交付前还要实际验证：「添加页面注释 → 添加模块注释 → 刷新后仍存在 → 编辑 → 关闭默认 Marker 后普通状态隐藏、注释模式显示 → 复制同步 Prompt → 导出注释 JSON → 清空本机草稿 → 导入恢复」。
+
 ## 版本注释（必须）
 
-生成或修改业务页面时，在文件最顶部（`import` 之前）写如下块注释，版本号取自本 skill 当前 `version`（现为 `1.7.0`）：
+生成或修改业务页面时，在文件最顶部（`import` 之前）写如下块注释，版本号取自本 skill 当前 `version`（现为 `1.8.0`）：
 
 ```jsx
 /**
- * @wireframe-skill multi-screen-wireframe@1.7.0
- * 创建基于 v1.7.0
- * 修改基于 v1.7.0
+ * @wireframe-skill multi-screen-wireframe@1.8.0
+ * 创建基于 v1.8.0
+ * 修改基于 v1.8.0
  */
 ```
 

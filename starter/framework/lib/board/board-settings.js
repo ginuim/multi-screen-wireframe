@@ -11,6 +11,7 @@ export function detectMacOS(navigatorLike = typeof navigator === 'undefined' ? n
 function defaultSettings(navigatorLike) {
   return {
     showCanvasIndex: true,
+    showAnnotationMarkers: true,
     trackpadZoom: detectMacOS(navigatorLike),
     zoomSensitivity: DEFAULT_ZOOM_SENSITIVITY,
   }
@@ -45,6 +46,7 @@ export function readBoardSettings(
     if (parsed && typeof parsed === 'object') {
       return {
         showCanvasIndex: parsed.showCanvasIndex !== false,
+        showAnnotationMarkers: parsed.showAnnotationMarkers !== false,
         trackpadZoom: typeof parsed.trackpadZoom === 'boolean'
           ? parsed.trackpadZoom
           : defaults.trackpadZoom,
@@ -60,6 +62,7 @@ export function readBoardSettings(
 export function saveBoardSettings(storage, projectName, settings) {
   const normalized = {
     showCanvasIndex: settings.showCanvasIndex !== false,
+    showAnnotationMarkers: settings.showAnnotationMarkers !== false,
     trackpadZoom: settings.trackpadZoom === true,
     zoomSensitivity: normalizeZoomSensitivity(settings.zoomSensitivity),
   }

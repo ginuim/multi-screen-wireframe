@@ -6,7 +6,7 @@
 
 | 路径 | 角色 |
 |------|------|
-| `src/` | 业务：screens、layouts、`project.js`、`app.jsx`、`styles/app.css` |
+| `src/` | 业务：screens、layouts、`project.js`、`annotations.js`、`app.jsx`、`styles/app.css` |
 | `framework/lib/` | 库：board、core、ui |
 | `framework/styles/prototype.css` | 库样式（升级时整夹替换；业务不要改） |
 | `framework/vendor/` | React 与导出库 |
@@ -17,13 +17,13 @@
 
 ## 数据模型
 
-`src/project.js` 直接导入 screen 函数。`project.viewports` 定义视口，`project.screens` 定义页面；`screens[].links` 是唯一页面流边。screen id 必须唯一并匹配 `^[a-z0-9-]+$`，每个 link 必须指向现有 id，演示模式至少需要一个 `entry: true`。
+`src/project.js` 直接导入 screen 函数。`project.viewports` 定义视口，`project.screens` 定义页面；`screens[].links` 是唯一页面流边。screen id 必须唯一并匹配 `^[a-z0-9-]+$`，每个 link 必须指向现有 id，演示模式至少需要一个 `entry: true`。`src/annotations.js` 保存已经固化的页面 / 模块注释，由 project 暴露 `annotationsRevision` 与 `annotations`。
 
 每个 `screens[].id` 必须对应真实文件 `src/screens/<id>.jsx`。缺源码等于无法再编辑，禁止只改 `dist/app.js`。
 
 ## 允许修改
 
-- 业务只修改 `src/` 中的 JSX、布局、`src/project.js` 和 `src/styles/app.css`。
+- 业务只修改 `src/` 中的 JSX、布局、`src/project.js`、`src/annotations.js` 和 `src/styles/app.css`。
 - **禁止**修改 `framework/`（含 `framework/styles/prototype.css`）。业务样式用 JSX `style` 或 `src/styles/app.css`。
 - 库缺陷只在 `framework/lib/` 修（skill 源头），不要在业务文件里打补丁。
 - 新页面从 `src/screens/_template.jsx` 复制，使用标准 JSX 与 ESM import/export。
@@ -48,5 +48,6 @@
 4. 运行构建。
 5. 构建成功后双击 `index.html`，检查画布、演示、导航和目标视口。
 6. 打开「修改」，分别点选关键 id、普通业务 class 和重复数据节点；多选两个节点加入同一条修改，确认两个目标显示同一黄色编号且点击可查看意见；验证 Prompt 可编辑、可复制，并确认按住空格可拖动画布。
+7. 打开「注释」，分别添加页面注释和模块注释；刷新后确认本机草稿仍在，验证编辑 / 删除、默认 Marker 显示开关、同步 Prompt，以及注释 JSON 导出 / 导入。
 
 完整可复制写法见 `EDITING.md`。

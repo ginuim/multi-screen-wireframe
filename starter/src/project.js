@@ -1,8 +1,11 @@
 import { DetailScreen } from './screens/detail.jsx'
 import { HomeScreen } from './screens/home.jsx'
+import { annotations, annotationsRevision } from './annotations.js'
 
 export const project = {
   name: '多屏线框原型',
+  annotationsRevision,
+  annotations,
   viewports: {
     mobile: { width: 375, height: 812 },
     desktop: { width: 1280, height: 800 },

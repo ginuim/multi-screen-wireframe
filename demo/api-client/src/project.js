@@ -1,3 +1,4 @@
+import { annotations, annotationsRevision } from './annotations.js'
 import { CollectionScreen } from './screens/collection.jsx'
 import { EnvironmentsScreen } from './screens/environments.jsx'
 import { HistoryScreen } from './screens/history.jsx'
@@ -9,6 +10,8 @@ const SHELL_LINKS = ['workspace', 'collection', 'environments', 'history', 'sett
 
 export const project = {
   name: 'API Client（Postman 风格）',
+  annotationsRevision,
+  annotations,
   viewports: {
     desktop: { width: 1440, height: 900 },
   },

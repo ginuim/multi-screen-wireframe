@@ -1,7 +1,7 @@
 /**
- * @wireframe-skill multi-screen-wireframe@1.7.0
- * 创建基于 v1.7.0
- * 修改基于 v1.7.0
+ * @wireframe-skill multi-screen-wireframe@1.8.0
+ * 创建基于 v1.8.0
+ * 修改基于 v1.8.0
  */
 import { Column, Heading, Text } from '../../framework/lib/ui/index.js'
 

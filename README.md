@@ -1,6 +1,6 @@
 # Multi-Screen Wireframe
 
-**Skill 版本 / Version：`1.7.0`**（见 `VERSION`）
+**Skill 版本 / Version：`1.8.0`**（见 `VERSION`）
 
 **作者 / Author**：[reaidea](https://reaidea.com/)
 
@@ -24,6 +24,8 @@ The deliverable ships with source, React, esbuild, and export utilities. Runtime
   Export single-page PNG or multi-page ZIP
 - **修改 Prompt**：单选 / 多选 DOM 节点添加意见，以黄色编号标记并浮动查看，生成可继续编辑和复制给 AI 的 Prompt
   Select DOM nodes and turn scoped comments into an editable AI prompt
+- **页面 / 模块注释**：蓝色注释标记，本机自动保存；可编辑、删除、导入 / 导出 JSON，并批量同步到原型源码
+  Persistent page and module annotations with local drafts, JSON exchange, and an AI sync prompt
 - **帮助与快捷操作**：键盘切换画板、演示、交互锁、修改、沉浸、全屏与热区；按 `?` 查看完整清单
   Keyboard shortcuts for board modes, interaction lock, review, immersive/fullscreen, and hotspots
 - **可配置索引**：画板索引可拖拽、关闭，并按项目记住显示开关
@@ -143,11 +145,19 @@ Confirm the output path → copy all of `starter/` → edit only business `src/`
 
 修改记录只保留在当前页面会话中，不会直接改 JSX，也不会生成额外状态文件。AI 应按 Prompt 中的 id / class / `data-wf-key` 搜索 `src/`，修改源码后重新构建。
 
+## 添加与同步注释 / Annotate and sync
+
+点击工具栏「注释」，可直接选择页面，或点选屏内模块后添加说明、问题和设计决策。注释以蓝色编号标记，可编辑或删除，不承载 Todo / 评审状态。
+
+注释先以操作日志自动保存在当前浏览器，并显示“待同步”数量。点击「复制同步 Prompt」交给 AI，会把操作按稳定 id 幂等合并到 `src/annotations.js`，再由 `src/project.js` 暴露 `annotationsRevision` 与 `annotations`；重新构建后注释随原型和 Git 一起保存。浏览器本地存储不可用时应立即导出注释 JSON。
+
+「导出注释 JSON」生成 `<project-id>.wireframe-annotations.json`，可从其他设备或浏览器的注释面板导入并合并。同一项目 id 才允许导入，避免把注释误写到其他原型。JSON 是跨设备交换和备份方式，不是日常必经步骤。
+
 ## 快捷键与画板设置 / Shortcuts and board settings
 
 macOS 使用 `Ctrl+1` / `Ctrl+2` 切换画板与演示，`Ctrl+I` 切换交互锁，`Ctrl+M` 切换修改模式；Windows/Linux 保持使用 `Alt+1` / `Alt+2`、`Alt+I`、`Alt+M`。浏览器全屏使用当前平台修饰键加 `Shift+F`，沉浸模式使用当前平台修饰键加 `3`；缩放使用 `Ctrl+滚轮`。按住 `Space` 临时拖动画布，按 `Esc` 关闭当前面板或退出模式，按 `?` 打开“帮助 / 快捷键”面板。输入框和可编辑内容不会响应普通快捷键；沉浸工具栏同样提供帮助和设置入口。
 
-画板底部索引可通过独立把手拖动，也可直接关闭。工具栏“帮助 / 快捷键 / 设置”面板中的“显示画板索引”可重新开启索引；显示状态按项目保存在浏览器本地，拖拽位置只在当前页面会话中保留。
+画板底部索引可通过独立把手拖动，也可直接关闭。工具栏“帮助 / 快捷键 / 设置”面板中的“显示画板索引”可重新开启索引；“默认显示注释标记”可控制普通浏览状态是否展示 Marker，关闭后进入注释模式仍会临时显示。显示状态按项目保存在浏览器本地，拖拽位置只在当前页面会话中保留。
 
 ## 构建 / Build
 

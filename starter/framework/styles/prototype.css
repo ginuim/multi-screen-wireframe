@@ -1349,6 +1349,253 @@ button:disabled {
   background: #fff;
 }
 
+.wf-annotation-scope,
+.wf-annotation-filters,
+.wf-annotation-file-actions,
+.wf-annotation-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wf-annotation-scope button,
+.wf-annotation-filters button,
+.wf-annotation-file-actions button,
+.wf-annotation-item-actions button,
+.wf-annotation-target button {
+  padding: 5px 8px;
+  border: 1px solid var(--board-border);
+  border-radius: 5px;
+  background: var(--board-surface);
+  color: var(--board-muted);
+  font-size: 10px;
+}
+
+.wf-annotation-scope button.is-active,
+.wf-annotation-filters button.is-active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.wf-annotation-scope button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.wf-annotation-target {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+  margin-top: 10px;
+  padding: 8px;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 10px;
+}
+
+.wf-annotation-target code {
+  grid-column: 1;
+  overflow-wrap: anywhere;
+  font-size: 9px;
+}
+
+.wf-annotation-target button {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.wf-annotation-save-state,
+.wf-annotation-message,
+.wf-annotation-orphaned {
+  margin: 8px 0 0;
+  color: #2563eb;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.wf-annotation-save-state.is-error,
+.wf-annotation-orphaned {
+  color: #b45309;
+}
+
+.wf-annotation-filters {
+  justify-content: flex-end;
+}
+
+.wf-annotation-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wf-annotation-item {
+  padding: 9px;
+  border: 1px solid var(--board-border);
+  border-radius: 7px;
+  background: var(--board-fill);
+}
+
+.wf-annotation-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 7px;
+  font-size: 9px;
+}
+
+.wf-annotation-item-meta strong {
+  color: var(--board-text);
+  font-size: 11px;
+}
+
+.wf-annotation-item-meta span {
+  color: var(--board-muted);
+}
+
+.wf-annotation-item-meta .wf-annotation-pending {
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.wf-annotation-selector {
+  display: block;
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+  color: #64748b;
+  font-size: 9px;
+}
+
+.wf-annotation-content {
+  margin: 7px 0;
+  color: var(--board-text);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.wf-annotation-edit {
+  width: 100%;
+  min-height: 70px;
+  margin: 7px 0;
+  padding: 7px;
+  border: 1px solid var(--board-border);
+  border-radius: 5px;
+  background: var(--board-surface);
+  color: var(--board-text);
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.wf-annotation-file-actions {
+  margin-top: 10px;
+}
+
+.wf-annotation-file-input {
+  display: none;
+}
+
+.wf-annotation-prompt {
+  min-height: 220px;
+}
+
+.wf-annotation-markers {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.wf-annotation-marker {
+  position: absolute;
+  z-index: 1;
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(29, 78, 216, 0.8);
+  border-radius: 8px 8px 8px 2px;
+  background: rgba(96, 165, 250, 0.84);
+  box-shadow: 0 2px 8px rgba(30, 64, 175, 0.25);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+}
+
+.wf-annotation-marker:hover,
+.wf-annotation-marker.is-active {
+  background: rgba(37, 99, 235, 0.96);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.26), 0 3px 10px rgba(30, 64, 175, 0.3);
+}
+
+.wf-annotation-marker.is-orphaned {
+  border-style: dashed;
+  background: rgba(148, 163, 184, 0.9);
+}
+
+.wf-annotation-marker-popover {
+  position: absolute;
+  z-index: 2;
+  width: min(320px, calc(100% - 24px));
+  padding: 11px;
+  border: 1px solid rgba(37, 99, 235, 0.34);
+  border-radius: 8px;
+  background: rgba(239, 246, 255, 0.98);
+  box-shadow: 0 12px 30px rgba(30, 64, 175, 0.18);
+  color: #1e3a8a;
+  pointer-events: auto;
+}
+
+.wf-annotation-marker-close {
+  padding: 3px 6px;
+  border: 1px solid rgba(37, 99, 235, 0.28);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #1e40af;
+  font-size: 10px;
+}
+
+.wf-annotation-marker-content {
+  margin: 8px 0;
+  color: #1e3a8a;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.wf-annotation-marker-more {
+  display: block;
+  margin: 2px 0 0 auto;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 400;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.wf-annotation-marker-more:hover {
+  color: #1d4ed8;
+}
+
 .wf-screen-list > li {
   display: flex;
   align-items: center;

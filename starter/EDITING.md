@@ -6,13 +6,35 @@
 
 为了让 Board 的「修改」意见能用 DOM 选择器准确定位源码，所有业务 JSX 节点都写语义 `className`；页面根、标题、主内容、关键卡片 / 表单 / 表格 / 操作 / 弹层写以 screen id 开头的全局唯一 `id`；重复数据节点写稳定 `data-wf-key`。
 
+## 注释数据
+
+Board 的「注释」支持页面和模块两种锚点。本机新增、编辑与删除会自动保存为待同步操作；复制面板中的同步 Prompt 给 AI 后，应把操作按稳定 id 合并到 `src/annotations.js`，更新 `annotationsRevision`，再重新构建。不要把注释文字写入 screen JSX。
+
+```js
+export const annotationsRevision = 'annotations-r1'
+
+export const annotations = [
+  {
+    id: 'note-about-title',
+    screenId: 'about',
+    screenTitle: '关于项目',
+    anchor: { kind: 'node', selector: '#about-title' },
+    content: '标题文案需要产品确认',
+    createdAt: '2026-08-11T02:00:00.000Z',
+    updatedAt: '2026-08-11T02:00:00.000Z',
+  },
+]
+```
+
+`src/project.js` 必须导入并暴露 `annotationsRevision` 与 `annotations`。注释 JSON 仅用于导入、导出和跨设备交换。
+
 ## 页面示例
 
 ```jsx
 /**
- * @wireframe-skill multi-screen-wireframe@1.7.0
- * 创建基于 v1.7.0
- * 修改基于 v1.7.0
+ * @wireframe-skill multi-screen-wireframe@1.8.0
+ * 创建基于 v1.8.0
+ * 修改基于 v1.8.0
  */
 import { Column, Heading, Text } from '../../framework/lib/ui/index.js'
 
@@ -30,9 +52,9 @@ export function AboutScreen() {
 
 ```jsx
 /**
- * @wireframe-skill multi-screen-wireframe@1.7.0
- * 创建基于 v1.7.0
- * 修改基于 v1.7.0
+ * @wireframe-skill multi-screen-wireframe@1.8.0
+ * 创建基于 v1.8.0
+ * 修改基于 v1.8.0
  */
 import { Card, Column, Grid, Heading, Row, Text } from '../../framework/lib/ui/index.js'
 
@@ -57,9 +79,9 @@ export function DashboardScreen() {
 
 ```jsx
 /**
- * @wireframe-skill multi-screen-wireframe@1.7.0
- * 创建基于 v1.7.0
- * 修改基于 v1.7.0
+ * @wireframe-skill multi-screen-wireframe@1.8.0
+ * 创建基于 v1.8.0
+ * 修改基于 v1.8.0
  */
 import { Card, Column, Heading, Row } from '../../framework/lib/ui/index.js'
 
@@ -92,9 +114,9 @@ App / 小程序带底栏时，用 `MobileShell`（或全高 Column 末尾放 `Ta
 
 ```jsx
 /**
- * @wireframe-skill multi-screen-wireframe@1.7.0
- * 创建基于 v1.7.0
- * 修改基于 v1.7.0
+ * @wireframe-skill multi-screen-wireframe@1.8.0
+ * 创建基于 v1.8.0
+ * 修改基于 v1.8.0
  */
 import { Column, Heading, MobileShell, Text } from '../../framework/lib/ui/index.js'
 import { useScreenId } from '../../framework/lib/core/ScreenIdentity.jsx'
@@ -122,9 +144,9 @@ export function DiscoverScreen() {
 
 ```jsx
 /**
- * @wireframe-skill multi-screen-wireframe@1.7.0
- * 创建基于 v1.7.0
- * 修改基于 v1.7.0
+ * @wireframe-skill multi-screen-wireframe@1.8.0
+ * 创建基于 v1.8.0
+ * 修改基于 v1.8.0
  */
 import { Button, Column, ConfirmDialog, Heading } from '../../framework/lib/ui/index.js'
 

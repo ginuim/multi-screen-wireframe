@@ -10,6 +10,18 @@ import { ReviewMarkers } from './ReviewMarkers.jsx'
 import { ReviewLauncher } from './ReviewLauncher.jsx'
 import { describeReviewElement } from './review.js'
 import { preventUnsavedReviewExit } from './before-unload.js'
+import { AnnotationPanel } from './AnnotationPanel.jsx'
+import { AnnotationMarkers } from './AnnotationMarkers.jsx'
+import {
+  applyAnnotationOperations,
+  baseAnnotations,
+  deleteAnnotationOperation,
+  getAnnotationStorage,
+  preventUnsavedAnnotationExit,
+  readAnnotationDraft,
+  saveAnnotationDraft,
+  upsertAnnotationOperation,
+} from './annotations.js'
 import { ShortcutHelp } from './BoardPanels.jsx'
 import {
   getBoardStorage,
@@ -39,6 +51,7 @@ function ZoomControls({ scale, setScale, onReset }) {
 function ToolbarIcon({ name }) {
   const paths = {
     edit: <><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" /></>,
+    comment: <><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" /><path d="M8 9h8M8 13h5" /></>,
     fullscreen: <><path d="M8 3H5a2 2 0 0 0-2 2v3" /><path d="M21 8V5a2 2 0 0 0-2-2h-3" /><path d="M3 16v3a2 2 0 0 0 2 2h3" /><path d="M16 21h3a2 2 0 0 0 2-2v-3" /></>,
     expand: <><path d="m7 15 5 5 5-5" /><path d="m7 9 5-5 5 5" /></>,
     collapse: <><path d="m7 20 5-5 5 5" /><path d="m7 4 5 5 5-5" /></>,
@@ -154,13 +167,22 @@ export function Board({ project }) {
   const [immersiveToolbarExpanded, setImmersiveToolbarExpanded] = React.useState(true)
   const [browserFullscreen, setBrowserFullscreen] = React.useState(false)
   const [reviewEnabled, setReviewEnabled] = React.useState(false)
+  const [reviewTool, setReviewTool] = React.useState('modify')
   const [reviewPanelVisible, setReviewPanelVisible] = React.useState(false)
   const [reviewSelections, setReviewSelections] = React.useState([])
   const [reviewMultiSelect, setReviewMultiSelect] = React.useState(false)
   const [reviewItems, setReviewItems] = React.useState([])
+  const annotationBase = React.useMemo(() => baseAnnotations(project), [project])
+  const [annotationOperations, setAnnotationOperations] = React.useState(
+    () => readAnnotationDraft(getAnnotationStorage(), project).operations,
+  )
+  const [annotationStorageSaved, setAnnotationStorageSaved] = React.useState(true)
   const [helpVisible, setHelpVisible] = React.useState(false)
   const [canvasIndexVisible, setCanvasIndexVisible] = React.useState(
     () => readBoardSettings(getBoardStorage(), project.name).showCanvasIndex,
+  )
+  const [showAnnotationMarkers, setShowAnnotationMarkers] = React.useState(
+    () => readBoardSettings(getBoardStorage(), project.name).showAnnotationMarkers,
   )
   const [trackpadZoom, setTrackpadZoom] = React.useState(
     () => readBoardSettings(getBoardStorage(), project.name).trackpadZoom,
@@ -179,6 +201,10 @@ export function Board({ project }) {
   const activeScale = isDemo ? demoScale : canvasScale
   const setActiveScale = isDemo ? setDemoScale : setCanvasScale
   const wheelZoomOptions = { trackpadMode: trackpadZoom, sensitivity: zoomSensitivity }
+  const annotations = React.useMemo(
+    () => applyAnnotationOperations(annotationBase, annotationOperations),
+    [annotationBase, annotationOperations],
+  )
 
   const clearReviewSelection = React.useCallback(() => {
     for (const element of selectedReviewElementsRef.current) {
@@ -194,7 +220,7 @@ export function Board({ project }) {
     const activeRoot = contentRoot || primary?.contentRoot
     if (!element || !activeScreen || !activeRoot) return
     const nextSelection = describeReviewElement(element, activeRoot, activeScreen)
-    const additive = reviewMultiSelect || options.additive
+    const additive = reviewTool === 'modify' && (reviewMultiSelect || options.additive)
     setReviewPanelVisible(true)
 
     setReviewSelections((current) => {
@@ -224,7 +250,7 @@ export function Board({ project }) {
       selectedReviewElementsRef.current.add(element)
       return additive ? [...current, nextSelection] : [nextSelection]
     })
-  }, [project.screens, reviewMultiSelect, reviewSelections])
+  }, [project.screens, reviewMultiSelect, reviewSelections, reviewTool])
 
   const removeReviewSelection = React.useCallback((element) => {
     element?.classList.remove('is-review-selected')
@@ -246,20 +272,31 @@ export function Board({ project }) {
     breadcrumbHoverElementRef.current?.classList.add('is-review-hovered')
   }, [])
 
-  const toggleReview = React.useCallback(() => {
-    if (reviewEnabled) {
+  const toggleReview = React.useCallback((tool = 'modify') => {
+    if (reviewEnabled && reviewTool === tool) {
       closeReview()
       return
     }
     setInteractive(true)
-    setReviewPanelVisible(false)
+    setReviewMultiSelect(false)
+    setReviewTool(tool)
+    setReviewPanelVisible(tool === 'annotation')
     setReviewEnabled(true)
-  }, [closeReview, reviewEnabled])
+  }, [closeReview, reviewEnabled, reviewTool])
 
   const openReviewPanel = () => {
     setInteractive(true)
+    setReviewTool('modify')
     setReviewEnabled(true)
     setReviewPanelVisible(true)
+  }
+
+  const openAnnotationPanel = (annotation) => {
+    setInteractive(true)
+    setReviewTool('annotation')
+    setReviewEnabled(true)
+    setReviewPanelVisible(true)
+    if (annotation?.screenId) selectEntry(annotation.screenId)
   }
 
   const closeReviewPanel = React.useCallback(() => {
@@ -277,6 +314,37 @@ export function Board({ project }) {
   const removeReviewItem = (id) => {
     setReviewItems((current) => current.filter((item) => item.id !== id))
   }
+
+  const upsertAnnotation = React.useCallback((annotation) => {
+    setAnnotationOperations((current) => (
+      upsertAnnotationOperation(annotationBase, current, annotation)
+    ))
+  }, [annotationBase])
+
+  const deleteAnnotation = React.useCallback((id) => {
+    setAnnotationOperations((current) => (
+      deleteAnnotationOperation(annotationBase, current, id)
+    ))
+  }, [annotationBase])
+
+  const importAnnotations = React.useCallback((incoming, importedOperations = []) => {
+    setAnnotationOperations((current) => {
+      let next = incoming.reduce(
+        (operations, annotation) => upsertAnnotationOperation(annotationBase, operations, annotation),
+        current,
+      )
+      for (const operation of importedOperations) {
+        if (operation.op === 'delete') {
+          next = deleteAnnotationOperation(annotationBase, next, operation.id)
+        } else if (operation.op === 'upsert') {
+          next = upsertAnnotationOperation(annotationBase, next, operation.annotation)
+        }
+      }
+      return next
+    })
+  }, [annotationBase])
+
+  const clearAnnotationDraft = React.useCallback(() => setAnnotationOperations([]), [])
 
   React.useEffect(() => () => {
     for (const element of selectedReviewElementsRef.current) {
@@ -297,6 +365,25 @@ export function Board({ project }) {
     window.addEventListener('beforeunload', preventUnsavedReviewExit)
     return () => window.removeEventListener('beforeunload', preventUnsavedReviewExit)
   }, [reviewItems.length])
+
+  React.useEffect(() => {
+    const draft = readAnnotationDraft(getAnnotationStorage(), project)
+    setAnnotationOperations(draft.operations)
+  }, [project])
+
+  React.useEffect(() => {
+    setAnnotationStorageSaved(saveAnnotationDraft(
+      getAnnotationStorage(),
+      project,
+      annotationOperations,
+    ))
+  }, [annotationOperations, project])
+
+  React.useEffect(() => {
+    if (!annotationOperations.length || annotationStorageSaved) return undefined
+    window.addEventListener('beforeunload', preventUnsavedAnnotationExit)
+    return () => window.removeEventListener('beforeunload', preventUnsavedAnnotationExit)
+  }, [annotationOperations.length, annotationStorageSaved])
 
   const exitImmersive = React.useCallback(() => {
     setImmersive(false)
@@ -332,29 +419,42 @@ export function Board({ project }) {
     setCanvasIndexVisible(visible)
     saveBoardSettings(getBoardStorage(), project.name, {
       showCanvasIndex: visible,
+      showAnnotationMarkers,
       trackpadZoom,
       zoomSensitivity,
     })
-  }, [project.name, trackpadZoom, zoomSensitivity])
+  }, [project.name, showAnnotationMarkers, trackpadZoom, zoomSensitivity])
+
+  const updateShowAnnotationMarkers = React.useCallback((visible) => {
+    setShowAnnotationMarkers(visible)
+    saveBoardSettings(getBoardStorage(), project.name, {
+      showCanvasIndex: canvasIndexVisible,
+      showAnnotationMarkers: visible,
+      trackpadZoom,
+      zoomSensitivity,
+    })
+  }, [canvasIndexVisible, project.name, trackpadZoom, zoomSensitivity])
 
   const updateTrackpadZoom = React.useCallback((enabled) => {
     setTrackpadZoom(enabled)
     saveBoardSettings(getBoardStorage(), project.name, {
       showCanvasIndex: canvasIndexVisible,
+      showAnnotationMarkers,
       trackpadZoom: enabled,
       zoomSensitivity,
     })
-  }, [canvasIndexVisible, project.name, zoomSensitivity])
+  }, [canvasIndexVisible, project.name, showAnnotationMarkers, zoomSensitivity])
 
   const updateZoomSensitivity = React.useCallback((value) => {
     const normalized = normalizeZoomSensitivity(value)
     setZoomSensitivity(normalized)
     saveBoardSettings(getBoardStorage(), project.name, {
       showCanvasIndex: canvasIndexVisible,
+      showAnnotationMarkers,
       trackpadZoom,
       zoomSensitivity: normalized,
     })
-  }, [canvasIndexVisible, project.name, trackpadZoom])
+  }, [canvasIndexVisible, project.name, showAnnotationMarkers, trackpadZoom])
 
   // 只在切换项目时清位置。首屏 useEffect 若也 set null，会盖掉 CanvasIndex
   // useLayoutEffect 刚算好的坐标，索引会一直 visibility:hidden。
@@ -362,6 +462,7 @@ export function Board({ project }) {
   React.useEffect(() => {
     const settings = readBoardSettings(getBoardStorage(), project.name)
     setCanvasIndexVisible(settings.showCanvasIndex)
+    setShowAnnotationMarkers(settings.showAnnotationMarkers)
     setTrackpadZoom(settings.trackpadZoom)
     setZoomSensitivity(settings.zoomSensitivity)
     const previousName = canvasIndexSettingsProjectRef.current
@@ -620,14 +721,30 @@ export function Board({ project }) {
           </button>
           <button
             type="button"
-            className={reviewEnabled ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
-            aria-pressed={reviewEnabled}
-            aria-label={reviewEnabled ? '修改中' : '修改'}
+            className={reviewEnabled && reviewTool === 'modify' ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
+            aria-pressed={reviewEnabled && reviewTool === 'modify'}
+            aria-label={reviewEnabled && reviewTool === 'modify' ? '修改中' : '修改'}
             title={`修改：点选页面节点并整理成可编辑的 AI 修改 Prompt（${shortcutModifier}+M）`}
-            onClick={toggleReview}
+            onClick={() => toggleReview('modify')}
           >
             <ToolbarIcon name="edit" />
             <span className="wf-visually-hidden">修改</span>
+          </button>
+          <button
+            type="button"
+            className={reviewEnabled && reviewTool === 'annotation' ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
+            aria-pressed={reviewEnabled && reviewTool === 'annotation'}
+            aria-label={reviewEnabled && reviewTool === 'annotation' ? '注释中' : '注释'}
+            title="注释：给页面或模块添加可持久化说明"
+            onClick={() => toggleReview('annotation')}
+          >
+            <ToolbarIcon name="comment" />
+            {annotations.length > 0 ? (
+              <span className="wf-toolbar-icon-count">
+                {annotations.length}
+              </span>
+            ) : null}
+            <span className="wf-visually-hidden">注释</span>
           </button>
           <button
             type="button"
@@ -808,8 +925,15 @@ export function Board({ project }) {
           onCanvasClick={reviewPanelVisible ? closeReviewPanel : undefined}
         />
       )}
-      {reviewEnabled ? (
+      {reviewEnabled && reviewTool === 'modify' ? (
         <ReviewMarkers boardRef={boardRef} items={reviewItems} onOpenPanel={openReviewPanel} />
+      ) : null}
+      {showAnnotationMarkers || (reviewEnabled && reviewTool === 'annotation') ? (
+        <AnnotationMarkers
+          boardRef={boardRef}
+          annotations={annotations}
+          onOpenPanel={openAnnotationPanel}
+        />
       ) : null}
       <ReviewLauncher
         boardRef={boardRef}
@@ -822,6 +946,8 @@ export function Board({ project }) {
           demoAvailable={demoAvailable}
           showCanvasIndex={canvasIndexVisible}
           onShowCanvasIndexChange={updateCanvasIndexVisible}
+          showAnnotationMarkers={showAnnotationMarkers}
+          onShowAnnotationMarkersChange={updateShowAnnotationMarkers}
           trackpadZoom={trackpadZoom}
           onTrackpadZoomChange={updateTrackpadZoom}
           zoomSensitivity={zoomSensitivity}
@@ -831,7 +957,7 @@ export function Board({ project }) {
       ) : null}
       <ReviewPanel
         project={project}
-        visible={reviewPanelVisible && reviewEnabled}
+        visible={reviewPanelVisible && reviewEnabled && reviewTool === 'modify'}
         selections={reviewSelections}
         multiSelect={reviewMultiSelect}
         items={reviewItems}
@@ -844,6 +970,22 @@ export function Board({ project }) {
         onClearSelection={clearReviewSelection}
         onAddItem={addReviewItem}
         onRemoveItem={removeReviewItem}
+        onClose={closeReview}
+      />
+      <AnnotationPanel
+        project={project}
+        visible={reviewPanelVisible && reviewEnabled && reviewTool === 'annotation'}
+        selection={reviewSelections[reviewSelections.length - 1] || null}
+        currentScreenId={currentScreenId}
+        annotations={annotations}
+        operations={annotationOperations}
+        storageSaved={annotationStorageSaved}
+        onAdd={upsertAnnotation}
+        onUpsert={upsertAnnotation}
+        onDelete={deleteAnnotation}
+        onImport={importAnnotations}
+        onClearDraft={clearAnnotationDraft}
+        onClearSelection={clearReviewSelection}
         onClose={closeReview}
       />
     </div>

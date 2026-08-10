@@ -78,7 +78,9 @@ export function ReviewMarkers({ boardRef, items, onOpenPanel }) {
     })
   }, [refresh])
 
-  React.useLayoutEffect(scheduleRefresh)
+  React.useLayoutEffect(() => {
+    refresh()
+  }, [refresh])
 
   React.useEffect(() => {
     const options = { capture: true, passive: true }

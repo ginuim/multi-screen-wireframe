@@ -6,9 +6,13 @@ Skill 版本见仓库根目录 `VERSION`（与 `SKILL.md` / `package.json` 同�
 
 ```js
 import { HomeScreen } from './screens/home.jsx'
+import { annotations, annotationsRevision } from './annotations.js'
 
 export const project = {
+  id: 'project-id',
   name: '项目名',
+  annotationsRevision,
+  annotations,
   viewports: {
     mobile: { width: 375, height: 812 },
   },
@@ -36,6 +40,7 @@ export const project = {
 5. `links[]` 中每个目标都存在。
 6. 至少一个 screen；演示模式至少一个 `entry: true`。
 7. `links` 是页面流的唯一边数据。
+8. `annotations` 可选；提供时必须同时提供非空 `annotationsRevision`，每条注释的 id 唯一、screenId 存在，node 注释必须带 selector。
 
 ## 上下文
 
@@ -76,6 +81,38 @@ Board 的「修改」模式会拦截屏内交互。用户可以点选节点、�
 - 重复数据节点有稳定 `data-wf-key`；`DataTable` 自动把 row key 和 column key 输出到对应 DOM。
 - 共享 layout 只用 class，不写会在画布多屏渲染时重复的 id。
 - 不用文字内容、`is-*` 状态 class、DOM 层级或 `nth-child` 作为业务定位协议。
+
+## 注释与持久化
+
+Board 的「注释」模式与「修改」模式分离：黄色圆形编号表示待执行修改，蓝色气泡编号表示可持久化注释。注释可以绑定整个 screen，也可以绑定稳定 DOM 选择器；选择器失效时使用创建时记录的相对位置显示灰蓝色虚线标记，并提示定位失效。
+
+正式数据放在 `src/annotations.js`：
+
+```js
+export const annotationsRevision = 'annotations-r1'
+
+export const annotations = [
+  {
+    id: 'note-order-summary',
+    screenId: 'order-detail',
+    screenTitle: '订单详情',
+    anchor: {
+      kind: 'node',
+      selector: '#order-detail-summary',
+      fallbackPosition: { x: 0.76, y: 0.2 },
+    },
+    content: '确认是否展示优惠明细',
+    createdAt: '2026-08-11T02:00:00.000Z',
+    updatedAt: '2026-08-11T02:00:00.000Z',
+  },
+]
+```
+
+`src/project.js` 导入并暴露 `annotationsRevision`、`annotations`。Board 将本机新增、编辑与删除压缩为按 id 的 upsert / delete 操作，保存在项目隔离的浏览器存储中；内置 revision 更新后，已经包含在源码的数据会自动从本机操作中清理。因为 `file://` 下浏览器存储不保证跨浏览器一致，所以它只是草稿层。
+
+“帮助 / 快捷键 / 设置”中的“默认显示注释标记”按项目持久化；关闭后普通浏览状态隐藏 Marker，进入注释模式时仍显示，方便继续定位和编辑。
+
+注释面板可生成同步 Prompt，要求 AI 只修改业务 `src/annotations.js` / `src/project.js` 并重新构建。注释 JSON 用于跨设备交换与备份；导入要求 `schemaVersion` 和 `projectId` 匹配，并按稳定 id 合并。
 
 ## 布局
 
