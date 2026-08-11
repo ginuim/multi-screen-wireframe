@@ -12,7 +12,17 @@ const skillTag = `multi-screen-wireframe-vue-global@${skillVersion}`
 
 async function listFiles(root) {
   const entries = await readdir(root, { recursive: true, withFileTypes: true })
-  return entries.filter((entry) => entry.isFile()).map((entry) => join(entry.parentPath, entry.name))
+  return entries
+    .filter((entry) => entry.isFile())
+    .map((entry) => {
+      const parentPath = entry.parentPath || entry.path
+      assert.ok(parentPath, `cannot resolve parent directory for ${entry.name}`)
+      return normalizePathSeparators(relative(root, join(parentPath, entry.name)))
+    })
+}
+
+export function normalizePathSeparators(filePath) {
+  return filePath.replaceAll('\\', '/')
 }
 
 function runClassicScript(source, api) {

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFile, readdir } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { checkProject } from '../scripts/check-project.mjs'
+import { checkProject, normalizePathSeparators } from '../scripts/check-project.mjs'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
 const starter = join(root, 'starter')
@@ -10,6 +10,11 @@ const version = (await readFile(join(root, 'VERSION'), 'utf8')).trim()
 const packageState = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
 assert.equal(packageState.name, 'multi-screen-wireframe-vue-global', 'package name is stale')
 assert.equal(packageState.version, version, 'VERSION and package.json must match')
+assert.equal(
+  normalizePathSeparators('framework\\runtime\\board.js'),
+  'framework/runtime/board.js',
+  'Windows path separators must be normalized before portable suffix checks',
+)
 
 const skillSource = await readFile(join(root, 'SKILL.md'), 'utf8')
 const frontmatter = skillSource.match(/^---\n([\s\S]*?)\n---/)

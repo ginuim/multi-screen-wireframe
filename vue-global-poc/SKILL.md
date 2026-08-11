@@ -10,12 +10,12 @@ description: Create or revise complete offline multi-screen wireframes and page-
 ## 生成流程
 
 1. 确认用户指定的输出目录；未指定时先询问，不覆盖现有目录。
-2. 从本 Skill 根目录运行 `node scripts/create-project.mjs <目标目录>`，完整复制 `starter/`。
+2. 完整复制 `starter/` 到目标目录。有可用 Node.js 时可从本 Skill 根目录运行 `node scripts/create-project.mjs <目标目录>`；当前环境不能运行 Node.js / `.mjs` 时，使用可用的文件工具复制整个目录，不要求最终用户安装 Node.js。
 3. 先定义 `src/project.js`：viewport、screen id、入口、页面说明和唯一页面流边 `links`。
 4. 只修改目标副本的 `src/`；必要时修改 `index.html` 的 title 和业务 CSS link。
 5. 为每个 screen 创建 `src/screens/<id>.js`，并用同 id 调用 `WireframeVue.defineScreen()`。
 6. 共享布局或业务组件放入 `src/layouts/` 或 `src/components/`，用 `Wf` 前缀注册，并按依赖顺序写入 `project.components`。
-7. 运行 `node <Skill根>/scripts/check-project.mjs <目标目录>`。
+7. 当前 AI 或维护环境能运行 Node.js / `.mjs` 时，运行 `node <Skill根>/scripts/check-project.mjs <目标目录>`；环境不支持时允许跳过这项脚本校验，继续按第 8 步直接打开 `index.html` 回归，不得为了校验要求产品经理安装 Node.js。
 8. 通过 `file://` 打开目标 `index.html`，回归画板、演示、导航、交互、修改、注释和错误隔离。
 9. 用户要求导出时，实际验证一张 PNG；多屏导出实际验证 ZIP。
 
@@ -123,7 +123,7 @@ Board 的修改与注释能力依赖稳定 DOM：
 
 ## 完成标准
 
-- `check-project.mjs` 通过，无缺屏、孤儿 screen、断链、重复 id 或不合规依赖。
+- 有可用 Node.js / `.mjs` 运行环境时，`check-project.mjs` 通过，无缺屏、孤儿 screen、断链、重复 id 或不合规依赖；环境不能运行时可跳过脚本校验，不将 Node.js 作为交付或使用前提。
 - `file://` 无目录授权即可启动，控制台无 Vue 编译/运行警告和错误卡。
 - 画板与演示模式都能渲染；主路径导航和关键屏内状态可操作。
 - 移动端长内容在 shell body 内滚动，TabBar 底边与 screen 底边对齐。
