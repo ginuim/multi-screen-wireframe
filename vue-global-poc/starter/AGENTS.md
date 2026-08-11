@@ -2,6 +2,13 @@
 
 本目录是可直接双击运行的离线原型。日常生成与修改只写 `src/`，不要修改 `framework/`。
 
+## 组件文档优先
+
+- 生成或修改业务代码前先读 `COMPONENTS.md`；它是 Wf 公共组件的权威 API 契约，优先级高于 demo 和零散示例。
+- 普通业务任务禁止为了解 props、事件或插槽而扫描 `framework/runtime/ui.js`、Board、vendor 或维护源码，避免额外上下文和对内部实现产生依赖。
+- 只有用户明确要求维护 framework，或 `COMPONENTS.md` 与运行行为不一致时，才读取组件实现；发现不一致必须报告，并在同一次组件改动中同步更新 `COMPONENTS.md`。
+- 组件增删/改名，或 props、默认值、事件、插槽、DOM/ARIA、导航、布局和组件样式行为变化，都视为组件改动，必须同步更新 `COMPONENTS.md` 及其实现指纹。
+
 ## 源码完整性
 
 - `project.screens` 每个 id 都有对应 `src/screens/<id>.js`。
@@ -20,6 +27,7 @@
 ## 稳定性
 
 - 使用 Composition API；定时器和监听器在 `onUnmounted()` 清理。
+- `v-html` 仅绑定源码内受控的静态 / 演示 HTML，或已经过可信清洗器处理的 HTML；不直接渲染用户输入、URL、本地存储或外部数据。
 - 所有业务节点使用语义 class；关键节点使用唯一 id；重复节点使用稳定 `data-wf-key`。
 - 页面流只写 `project.links`；导航使用 Wf 组件的 `to`。
 - 移动端使用 `WfMobileShell`，让内容区内部滚动、TabBar 留在 screen 底部。

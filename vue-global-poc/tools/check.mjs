@@ -22,6 +22,11 @@ assert.match(skillSource, new RegExp(`multi-screen-wireframe-vue-global@${versio
 const agentSource = await readFile(join(root, 'agents/openai.yaml'), 'utf8')
 assert.match(agentSource, /\$multi-screen-wireframe-vue-global/, 'agents/openai.yaml default prompt must mention the skill')
 
+const rootAgentsSource = await readFile(join(root, 'AGENTS.md'), 'utf8')
+const starterAgentsSource = await readFile(join(starter, 'AGENTS.md'), 'utf8')
+assert.match(rootAgentsSource, /组件.*改动[\s\S]*同步更新.*COMPONENTS\.md|COMPONENTS\.md[\s\S]*组件.*改动/, 'root AGENTS.md must require component documentation sync')
+assert.match(starterAgentsSource, /组件.*改动[\s\S]*同步更新.*COMPONENTS\.md|COMPONENTS\.md[\s\S]*组件.*改动/, 'starter AGENTS.md must require component documentation sync')
+
 const results = []
 results.push(await checkProject(starter))
 results.push(await checkProject(join(root, 'demo/api-client'), {
@@ -69,6 +74,7 @@ for (const demoName of ['api-client', 'travel-app']) {
   const html = await readFile(join(root, 'demo', demoName, 'index.html'), 'utf8')
   assert.match(html, /\.\.\/\.\.\/starter\/framework\//, `${demoName} must share starter/framework`)
   assert.doesNotMatch(html, /\.\.\/\.\.\/framework\//, `${demoName} still references the preview framework`)
+  assert.match(html, /COVERAGE FIXTURE ONLY/, `${demoName} must warn that its framework path is demo-only`)
 }
 
 const starterNames = await readdir(starter)

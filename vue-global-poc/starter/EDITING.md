@@ -44,4 +44,6 @@ WireframeVue.defineScreen('orders', ({ computed, ref, useScreenId }) => ({
 }))
 ```
 
-可用全局组件：`WfBox`、`WfRow`、`WfColumn`、`WfGrid`、`WfHeading`、`WfText`、`WfCard`、`WfBadge`、`WfAvatar`、`WfImagePlaceholder`、`WfButton`、`WfTextInput`、`WfTextArea`、`WfSelect`、`WfCheckbox`、`WfRadio`、`WfToggle`、`WfFormField`、`WfPageHeader`、`WfSideNav`、`WfTabBar`、`WfBreadcrumbs`、`WfMobileShell`、`WfCell`、`WfDataTable`、`WfTabs`、`WfSteps`、`WfEmptyState`、`WfModal`、`WfConfirmDialog`、`WfToast`、`WfLoadingOverlay`、`WfWireMap`、`WfMapMarker`、`WfMapOverlay`。
+组件 props、默认值、事件、插槽、数据 schema 和组合示例统一见 `COMPONENTS.md`。不要从 demo 的 `index.html` 复制 framework 路径，也不要为普通业务生成任务扫描 framework 源码。
+
+Vue Global 支持 `v-html`，但它不会清洗 HTML。只用于写在当前业务源码中的受控静态 / 演示内容，或已经过可信清洗器处理的内容；不要直接绑定用户输入、URL、本地存储或外部数据。来源不确定时使用 `{{ text }}` 或 Wf 组件。

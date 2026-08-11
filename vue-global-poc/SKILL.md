@@ -19,7 +19,7 @@ description: Create or revise complete offline multi-screen wireframes and page-
 8. 通过 `file://` 打开目标 `index.html`，回归画板、演示、导航、交互、修改、注释和错误隔离。
 9. 用户要求导出时，实际验证一张 PNG；多屏导出实际验证 ZIP。
 
-详细 schema、组件 props、slots、状态写法和注释格式见 [reference.md](reference.md)。
+详细业务 schema、状态写法和注释格式见 [reference.md](reference.md)；Wf 组件 props、默认值、事件、slots 和组合示例以复制后的 `COMPONENTS.md` 为权威契约。生成业务代码前先读该文件，不要为查询组件用法扫描 framework 源码。
 
 ## 交付边界
 
@@ -46,6 +46,7 @@ src/
 AGENTS.md
 EDITING.md
 README.md
+COMPONENTS.md              # Wf 组件权威公开 API
 ```
 
 ## Vue 源码约束
@@ -55,7 +56,8 @@ README.md
 - 从 factory 参数取得 `ref`、`computed`、生命周期和 screen 上下文；脚本中访问 ref 使用 `.value`，template 自动解包。
 - template 必须是当前文件中的非空字符串，由 Vue Global compiler 编译。
 - 禁止 import/export、`.vue` SFC、JSX、TypeScript、动态 import、裸 npm 包和本地 fetch。
-- 禁止 `v-html`；不加载在线资源、真实后端、emoji、Unicode 图标或业务语义 SVG。
+- Vue Global full build 支持 `v-html`；仅用于当前业务源码内受控的静态 / 演示 HTML，或已经过可信清洗器处理的 HTML。禁止直接绑定用户输入、URL 参数、本地存储、外部 API / CMS 等不可信内容；来源不确定时使用文本插值或组件。
+- 不加载在线资源、真实后端、emoji、Unicode 图标或业务语义 SVG。
 - `v-for` 必须有稳定 `:key`；实际重复节点同时写稳定 `:data-wf-key`。
 - 复杂派生逻辑放进 `computed()`；template 表达式保持简单且无副作用。
 - 定时器、监听器和外部资源必须在 `onUnmounted()` 清理。
@@ -126,4 +128,4 @@ Board 的修改与注释能力依赖稳定 DOM：
 - 移动端长内容在 shell body 内滚动，TabBar 底边与 screen 底边对齐。
 - 单屏故意失败时只显示该 screen 的错误卡，其他 screen 继续工作。
 
-完整实现示例见 `demo/api-client` 和 `demo/travel-app`；不要把 demo 当复制源。
+完整实现示例见 `demo/api-client` 和 `demo/travel-app`；demo 只用于覆盖测试。参考 demo 时只看其 `src/` 业务写法，不复制 `index.html` 或其中的 `../../starter/framework/` 仓库测试路径。

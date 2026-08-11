@@ -158,10 +158,34 @@ Factory 参数可按需解构：
 - 可使用自闭合组件；复杂 slot 推荐显式闭合。
 - 用 `v-model`、`v-model:checked`、`v-model:active-id` 对应组件 emits。
 - `v-if` 与 `v-for` 不放在同一节点；先用 computed 过滤数据。
-- 不使用 `v-html`，不在 template 中写赋值或有副作用函数。
+- `v-html` 可用于业务源码内受控的静态 / 演示 HTML，或已经过可信清洗器处理的 HTML；禁止直接渲染用户输入、URL 参数、本地存储、外部 API / CMS 等不可信内容。
+- 不在 template 中写赋值或有副作用函数。
 - 原生 HTML 仍遵守合法嵌套；表格数据优先使用 `WfDataTable`。
 
+### `v-html` 安全边界
+
+Vue Global full build 包含 template compiler，`v-html` 与 SFC / 构建版用法一致。它会跳过 Vue 的文本转义并覆盖容器子节点，因此容器应保持为空，并且只绑定可以证明受控或已清洗的内容。交付物默认不内置 HTML 清洗器；不能确定内容信任边界时，使用 `{{ text }}` 或结构化组件。
+
+```js
+WireframeVue.defineScreen('article', () => ({
+  setup() {
+    // 受控的本地演示内容，不来自用户输入或外部数据。
+    const trustedArticleHtml = '<p class="article-page__paragraph">这是富文本演示内容。</p>'
+    return { trustedArticleHtml }
+  },
+  template: /*html*/ `
+    <article
+      id="article-content"
+      class="article-page__content"
+      v-html="trustedArticleHtml"
+    ></article>
+  `,
+}))
+```
+
 ## 组件库
+
+精确且随交付物复制的公开 API 以 [`starter/COMPONENTS.md`](starter/COMPONENTS.md) 为准。该文件逐个记录 props、默认值、事件、slots、数据 schema、无障碍与组合示例；以下仅保留生成流程所需的分类速览，不应替代组件契约，也不要通过读取 framework 源码补猜 API。
 
 ### 布局
 

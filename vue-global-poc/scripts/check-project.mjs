@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { readFile, readdir } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { runInNewContext } from 'node:vm'
@@ -32,6 +33,28 @@ function assertVersionComment(source, label) {
   assert.match(source, new RegExp(`@wireframe-skill\\s+${skillTag.replaceAll('.', '\\.').replaceAll('-', '\\-')}`), `${label} must use ${skillTag}`)
   assert.match(source, /创建基于\s+v\d+\.\d+\.\d+/, `${label} must preserve 创建基于`)
   assert.match(source, new RegExp(`修改基于\\s+v${skillVersion.replaceAll('.', '\\.')}`), `${label} must update 修改基于 to v${skillVersion}`)
+}
+
+function componentContract(uiSource) {
+  const block = uiSource.match(/const components = Object\.freeze\(\{([\s\S]*?)\n\s*\}\)/)
+  assert.ok(block, 'framework/runtime/ui.js public component registry is missing')
+  const names = [...block[1].matchAll(/^\s+(Wf[A-Z][A-Za-z0-9]*),\s*$/gm)].map((match) => match[1])
+  assert.ok(names.length > 0, 'framework/runtime/ui.js public component registry is empty')
+  return {
+    fingerprint: createHash('sha256').update(uiSource).digest('hex'),
+    names,
+  }
+}
+
+async function assertComponentDocs(root, frameworkRoot) {
+  const docs = await readFile(join(root, 'COMPONENTS.md'), 'utf8')
+  const uiSource = await readFile(join(frameworkRoot, 'runtime/ui.js'), 'utf8')
+  const contract = componentContract(uiSource)
+  const marker = docs.match(/<!-- ui-contract-sha256: ([a-f0-9]{64}) -->/)
+  assert.ok(marker, 'COMPONENTS.md ui-contract-sha256 marker is missing')
+  assert.equal(marker[1], contract.fingerprint, 'COMPONENTS.md is stale: review the API text and update ui-contract-sha256')
+  const documentedNames = [...docs.matchAll(/^### (Wf[A-Z][A-Za-z0-9]*)\s*$/gm)].map((match) => match[1])
+  assert.deepEqual(documentedNames.sort(), [...contract.names].sort(), 'COMPONENTS.md must contain exactly one heading for every public Wf component')
 }
 
 export async function checkProject(projectDirectory, options = {}) {
@@ -140,6 +163,8 @@ export async function checkProject(projectDirectory, options = {}) {
     const rootNames = await readdir(root)
     assert.ok(!rootNames.includes('dist'), 'delivery must not contain dist/')
     assert.ok(!rootNames.includes('build.command') && !rootNames.includes('build.cmd'), 'delivery must not contain build scripts')
+    assert.doesNotMatch(indexSource, /(?:src|href)=["'][^"']*\.\.\/[^"']*framework\//, 'delivery index.html must use its local framework/ and must not copy demo paths')
+    if (options.allowMaintenanceSource !== true) await assertComponentDocs(root, frameworkRoot)
   }
 
   return { root, projectName: project.name, screenCount: ids.length, componentCount: componentNames.size }
