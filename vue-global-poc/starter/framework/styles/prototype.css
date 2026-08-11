@@ -2089,13 +2089,6 @@ button:disabled {
   cursor: pointer;
 }
 
-.wf-demo-page-label {
-  flex-shrink: 0;
-  color: var(--board-muted);
-  font-size: 12px;
-  white-space: nowrap;
-}
-
 .wf-demo-viewport {
   display: flex;
   min-height: 0;

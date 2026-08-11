@@ -144,11 +144,9 @@ export function Board({ project }) {
     currentScreenId,
     canGoBack,
     goBack,
-    reset,
   } = usePrototype()
   const demoAvailable = canUseDemo(project.screens)
   const viewportOptions = Object.keys(project.viewports)
-  const currentScreen = project.screens.find((screen) => screen.id === currentScreenId)
   const shortcutModifier = shortcutModifierLabel()
 
   const [selectedIds, setSelectedIds] = React.useState(
@@ -587,11 +585,6 @@ export function Board({ project }) {
     }
   }, setExportError)
 
-  const resetDemo = () => {
-    reset()
-    setHotspotsVisible(false)
-  }
-
   const resetDemoView = () => {
     setDemoViewResetKey((value) => value + 1)
   }
@@ -695,13 +688,6 @@ export function Board({ project }) {
               {canGoBack ? (
                 <button type="button" className="wf-board-button" onClick={goBack}>返回</button>
               ) : null}
-              <button type="button" className="wf-board-button" onClick={resetDemo}>重置</button>
-              <span className="wf-demo-page-label">
-                当前：
-                {currentScreen
-                  ? `${project.screens.findIndex((screen) => screen.id === currentScreen.id) + 1}. ${currentScreen.title} · ${currentScreen.id}.js`
-                  : currentScreenId}
-              </span>
             </>
           )}
         </div>
