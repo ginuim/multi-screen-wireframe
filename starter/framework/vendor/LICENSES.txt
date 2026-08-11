@@ -1,5 +1,8 @@
 The bundled vendor files are distributed under the MIT License.
 
+Vue.js
+Copyright (c) 2018-present, Yuxi (Evan) You and Vue contributors
+
 React and ReactDOM
 Copyright (c) Meta Platforms, Inc. and affiliates.
 

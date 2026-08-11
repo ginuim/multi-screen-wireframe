@@ -1,180 +1,340 @@
-# v2 协议与组件参考
+# Vue Global 协议与组件参考
 
-Skill 版本见仓库根目录 `VERSION`（与 `SKILL.md` / `package.json` 同步）。框架在 `framework/`，业务在 `src/`。生成的 `src/screens`、`src/layouts` 须带 `@wireframe-skill` 版本注释；每个 `screens[].id` 必须有对应 `src/screens/<id>.jsx`；业务样式写 `src/styles/app.css` 或内联 style，禁止改 `framework/styles/prototype.css`。
+本文件描述业务 `src/` 的稳定协议。交付物无需 Node、构建器、包管理器、网络或服务器；`index.html` 通过经典脚本依次加载 Vue compiler、注册表、Wf UI、预编译 Board、project、annotations、业务组件和 screens。
+
+## 目录
+
+- [Project schema](#project-schema)
+- [Screen 与共享组件](#screen-与共享组件)
+- [Composition API](#composition-api)
+- [Template 规则](#template-规则)
+- [组件库](#组件库)
+- [注释协议](#注释协议)
+- [运行与错误隔离](#运行与错误隔离)
 
 ## Project schema
 
-```js
-import { HomeScreen } from './screens/home.jsx'
-import { annotations, annotationsRevision } from './annotations.js'
+`src/project.js` 使用 IIFE，避免创建顶层变量：
 
-export const project = {
-  id: 'project-id',
-  name: '项目名',
-  annotationsRevision,
-  annotations,
-  viewports: {
-    mobile: { width: 375, height: 812 },
-  },
-  defaultViewport: 'mobile',
-  screens: [
-    {
-      id: 'home',
-      title: '首页',
-      description: '入口页面',
-      component: HomeScreen,
-      entry: true,
-      links: ['detail'],
-      edgeCases: [],
+```js
+(function defineProject({ defineProject }) {
+  defineProject({
+    format: 'vue-global',
+    formatVersion: 2,
+    id: 'weekend-trip',
+    name: '周末旅行助手',
+    viewports: {
+      mobile: { width: 375, height: 812 },
+      desktop: { width: 1440, height: 900 },
     },
-  ],
-}
+    defaultViewport: 'mobile',
+    components: [
+      { name: 'WfMobileLayout', source: 'src/layouts/mobile-layout.js' },
+    ],
+    screens: [
+      {
+        id: 'home',
+        title: '首页',
+        description: '路线推荐入口',
+        entry: true,
+        links: ['detail'],
+        edgeCases: [],
+      },
+      {
+        id: 'detail',
+        title: '路线详情',
+        links: ['home'],
+        edgeCases: ['长内容滚动'],
+      },
+    ],
+  })
+})(window.WireframeVue)
 ```
 
 不变量：
 
-1. `screens[].id` 唯一并匹配 `/^[a-z0-9-]+$/`。
-2. `defaultViewport` 必须存在于 `viewports`。
-3. viewport 的 `width`、`height` 是正数。
-4. `component` 是函数。
-5. `links[]` 中每个目标都存在。
-6. 至少一个 screen；演示模式至少一个 `entry: true`。
-7. `links` 是页面流的唯一边数据。
-8. `annotations` 可选；提供时必须同时提供非空 `annotationsRevision`，每条注释的 id 唯一、screenId 存在，node 注释必须带 selector。
+1. `format` 固定为 `vue-global`，`formatVersion` 固定为 `2`，并与 `framework/FORMAT_VERSION` 的 `vue-global@2` 对应。
+2. `id` 只含小写字母、数字与连字符，且 screen 间唯一。
+3. `defaultViewport` 存在于 `viewports`，宽高均为正数。
+4. `screens` 非空，至少一个 `entry: true`；每屏都有 `links` 和 `edgeCases` 数组。
+5. 每个 links 目标都存在；演示模式只允许沿 links 导航。
+6. `components` 可选；每项 name 唯一、以 `Wf` 开头，并提供相对 `index.html` 的 source。
+7. components 先按数组顺序加载，再按 screens 顺序加载。
 
-## 上下文
+## Screen 与共享组件
 
-`usePrototype()` 提供：
+Screen 固定写法：
+
+```js
+/**
+ * @wireframe-skill multi-screen-wireframe@2.0.0
+ * 创建基于 v2.0.0
+ * 修改基于 v2.0.0
+ */
+WireframeVue.defineScreen('orders', ({ computed, ref }) => ({
+  setup() {
+    const keyword = ref('')
+    const orders = ref([
+      { id: 'o-101', title: '订单 101' },
+      { id: 'o-102', title: '订单 102' },
+      { id: 'o-103', title: '订单 103' },
+    ])
+    const filteredOrders = computed(() => orders.value.filter((item) =>
+      item.title.includes(keyword.value),
+    ))
+    return { filteredOrders, keyword }
+  },
+  template: /*html*/ `
+    <WfColumn id="orders-page" class="orders__page" :gap="12">
+      <WfHeading id="orders-title" class="orders__title" :level="1">订单</WfHeading>
+      <WfTextInput id="orders-search" v-model="keyword" class="orders__search"></WfTextInput>
+      <WfCell
+        v-for="order in filteredOrders"
+        :key="order.id"
+        :data-wf-key="order.id"
+        class="orders__item"
+        :title="order.title"
+        to="detail"
+      ></WfCell>
+    </WfColumn>
+  `,
+}))
+```
+
+共享业务组件使用 `defineComponent()`；名称必须以 `Wf` 开头：
+
+```js
+(function defineMobileLayout({ defineComponent }) {
+  defineComponent('WfMobileLayout', ({ useScreenId }) => ({
+    setup() {
+      return {
+        screenId: useScreenId(),
+        tabs: [
+          { label: '首页', to: 'home' },
+          { label: '我的', to: 'profile' },
+        ],
+      }
+    },
+    template: `
+      <WfMobileShell :tabs="tabs" :active-id="screenId">
+        <slot></slot>
+      </WfMobileShell>
+    `,
+  }))
+})(window.WireframeVue)
+```
+
+`useScreenId()` 返回当前实际渲染 screen 的字符串 id，不是 Board 当前焦点。画布会同时渲染多屏，因此 SideNav/TabBar 选中态必须用它。
+
+## Composition API
+
+Factory 参数可按需解构：
 
 ```js
 {
-  mode,
-  viewportKey,
-  viewport,
-  entryId,
-  currentScreenId,
-  navigate,
-  selectEntry,
-  goBack,
-  reset,
+  ref,
+  shallowRef,
+  reactive,
+  readonly,
+  computed,
+  watch,
+  watchEffect,
+  onMounted,
+  onUnmounted,
+  nextTick,
+  useScreenId,      // string
+  useViewportKey,   // Ref<string>
 }
 ```
 
-自定义点击区域优先用组件的 `to`（`Button` / `Card` / `Box` / `Row` / `Column` / `Cell` 等）。热区高亮认 `[data-flow-to]`；`ScreenFrame` 会对屏内该属性做点击委托，因此即便写成裸 `span`/`div` 只带 `data-flow-to`，演示模式也能跳转。仍推荐用库组件，以便带上 `wf-interactive` 与键盘可达性。
+约束：
 
-演示模式中 `navigate(id)` 只允许当前 screen 的 `links` 目标；入口下拉列出全部页面，`selectEntry(id)` 可把任意屏设为演示起点并清空历史，重置回到当前 `entryId`。默认入口仍取第一个 `entry: true`。画布模式可直接聚焦任意 screen。画板双击某屏进入演示；演示视口双击屏外空白退出回画板（点在 `.wf-screen-chrome` 内不退出）。
+- 脚本中用 `ref.value`；template 顶层 ref 自动解包。
+- 用 `computed` 表达派生状态，不在 getter 中产生副作用。
+- watcher、listener、timer、observer 在卸载时清理。
+- 不在异步回调里延迟注册生命周期或 watcher。
 
-`currentScreenId` 是画板聚焦 / 演示当前页，不是“我正在渲染的这屏”。布局里 `TabBar` / `SideNav` 的选中态必须用 `useScreenId()`（由 `ScreenFrame` 注入），否则画布上所有屏会一起高亮同一个 tab。
+## Template 规则
 
-Board 快捷键：`Ctrl+1` 画板、`Ctrl+2` 演示、`Ctrl+I` 交互锁、`Ctrl+M` 修改、`Ctrl+F` 沉浸、`Ctrl+Shift+F` 浏览器全屏、`Ctrl+H` 演示热区、按住 `Space` 临时拖动画布、`Esc` 逐层退出、`?` 打开“帮助 / 快捷键”面板。普通快捷键不会在输入框、文本域、下拉框或可编辑内容中触发；沉浸工具栏也提供帮助与设置入口。
+- Template 是 JavaScript 字符串，由 `Vue.compile()` 直接处理，不经过浏览器的 in-DOM HTML 预解析。
+- 推荐 PascalCase `Wf*` 组件和 kebab-case props，例如 `title-id`、`active-id`。
+- 可使用自闭合组件；复杂 slot 推荐显式闭合。
+- 用 `v-model`、`v-model:checked`、`v-model:active-id` 对应组件 emits。
+- `v-if` 与 `v-for` 不放在同一节点；先用 computed 过滤数据。
+- `v-html` 可用于业务源码内受控的静态 / 演示 HTML，或已经过可信清洗器处理的 HTML；禁止直接渲染用户输入、URL 参数、本地存储、外部 API / CMS 等不可信内容。
+- 不在 template 中写赋值或有副作用函数。
+- 原生 HTML 仍遵守合法嵌套；表格数据优先使用 `WfDataTable`。
 
-画板索引支持拖拽和关闭；拖拽位置只保留到当前页面会话结束。“帮助 / 快捷键 / 设置”面板可开关索引，显示状态以项目名为键保存在 `localStorage`；存储不可用时默认显示且不影响离线运行。
+### `v-html` 安全边界
 
-## 修改与 DOM 定位
-
-Board 的「修改」模式会拦截屏内交互。用户可以点选节点、沿面包屑切换到父节点，添加「修改建议 / 修改文字 / 调整顺序 / 删除节点」，再把修改清单生成可手动编辑和复制的 AI Prompt。开启多选或按住 Shift / Command / Ctrl 点击，可把多个节点绑定到同一条意见；所有目标旁显示同一个半透明黄色序号，点击序号浮动显示意见，并可通过「查看更多」展开完整修改面板。有修改项后，画板会显示带数量的可拖拽修改入口；点击入口展开修改面板，拖拽位置按项目保存在浏览器本地。按住空格时临时切换为画布拖动，松开后恢复修改；输入框和 Prompt textarea 内的空格不触发画布。批注编号和浮层只高于画布业务内容，低于侧栏、顶栏、画布索引、沉浸控件和修改面板等框架 chrome。修改意见只存在于当前页面会话，不改 JSX，也不生成 sidecar 文件。
-
-选择器优先级：关键节点 id → screen 作用域内的业务 class → `data-wf-key` → 带框架 class 的 DOM 路径兜底。生成业务源码时必须主动提供前三级稳定锚点：
-
-- 所有业务 JSX 节点都有英文语义 `className`，推荐 `<screen-or-module>__<role>`。
-- screen 业务根、header / 标题、主内容区、关键卡片 / 表单 / 表格、主操作和弹层有以 screen id 开头的全局唯一 id。
-- 重复数据节点有稳定 `data-wf-key`；`DataTable` 自动把 row key 和 column key 输出到对应 DOM。
-- 共享 layout 只用 class，不写会在画布多屏渲染时重复的 id。
-- 不用文字内容、`is-*` 状态 class、DOM 层级或 `nth-child` 作为业务定位协议。
-
-## 注释与持久化
-
-Board 的「注释」模式与「修改」模式分离：黄色圆形编号表示待执行修改，蓝色气泡编号表示可持久化注释。注释可以绑定整个 screen，也可以绑定稳定 DOM 选择器；选择器失效时使用创建时记录的相对位置显示灰蓝色虚线标记，并提示定位失效。
-
-正式数据放在 `src/annotations.js`：
+Vue Global full build 包含 template compiler，`v-html` 与 SFC / 构建版用法一致。它会跳过 Vue 的文本转义并覆盖容器子节点，因此容器应保持为空，并且只绑定可以证明受控或已清洗的内容。交付物默认不内置 HTML 清洗器；不能确定内容信任边界时，使用 `{{ text }}` 或结构化组件。
 
 ```js
-export const annotationsRevision = 'annotations-r1'
-
-export const annotations = [
-  {
-    id: 'note-order-summary',
-    screenId: 'order-detail',
-    screenTitle: '订单详情',
-    anchor: {
-      kind: 'node',
-      selector: '#order-detail-summary',
-      fallbackPosition: { x: 0.76, y: 0.2 },
-    },
-    content: '确认是否展示优惠明细',
-    createdAt: '2026-08-11T02:00:00.000Z',
-    updatedAt: '2026-08-11T02:00:00.000Z',
+WireframeVue.defineScreen('article', () => ({
+  setup() {
+    // 受控的本地演示内容，不来自用户输入或外部数据。
+    const trustedArticleHtml = '<p class="article-page__paragraph">这是富文本演示内容。</p>'
+    return { trustedArticleHtml }
   },
-]
+  template: /*html*/ `
+    <article
+      id="article-content"
+      class="article-page__content"
+      v-html="trustedArticleHtml"
+    ></article>
+  `,
+}))
 ```
 
-`src/project.js` 导入并暴露 `annotationsRevision`、`annotations`。Board 将本机新增、编辑与删除压缩为按 id 的 upsert / delete 操作，保存在项目隔离的浏览器存储中；内置 revision 更新后，已经包含在源码的数据会自动从本机操作中清理。因为 `file://` 下浏览器存储不保证跨浏览器一致，所以它只是草稿层。
+## 组件库
 
-“帮助 / 快捷键 / 设置”中的“默认显示注释标记”按项目持久化；关闭后普通浏览状态隐藏 Marker，进入注释模式时仍显示，方便继续定位和编辑。
+精确且随交付物复制的公开 API 以 [`starter/COMPONENTS.md`](starter/COMPONENTS.md) 为准。该文件逐个记录 props、默认值、事件、slots、数据 schema、无障碍与组合示例；以下仅保留生成流程所需的分类速览，不应替代组件契约，也不要通过读取 framework 源码补猜 API。
 
-注释面板可生成同步 Prompt，要求 AI 只修改业务 `src/annotations.js` / `src/project.js` 并重新构建。注释 JSON 用于跨设备交换与备份；导入要求 `schemaVersion` 和 `projectId` 匹配，并按稳定 id 合并。
+### 布局
 
-## 布局
+- `WfBox({ to })`
+- `WfRow({ gap, alignItems, justifyContent, to })`
+- `WfColumn({ gap, alignItems, justifyContent, to })`
+- `WfGrid({ columns, gap, to })`：columns 接受正整数、CSS grid 字符串或 viewport 映射。
 
-- `Box`：普通 `div`，透传 DOM props。
-- `Row({ gap, alignItems, justifyContent, style })`：横向 flex。
-- `Column({ gap, alignItems, justifyContent, style })`：纵向 flex。
-- `Grid({ columns, gap, style })`：CSS grid。
+`to` 会输出 `data-flow-to` 并由 Board 统一导航。`Row`/`Column` 使用 `align-items`、`justify-content` props；自定义 style 用 `:style`。
 
-`Box` / `Row` / `Column` / `Grid` 与 `Card` 一样接受 `to` 和 `onClick`（整块可点区域可直接写在布局上，不必再包一层 `Card`）。
+### 内容
 
-`style` 最后合并，可覆盖组件默认值。`Grid.columns` 接受正整数、非空 CSS 模板字符串，或按 viewport key 映射的值，例如：
+- `WfHeading({ level })`
+- `WfText({ as })`
+- `WfCard({ to })`
+- `WfBadge`
+- `WfAvatar({ size, label })`
+- `WfImagePlaceholder({ width, height, borderRadius })`
 
-```jsx
-<Grid columns={{ mobile: 1, desktop: 4 }} gap={12}>
-  {children}
-</Grid>
-```
+### 表单
 
-## 内容与表单
+- `WfButton({ variant, to })`
+- `WfTextInput`、`WfTextArea`、`WfSelect`：使用 `v-model`。
+- `WfCheckbox`、`WfRadio`：使用布尔 `v-model`，提供 `label`。
+- `WfToggle({ label })`：使用 `v-model:checked`。
+- `WfFormField({ label, for, hint, error })`
 
-- 内容：`Heading`、`Text`、`Card`、`Badge`、`Avatar`、`ImagePlaceholder`
-- 表单：`Button`、`TextInput`、`TextArea`、`Select`、`Checkbox`、`Radio`、`Toggle`、`FormField`
+初值写进 `setup()` 的 ref，不依赖 `value`/`checked` HTML attribute。表单 id 与 `WfFormField for` 一致。
 
-`PageHeader` 的页面标题需要精确修改定位时传 `titleId`，副标题可传 `subtitleId`；header 自身仍用普通 `id`。例如 `<PageHeader id="order-detail-header" titleId="order-detail-title" ... />`。
+### 导航与数据
 
-`Avatar` 只表达圆形几何占位。`ImagePlaceholder` 只表达矩形尺寸、比例和圆角。
+- `WfPageHeader({ title, titleId, subtitle, subtitleId })`：操作区使用 `#actions`。
+- `WfSideNav({ items, activeId })`
+- `WfTabBar({ items, activeId })`
+- `WfMobileShell({ tabs, activeId })`：默认 slot 是内部滚动内容，TabBar 留在底部。
+- `WfBreadcrumbs({ items })`
+- `WfCell({ title, subtitle, value, to })`
+- `WfDataTable({ columns, rows, getRowKey })`
+- `WfTabs({ items, activeId })`：使用 `v-model:active-id`。
+- `WfSteps({ items, current, direction })`
+- `WfEmptyState({ title, description })`：操作使用 `#action`。
 
-## 导航与数据
+items 使用稳定 id/to；rows 默认以 `row.id` 作为 key。不能把 screen 间导航写成临时 click handler 来绕过 screens[].links。
 
-- 导航：`PageHeader`、`SideNav`、`TabBar`、`MobileShell`、`Breadcrumbs`
-- 数据：`Cell`、`DataTable`、`Tabs`、`Steps`、`EmptyState`
+### 反馈与地图
 
-`MobileShell` 是移动端整屏壳：上内容区可滚，下 `TabBar` 贴底。App / 小程序底栏优先用它；`activeId` 传 `useScreenId()`。`TabBar` 自身带 `margin-top: auto`，放在全高 flex Column 末尾也会贴底。不要用 `position: fixed` 钉底栏。
+- `WfModal({ open, title })`：`@close`，操作区使用 `#actions`。
+- `WfConfirmDialog({ open, title, message, confirmLabel, cancelLabel })`：`@confirm`、`@cancel`。
+- `WfToast({ open })`
+- `WfLoadingOverlay({ open, label })`
+- `WfWireMap`
+- `WfMapMarker({ x, y, label, to })`
+- `WfMapOverlay({ position })`
 
-`Steps` 支持 `items=[{ id, label, description? }]`、`current`、`direction="horizontal|vertical"`。完成态用 CSS 几何勾，当前态实心圆，待办态空心圆，步骤之间有连接线。
+反馈组件 Teleport 到当前 `.wf-screen-content`，不会逃逸到其他 screen；禁止用 `position: fixed` 自制全局弹层。
 
-`EmptyState` 只用于列表无数据。不要把它放在已有记录下面当“没有更多”。
+## 注释协议
 
-生成默认：列表 / 表格 / Cell 组至少 3 条有区分度的演示数据，并尽量让列表区超过一屏可滚；仅当用户明确要求空态或少量样例时例外。完整页面流与屏内内容要求见 `SKILL.md`「内容完整度」。
+除非用户明确要求添加、固化或导入原型注释，否则保持 `src/annotations.js` 为空注释集。注释只写入该文件，不把注释文字写进 screen template 或 `project.js`。
 
-`Card`、`Button`、`Cell`、`Box`、`Row`、`Column`、`Grid` 接受 `to="screen-id"`。`SideNav` 和 `TabBar` 接受 `items={[{ label, to }]}` 与 `activeId`。`activeId` 应传 `useScreenId()`，不要传 `usePrototype().currentScreenId`。它们统一写入 `data-flow-to`，调用上下文导航，并在演示模式维护历史。
+### 文件结构
 
-## 反馈与地图
-
-- 反馈：`Modal`、`ConfirmDialog`、`Toast`、`LoadingOverlay`
-- 地图：`WireMap`、`MapMarker`、`MapOverlay`
-
-反馈组件相对 `.wf-screen-content` 绝对定位。`ConfirmDialog` 组合 `Modal`。
-
-```jsx
-<WireMap>
-  <MapMarker x={40} y={60} label="位置 A" to="detail" />
-  <MapOverlay position="bottom">说明</MapOverlay>
-</WireMap>
-```
-
-## 构建产物
-
-`src/app.jsx` 是入口，从 `lib/` 引入 Board / core。构建使用 classic JSX transform、browser platform、ES2018、IIFE 和 inline source map，原子替换 `dist/app.js`。生成文件顶部固定包含：
+`src/annotations.js` 通过 `WireframeVue.defineAnnotations()` 注册一次：
 
 ```js
-/* GENERATED FILE. EDIT src/, THEN RUN BUILD. */
+(function defineAnnotations({ defineAnnotations }) {
+  defineAnnotations({
+    annotationsRevision: 'annotations-r3',
+    annotations: [
+      {
+        id: 'note-orders-page-purpose',
+        screenId: 'orders',
+        screenTitle: '订单',
+        anchor: { kind: 'screen' },
+        content: '确认这个页面是否只展示近 90 天订单',
+        createdAt: '2026-08-11T02:00:00.000Z',
+        updatedAt: '2026-08-11T02:00:00.000Z',
+      },
+      {
+        id: 'note-orders-summary-discount',
+        screenId: 'orders',
+        screenTitle: '订单',
+        anchor: {
+          kind: 'node',
+          selector: '#orders-summary',
+          fallbackPosition: { x: 0.76, y: 0.2 },
+        },
+        content: '确认是否展示优惠明细',
+        createdAt: '2026-08-11T02:00:00.000Z',
+        updatedAt: '2026-08-11T02:00:00.000Z',
+      },
+    ],
+  })
+})(window.WireframeVue)
 ```
 
-构建失败不会覆盖上一次可运行产物。
+没有注释时保留同样的注册外壳：
+
+```js
+(function defineAnnotations({ defineAnnotations }) {
+  defineAnnotations({ annotationsRevision: 'annotations-r1', annotations: [] })
+})(window.WireframeVue)
+```
+
+### 容器字段
+
+| 字段 | 要求 | 说明 |
+| --- | --- | --- |
+| `annotationsRevision` | 非空字符串 | 注释源码的基线版本。每次固化新增、修改或删除后更换为新的唯一值，例如 `annotations-r4` 或带时间戳的值。 |
+| `annotations` | 数组 | 已固化的注释列表；无注释时写 `[]`。 |
+
+### 注释字段
+
+| 字段 | 要求 | 说明 |
+| --- | --- | --- |
+| `id` | 必填，非空字符串 | 在整个项目中唯一且长期稳定。推荐 `note-<screen>-<topic>`；修改内容时不更换 id。 |
+| `screenId` | 必填 | 必须引用 `project.screens` 中已存在的 screen id。 |
+| `screenTitle` | 可选 | 面板中显示的页面名称；省略时回退为 `screenId`。 |
+| `anchor` | 必填 | 页面注释写 `{ kind: 'screen' }`；节点注释写 `{ kind: 'node', selector, fallbackPosition? }`。 |
+| `content` | 必填，非空字符串 | 注释正文；运行时会去除首尾空白。 |
+| `createdAt` | 可选 | 推荐写 ISO 8601 时间字符串。省略时以加载时间补齐；列表会先按它排序。 |
+| `updatedAt` | 可选 | 推荐写 ISO 8601 时间字符串。修改内容时更新；省略时回退为 `createdAt`。 |
+
+不要写 `status` 等未列出字段；当前运行时只保留上述字段，未支持的字段会在标准化、导出或同步时丢失。
+
+### 页面与节点定位
+
+- 页面注释使用 `anchor: { kind: 'screen' }`，标记相对当前 screen 内容区定位。
+- 节点注释必须提供合法且稳定的 CSS `selector`。优先使用以 screen id 开头的全局唯一 `#id`；重复数据节点使用稳定 `data-wf-key` 组合选择器。不使用文字、`nth-child`、短命状态 class 或易变 DOM 层级定位。
+- `selector` 命中的节点必须位于 `screenId` 对应的 `.wf-screen-content` 内。选择器无效、未命中或命中其他 screen 时，注释显示为定位失效并改用备用位置。
+- `fallbackPosition` 是相对 screen 内容区的归一化坐标，`x` 和 `y` 均取 `0`–`1`。超出范围的有限数值会被截断；缺失或非有限数值时使用默认备用位置 `{ x: 0.96, y: 0.04 }`。
+
+### 修改、删除与同步
+
+- 把 `src/annotations.js` 视为正式基线；Board 中新增、编辑和删除的注释先保存为浏览器本机草稿，不会自动改写源码。
+- 同步 Prompt 中的 `operations` 只支持 `upsert` 和 `delete`。`upsert` 按 id 新增或完整替换，`delete` 按 id 删除；保留未涉及的基线注释。
+- 同步完成后更新 `annotationsRevision`，刷新 `index.html`，验证页面注释、节点定位、失效定位提示和待同步状态。
+- Board 导出的 `*.wireframe-annotations.json` 是交换包，包含 `schemaVersion`、`projectId`、`baseRevision`、`annotations` 和 `operations`；它不是 `src/annotations.js` 的源码格式，不要原样粘贴进该文件。导入时要求 `schemaVersion` 受支持、`projectId` 与当前项目一致且注释数组全部有效。
+
+## 运行与错误隔离
+
+Loader 顺序：
+
+1. project 已由 `index.html` 加载。
+2. 依次加载 `project.components`，任何共享组件失败都会阻止启动并显示启动错误。
+3. 依次加载 screen；某个 screen 加载或编译失败会记录为该屏错误，不阻止其他 screen。
+4. Board 为每个 screen 建立独立 Vue app，并注入 screen id 与 viewport key。
+
+注册表校验重复 screen、缺屏、孤儿注册、共享组件命名和 Vue template 编译错误。运行时错误由单屏 error handler 捕获。开发版 Vue 保留完整诊断；交付物仍完全离线。

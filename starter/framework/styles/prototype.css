@@ -1863,6 +1863,12 @@ button:disabled {
   touch-action: none;
 }
 
+/* Vue bridge adds one mount node between ScreenFrame and the business screen. */
+.wf-vue-screen-host {
+  width: 100%;
+  height: 100%;
+}
+
 .wf-screen-content.is-expanded {
   overflow: visible;
 }
@@ -2081,13 +2087,6 @@ button:disabled {
   color: var(--board-text);
   font-size: 13px;
   cursor: pointer;
-}
-
-.wf-demo-page-label {
-  flex-shrink: 0;
-  color: var(--board-muted);
-  font-size: 12px;
-  white-space: nowrap;
 }
 
 .wf-demo-viewport {

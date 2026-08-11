@@ -1,35 +1,47 @@
 # AGENTS.md — multi-screen-wireframe
 
-本目录是独立的多屏线框 skill。生成流程见 `SKILL.md`，组件与数据协议见 `reference.md`，人类使用说明见 `README.md`。
+本目录是 `multi-screen-wireframe` v2 主线。生成流程见 `SKILL.md`，业务协议见 `reference.md`，当前版本见 `VERSION`。v1 React/JSX 最终版冻结在 Git tag `v1.8.0`。
 
-**当前版本**：见根目录 `VERSION`（现 `1.8.0`）。`SKILL.md` frontmatter 的 `version` 与 `package.json` 必须与之一致。
+## 代际边界
+
+- v2 交付格式固定为 `vue-global@2`。`src/project.js` 的 `format` / `formatVersion` 与 `framework/FORMAT_VERSION` 必须一致。
+- v1 的 `.jsx`、build 脚本、esbuild 工具和 framework 不进入 v2 starter；不提供旧组件 API 兼容层。
+- framework 只允许在相同格式和 major 内整夹更新。禁止 v1 / v2 互相覆盖 framework。
+- 迁移 v1 交付物必须由用户明确要求，并在新目录中转换；不得原地覆盖旧项目。
 
 ## 维护边界
 
 - 交付复制源永远是整个 `starter/`。
-- 生成原型时，先把 `starter/` 复制到用户确认的目标目录，只修改目标副本的 `src/`（screens / layouts / project / annotations / app / `src/styles/app.css`）；必要时改 `index.html` 的 title 与业务 css link。
-- 框架在 `starter/framework/`（`lib` / `styles` / `vendor` / `tools`）。升级时整夹覆盖交付物的 `framework/`，**不要覆盖 `src/`**。
-- **禁止**生成任务修改 `framework/`（含 `prototype.css`）。
-- 不得修改相邻的 `multi-screen-wireframe`。
-- 不提供旧版 API 兼容层，不复制旧版 runtime 或业务实现。
-- `framework/vendor/` 仅含有版本和许可证记录的第三方静态库。
-- `demo/` 是覆盖测试，不是复制源；共享 `starter/framework/`，不携带 `tools/`。demo 业务样式放各自 `styles/demo.css`，不得写入 `framework/styles/prototype.css`。
+- 生成项目时优先使用 `scripts/create-project.mjs`；环境没有 Node.js 时可完整复制 `starter/`，随后只修改目标副本的 `src/`。
+- 不得用 `demo/` 或根目录预览作为复制源；demo 只覆盖复杂交互和长内容。
+- demo 共享 `starter/framework/`，其中 `../../starter/framework/` 只是仓库测试路径，不能复制进交付物。
+- 根目录的 `framework/`、`src/`、`index.html` 是维护预览镜像；交付内容以 `starter/` 为准。
+- `framework/react-source/` 与 `framework/runtime/bridge-entry.jsx` 仅供维护，不进入 starter。
+- 修改公共 runtime 后重新生成 `framework/runtime/board.js`，同步交付所需 runtime、styles、vendor 和 `FORMAT_VERSION` 到 `starter/framework/`，再验证 starter 与两个 demo。
+- 交付物不加入 esbuild、WASM、Node runtime、包管理器或服务器。
 
-## 技术约束
+## 组件契约维护
 
-- 业务源码是标准 JSX + ESM；`src/app.jsx` 编译为单个 IIFE `dist/app.js`。
-- `project.screens` 每个 id 必须有对应的 `src/screens/<id>.jsx` 源文件；禁止只交付 `dist`。
-- 交付构建只用 `framework/tools/` 随包 esbuild，不依赖 Node、包管理器、网络或服务器。
-- 默认灰阶。图标和图片只用方形、圆形、线框块等抽象几何占位。
-- 弹层必须使用组件库并相对单个 screen 定位，禁止 `position: fixed`。
-- 有参考图时先测量 viewport、区域、尺寸、间距、对齐和圆角，再实现。
-- 生成默认求完整：主路径多屏 + 屏内可演示内容；列表类至少 3 条并尽量超过一屏可滚（用户另有要求除外）。细节见 `SKILL.md`「内容完整度」。
-- 生成/修改 `src/screens`、`src/layouts` 时必须在文件顶注释写明基于的 skill 版本（见 `SKILL.md`「版本注释」）。
-- 生成的业务 JSX 节点必须有语义 class；关键节点有全局唯一 id；重复数据节点有稳定 `data-wf-key`，以支持 Board 修改模式和模块注释生成可定位的 AI Prompt。
+- `starter/COMPONENTS.md` 是 Wf 公共组件的权威 API 文档；生成业务代码前先读它，不扫描 framework 猜测组件用法。
+- 任何组件改动都必须在同一次修改中同步更新 `starter/COMPONENTS.md` 及其实现指纹。
+- `starter/framework/runtime/ui.js` 的组件增删/改名，以及 props、默认值、事件、插槽、属性透传、DOM/ARIA、导航和布局行为变化，必须同步更新 `starter/COMPONENTS.md`。
+- 影响组件公开布局或交互行为的 CSS 修改也必须同步更新组件文档。
+- 组件实现变更后更新 `ui-contract-sha256` 并运行 `node tools/check.mjs`；只改指纹、不审阅正文不算完成。
 
-## 维护
+## 版本
 
-- 修改 `framework/` 公共实现后，重新构建 starter 和两个 demo。
-- demo 构建：`scripts/build-demo.sh demo/api-client` 或 `scripts/build-demo.sh demo/travel-app`。
-- 运行 `tests/*.test.mjs`，再做浏览器回归。
-- bump 版本时同步：`VERSION`、`package.json`、`SKILL.md` frontmatter、`starter/src/screens/_template.jsx` 注释中的版本号。
+- `VERSION`、`package.json`、screen/layout 的 `@wireframe-skill` 和“修改基于”必须同步。
+- major 格式变更必须同步 `project.formatVersion`、三个 framework 镜像中的 `FORMAT_VERSION`、README 兼容矩阵和 CHANGELOG。
+- 根预览 `src/` 与 `starter/src/` 保持镜像；starter、根预览和两个 demo 都使用当前版本注释。
+
+## 验证
+
+1. `node scripts/check-project.mjs starter`
+2. `node tools/check.mjs`
+3. 通过 `file://` 回归 `starter/index.html`、`demo/api-client/index.html`、`demo/travel-app/index.html`
+4. 验证控制台、错误隔离、主路径导航、弹层、TabBar、修改、注释和导出
+
+## 文件修改
+
+- 使用 `apply_patch` 编辑文本文件；机械版本替换和目录提升可使用批处理命令。
+- 保留与当前任务无关的未跟踪文件和用户修改。
