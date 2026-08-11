@@ -1,7 +1,7 @@
 /**
- * @wireframe-skill multi-screen-wireframe@2.0.0
+ * @wireframe-skill multi-screen-wireframe@2.1.0
  * 创建基于 v2.0.0
- * 修改基于 v2.0.0
+ * 修改基于 v2.1.0
  */
 WireframeVue.defineScreen('history', () => ({
   setup() { return { history: [{ id: 'hist-1', method: 'GET', name: 'List Users', url: 'https://api.staging.example.com/v1/users?page=1', status: '200', time: '142 ms', at: '今天 14:21:08' }, { id: 'hist-2', method: 'POST', name: 'Create Order', url: 'https://api.staging.example.com/v1/orders', status: '201', time: '310 ms', at: '今天 13:55:41' }, { id: 'hist-3', method: 'POST', name: 'Login', url: 'https://api.staging.example.com/v1/auth/login', status: '200', time: '98 ms', at: '今天 11:02:17' }, { id: 'hist-4', method: 'GET', name: 'Get Invoice', url: 'https://api.staging.example.com/v1/billing/invoices/inv_88', status: '404', time: '67 ms', at: '昨天 19:44:03' }, { id: 'hist-5', method: 'PATCH', name: 'Update User', url: 'https://api.staging.example.com/v1/users/u_1001', status: '200', time: '188 ms', at: '昨天 16:12:50' }, { id: 'hist-6', method: 'DELETE', name: 'Revoke Token', url: 'https://api.staging.example.com/v1/auth/token', status: '204', time: '54 ms', at: '08-08 21:06:22' }] } },

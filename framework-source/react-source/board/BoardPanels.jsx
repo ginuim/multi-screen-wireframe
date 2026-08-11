@@ -1,6 +1,15 @@
+import { SUPPORTED_LOCALES } from './i18n/detect.js'
 import { getBoardShortcuts } from './shortcuts.js'
+import { useT } from './i18n/context.jsx'
+
+const LOCALE_LABELS = {
+  'zh-CN': '简体中文',
+  'zh-TW': '繁體中文',
+  en: 'English',
+}
 
 function PanelShell({ id, title, ariaLabel, onClose, children }) {
+  const t = useT()
   const closeRef = React.useRef(null)
   const returnFocusRef = React.useRef(null)
 
@@ -20,7 +29,7 @@ function PanelShell({ id, title, ariaLabel, onClose, children }) {
       <section id={id} className="wf-board-panel" role="dialog" aria-modal="true" aria-label={ariaLabel}>
         <header className="wf-board-panel-header">
           <strong>{title}</strong>
-          <button ref={closeRef} type="button" className="wf-board-panel-close" onClick={onClose} aria-label={`关闭${title}`}>关闭</button>
+          <button ref={closeRef} type="button" className="wf-board-panel-close" onClick={onClose} aria-label={t('panel.closeAria', { title })}>{t('panel.close')}</button>
         </header>
         <div className="wf-board-panel-body">{children}</div>
       </section>
@@ -38,26 +47,39 @@ export function ShortcutHelp({
   onTrackpadZoomChange,
   zoomSensitivity,
   onZoomSensitivityChange,
+  locale,
+  onLocaleChange,
   onClose,
 }) {
-  const shortcuts = getBoardShortcuts()
+  const t = useT()
+  const shortcuts = getBoardShortcuts(undefined, t)
   return (
-    <PanelShell id="wf-board-utility" title="帮助 / 快捷键 / 设置" ariaLabel="帮助、快捷键与设置" onClose={onClose}>
+    <PanelShell id="wf-board-utility" title={t('help.title')} ariaLabel={t('help.ariaLabel')} onClose={onClose}>
       <dl className="wf-shortcut-list">
         {shortcuts.map((shortcut) => (
           <div className={shortcut.id === 'demo' && !demoAvailable ? 'is-disabled' : ''} key={shortcut.id}>
             <dt><kbd>{shortcut.keys}</kbd></dt>
-            <dd>{shortcut.label}{shortcut.id === 'demo' && !demoAvailable ? '（当前不可用）' : ''}</dd>
+            <dd>{shortcut.label}{shortcut.id === 'demo' && !demoAvailable ? t('help.demoUnavailable') : ''}</dd>
           </div>
         ))}
       </dl>
-      <p className="wf-board-panel-note">在输入框、文本域、下拉框和可编辑内容中不会触发普通快捷键。</p>
+      <p className="wf-board-panel-note">{t('help.shortcutNote')}</p>
       <section className="wf-board-panel-section" aria-labelledby="wf-board-index-setting-title">
-        <h2 id="wf-board-index-setting-title">画板设置</h2>
+        <h2 id="wf-board-index-setting-title">{t('settings.title')}</h2>
         <label className="wf-board-setting-row">
           <span>
-            <strong>显示画板索引</strong>
-            <small>在画板上显示可拖拽的页面索引</small>
+            <strong>{t('settings.language')}</strong>
+          </span>
+          <select value={locale} onChange={(event) => onLocaleChange(event.target.value)}>
+            {SUPPORTED_LOCALES.map((value) => (
+              <option value={value} key={value}>{LOCALE_LABELS[value]}</option>
+            ))}
+          </select>
+        </label>
+        <label className="wf-board-setting-row">
+          <span>
+            <strong>{t('settings.showCanvasIndex')}</strong>
+            <small>{t('settings.showCanvasIndexDesc')}</small>
           </span>
           <input
             type="checkbox"
@@ -67,8 +89,8 @@ export function ShortcutHelp({
         </label>
         <label className="wf-board-setting-row">
           <span>
-            <strong>默认显示注释标记</strong>
-            <small>关闭后仅在进入注释模式时显示</small>
+            <strong>{t('settings.showAnnotationMarkers')}</strong>
+            <small>{t('settings.showAnnotationMarkersDesc')}</small>
           </span>
           <input
             type="checkbox"
@@ -78,8 +100,8 @@ export function ShortcutHelp({
         </label>
         <label className="wf-board-setting-row">
           <span>
-            <strong>触摸板缩放</strong>
-            <small>Mac 首次默认开启；按双指手势幅度连续缩放</small>
+            <strong>{t('settings.trackpadZoom')}</strong>
+            <small>{t('settings.trackpadZoomDesc')}</small>
           </span>
           <input
             type="checkbox"
@@ -89,7 +111,7 @@ export function ShortcutHelp({
         </label>
         <label className={`wf-board-setting-range${trackpadZoom ? '' : ' is-disabled'}`}>
           <span>
-            <strong>缩放灵敏度</strong>
+            <strong>{t('settings.zoomSensitivity')}</strong>
             <output>{Math.round(zoomSensitivity * 100)}%</output>
           </span>
           <input
@@ -100,9 +122,9 @@ export function ShortcutHelp({
             value={zoomSensitivity}
             disabled={!trackpadZoom}
             onChange={(event) => onZoomSensitivityChange(Number(event.target.value))}
-            aria-label="触摸板缩放灵敏度"
+            aria-label={t('settings.zoomSensitivityAria')}
           />
-          <small><span>更细腻</span><span>更灵敏</span></small>
+          <small><span>{t('settings.zoomLess')}</span><span>{t('settings.zoomMore')}</span></small>
         </label>
       </section>
     </PanelShell>

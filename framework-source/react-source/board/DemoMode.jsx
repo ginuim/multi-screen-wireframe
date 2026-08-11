@@ -1,4 +1,5 @@
 import { usePrototype } from '../core/PrototypeContext.jsx'
+import { useT } from './i18n/context.jsx'
 import {
   fitDemoScale,
   isDemoBlankExitTarget,
@@ -8,7 +9,7 @@ import {
 import { ScreenFrame } from './ScreenFrame.jsx'
 import { useWheelZoom } from './useWheelZoom.js'
 
-const BLANK_EXIT_HINT = '双击空白处退出演示'
+const BLANK_EXIT_HINT_KEY = 'demo.blankExitHint'
 
 function readContentBox(el) {
   const style = window.getComputedStyle(el)
@@ -34,6 +35,7 @@ export function DemoMode({
   onReviewSelect,
   onCanvasClick,
 }) {
+  const t = useT()
   const { currentScreenId, viewport, viewportKey, setMode } = usePrototype()
   const screenIndex = project.screens.findIndex((item) => item.id === currentScreenId)
   const screen = screenIndex >= 0 ? project.screens[screenIndex] : null
@@ -53,7 +55,7 @@ export function DemoMode({
   const syncBlankExitHint = (event) => {
     const el = viewportRef.current
     if (!el) return
-    const next = isDemoBlankExitTarget(event.target) ? BLANK_EXIT_HINT : ''
+    const next = isDemoBlankExitTarget(event.target) ? t(BLANK_EXIT_HINT_KEY) : ''
     if ((el.getAttribute('title') || '') === next) return
     if (next) el.setAttribute('title', next)
     else el.removeAttribute('title')
@@ -147,7 +149,7 @@ export function DemoMode({
           />
         </div>
       </div>
-      <p className="wf-demo-hint">点击页面内按钮 / 链接跳转；可在工具栏开关热区高亮；标题栏可临时展开看全貌</p>
+      <p className="wf-demo-hint">{t('demo.hint')}</p>
     </div>
   )
 }

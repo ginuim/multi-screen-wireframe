@@ -1,3 +1,5 @@
+import { useT } from './i18n/context.jsx'
+
 function escapeAttribute(value) {
   return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"')
 }
@@ -80,6 +82,7 @@ function samePositions(left, right) {
 }
 
 export function AnnotationMarkers({ boardRef, annotations, onOpenPanel }) {
+  const t = useT()
   const [positions, setPositions] = React.useState([])
   const [activeKey, setActiveKey] = React.useState(null)
   const frameRef = React.useRef(null)
@@ -97,8 +100,6 @@ export function AnnotationMarkers({ boardRef, annotations, onOpenPanel }) {
     })
   }, [refresh])
 
-  // 注释数组变化后在本次 commit 立刻定位，避免旧 click/pointer 监听器
-  // 用上一版闭包覆盖刚排队的 requestAnimationFrame。
   React.useLayoutEffect(() => {
     refresh()
   }, [refresh])
@@ -131,13 +132,16 @@ export function AnnotationMarkers({ boardRef, annotations, onOpenPanel }) {
   const bubbleTop = active ? Math.max(12, Math.min(active.top + 24, boardHeight - 196)) : 0
 
   return (
-    <div className="wf-annotation-markers" aria-label="注释标记">
+    <div className="wf-annotation-markers" aria-label={t('annotation.markersAria')}>
       {positions.map((position, index) => (
         <button
           type="button"
           className={`wf-annotation-marker${activeKey === position.key ? ' is-active' : ''}${position.orphaned ? ' is-orphaned' : ''}`}
           key={position.key}
-          aria-label={`注释 ${index + 1}：${position.annotation.content}`}
+          aria-label={t('annotation.markerAria', {
+            index: index + 1,
+            content: position.annotation.content,
+          })}
           style={{ left: position.left, top: position.top }}
           onClick={(event) => {
             event.preventDefault()
@@ -152,20 +156,22 @@ export function AnnotationMarkers({ boardRef, annotations, onOpenPanel }) {
         <aside
           className="wf-annotation-marker-popover"
           style={{ left: bubbleLeft, top: bubbleTop }}
-          aria-label={`注释：${active.annotation.screenTitle}`}
+          aria-label={t('annotation.popoverAria', { title: active.annotation.screenTitle })}
         >
           <header className="wf-review-marker-popover-header">
             <strong className="wf-review-marker-popover-title">
-              {active.annotation.screenTitle} · {active.annotation.anchor.kind === 'node' ? '模块' : '页面'}
+              {active.annotation.screenTitle} · {active.annotation.anchor.kind === 'node'
+                ? t('annotation.kindNodeShort')
+                : t('annotation.kindScreenShort')}
             </strong>
-            <button className="wf-annotation-marker-close" type="button" onClick={() => setActiveKey(null)}>关闭</button>
+            <button className="wf-annotation-marker-close" type="button" onClick={() => setActiveKey(null)}>{t('annotation.close')}</button>
           </header>
-          {active.orphaned ? <p className="wf-annotation-orphaned">原定位已失效，当前显示备用位置。</p> : null}
+          {active.orphaned ? <p className="wf-annotation-orphaned">{t('annotation.orphaned')}</p> : null}
           <p className="wf-annotation-marker-content">{active.annotation.content}</p>
           <button className="wf-annotation-marker-more" type="button" onClick={() => {
             setActiveKey(null)
             onOpenPanel(active.annotation)
-          }}>查看全部</button>
+          }}>{t('annotation.viewAll')}</button>
         </aside>
       ) : null}
     </div>

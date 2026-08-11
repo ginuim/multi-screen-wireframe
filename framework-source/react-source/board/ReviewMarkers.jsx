@@ -1,4 +1,5 @@
-import { reviewTargets, REVIEW_TYPE_LABELS } from './review.js'
+import { reviewTargets, reviewTypeLabels } from './review.js'
+import { useT } from './i18n/context.jsx'
 
 function samePositions(left, right) {
   if (left.length !== right.length) return false
@@ -61,6 +62,8 @@ function resolvePositions(board, items) {
 }
 
 export function ReviewMarkers({ boardRef, items, onOpenPanel }) {
+  const t = useT()
+  const typeLabels = reviewTypeLabels(t)
   const [positions, setPositions] = React.useState([])
   const [activeKey, setActiveKey] = React.useState(null)
   const frameRef = React.useRef(null)
@@ -110,13 +113,16 @@ export function ReviewMarkers({ boardRef, items, onOpenPanel }) {
   const bubbleTop = active ? Math.max(12, Math.min(active.top + 24, boardHeight - 180)) : 0
 
   return (
-    <div className="wf-review-markers" aria-label="修改标记">
+    <div className="wf-review-markers" aria-label={t('review.markersAria')}>
       {positions.map((position) => (
         <button
           type="button"
           className={activeKey === position.key ? 'wf-review-marker is-active' : 'wf-review-marker'}
           key={position.key}
-          aria-label={`修改 ${position.itemIndex + 1}：${REVIEW_TYPE_LABELS[position.item.type]}`}
+          aria-label={t('review.markerAria', {
+            index: position.itemIndex + 1,
+            type: typeLabels[position.item.type],
+          })}
           style={{ left: position.left, top: position.top }}
           onClick={(event) => {
             event.preventDefault()
@@ -131,16 +137,16 @@ export function ReviewMarkers({ boardRef, items, onOpenPanel }) {
         <aside
           className="wf-review-marker-popover"
           style={{ left: bubbleLeft, top: bubbleTop }}
-          aria-label={`修改 ${active.itemIndex + 1}`}
+          aria-label={t('review.markerPopoverAria', { index: active.itemIndex + 1 })}
         >
           <header className="wf-review-marker-popover-header">
             <strong className="wf-review-marker-popover-title">
-              {active.itemIndex + 1}. {REVIEW_TYPE_LABELS[active.item.type]}
+              {active.itemIndex + 1}. {typeLabels[active.item.type]}
             </strong>
-            <button className="wf-review-marker-popover-close" type="button" onClick={() => setActiveKey(null)}>关闭</button>
+            <button className="wf-review-marker-popover-close" type="button" onClick={() => setActiveKey(null)}>{t('review.close')}</button>
           </header>
           <p className="wf-review-marker-popover-instruction">
-            {active.item.instruction || '删除该节点，并同步清理无用代码。'}
+            {active.item.instruction || t('review.removeDefaultInstruction')}
           </p>
           <div className="wf-review-marker-popover-targets">
             {reviewTargets(active.item).map((target) => (
@@ -155,7 +161,7 @@ export function ReviewMarkers({ boardRef, items, onOpenPanel }) {
               onOpenPanel?.()
             }}
           >
-            查看更多
+            {t('review.viewMore')}
           </button>
         </aside>
       ) : null}

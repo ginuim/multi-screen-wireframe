@@ -1,7 +1,7 @@
 /**
- * @wireframe-skill multi-screen-wireframe@2.0.0
+ * @wireframe-skill multi-screen-wireframe@2.1.0
  * 创建基于 v2.0.0
- * 修改基于 v2.0.0
+ * 修改基于 v2.1.0
  */
 WireframeVue.defineScreen('trips', ({ ref }) => ({
   setup() { return { tab: ref('upcoming'), tabs: [{ id: 'upcoming', label: '待出发' }, { id: 'completed', label: '已完成' }, { id: 'saved', label: '收藏' }], trips: [{ id: 'trip-canal', title: '周六运河散步', date: '8 月 15 日', status: '待出发', detail: '3 人 · 5 个地点' }, { id: 'trip-lake', title: '环湖骑行半日', date: '8 月 22 日', status: '规划中', detail: '2 人 · 4 个地点' }, { id: 'trip-museum', title: '雨天博物馆线', date: '9 月 5 日', status: '待确认', detail: '4 人 · 3 个场馆' }, { id: 'trip-hills', title: '城北轻徒步', date: '9 月 12 日', status: '规划中', detail: '3 人 · 6 个地点' }], completed: [{ id: 'trip-old-street', title: '老街慢游', date: '7 月 18 日 · 已完成' }, { id: 'trip-night-walk', title: '夜色建筑散步', date: '6 月 27 日 · 已完成' }, { id: 'trip-riverside', title: '南岸旧码头', date: '5 月 16 日 · 已完成' }] } },

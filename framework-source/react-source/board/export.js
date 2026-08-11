@@ -1,4 +1,5 @@
 import { expandScreenContent, measureContentBox } from './expand.js'
+import { createTranslator } from './i18n/context.jsx'
 
 let exportLibrariesPromise
 
@@ -8,7 +9,7 @@ const libraries = [
   { file: 'FileSaver.min.js', ready: () => typeof window.saveAs === 'function' },
 ]
 
-function loadScript(file) {
+function loadScript(file, t) {
   return new Promise((resolve, reject) => {
     let existing = document.querySelector(`script[data-wireframe-export="${file}"]`)
     if (existing) {
@@ -24,7 +25,7 @@ function loadScript(file) {
     }
     const vendorBase = window.WIREFRAME_VENDOR_BASE
     if (!vendorBase) {
-      reject(new Error('未配置本地导出库路径 WIREFRAME_VENDOR_BASE'))
+      reject(new Error(t('export.vendorBaseMissing')))
       return
     }
     const script = document.createElement('script')
@@ -37,18 +38,18 @@ function loadScript(file) {
     }
     script.onerror = () => {
       script.remove()
-      reject(new Error(`无法加载本地导出库 ${file}`))
+      reject(new Error(t('export.libraryLoadFailed', { file })))
     }
     document.head.appendChild(script)
   })
 }
 
-export function loadExportLibraries() {
+export function loadExportLibraries(t = createTranslator('zh-CN')) {
   if (!exportLibrariesPromise) {
     exportLibrariesPromise = libraries.reduce(
       (chain, library) => chain.then(async () => {
-        if (!library.ready()) await loadScript(library.file)
-        if (!library.ready()) throw new Error(`导出库初始化失败: ${library.file}`)
+        if (!library.ready()) await loadScript(library.file, t)
+        if (!library.ready()) throw new Error(t('export.libraryInitFailed', { file: library.file }))
       }),
       Promise.resolve(),
     ).catch((error) => {
@@ -59,9 +60,9 @@ export function loadExportLibraries() {
   return exportLibrariesPromise
 }
 
-export async function captureScreen(screenElement, viewport, { expanded = false } = {}) {
-  if (!screenElement) throw new Error('找不到要导出的 screen 元素')
-  await loadExportLibraries()
+export async function captureScreen(screenElement, viewport, { expanded = false } = {}, t = createTranslator('zh-CN')) {
+  if (!screenElement) throw new Error(t('export.screenNotFound'))
+  await loadExportLibraries(t)
 
   const sandbox = document.createElement('div')
   sandbox.className = 'wf-export-sandbox'
@@ -93,7 +94,7 @@ export async function captureScreen(screenElement, viewport, { expanded = false 
     })
     return await new Promise((resolve, reject) => {
       canvas.toBlob(
-        (blob) => blob ? resolve(blob) : reject(new Error('PNG 编码失败')),
+        (blob) => blob ? resolve(blob) : reject(new Error(t('export.pngEncodeFailed'))),
         'image/png',
       )
     })
@@ -109,18 +110,18 @@ function slug(value) {
     .replace(/^-|-$/g, '') || 'wireframe'
 }
 
-export async function exportSelected(screens) {
+export async function exportSelected(screens, t = createTranslator('zh-CN')) {
   if (!Array.isArray(screens) || screens.length === 0) {
-    throw new Error('至少选择一个 screen')
+    throw new Error(t('export.selectAtLeastOne'))
   }
-  await loadExportLibraries()
+  await loadExportLibraries(t)
   const captured = []
   for (const screen of screens) {
     captured.push({
       name: `${slug(screen.id)}.png`,
       blob: await captureScreen(screen.element, screen.viewport, {
         expanded: !!screen.expanded,
-      }),
+      }, t),
     })
   }
 

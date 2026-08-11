@@ -1,7 +1,7 @@
 /**
- * @wireframe-skill multi-screen-wireframe@2.0.0
+ * @wireframe-skill multi-screen-wireframe@2.1.0
  * 创建基于 v2.0.0
- * 修改基于 v2.0.0
+ * 修改基于 v2.1.0
  */
 WireframeVue.defineScreen('settings', ({ ref }) => ({
   setup() { return { ssl: ref(true), followRedirect: ref(true), proxy: ref(false), timeout: ref('15000'), host: ref('127.0.0.1'), port: ref('7890') } },

@@ -1,7 +1,7 @@
 /**
- * @wireframe-skill multi-screen-wireframe@2.0.0
+ * @wireframe-skill multi-screen-wireframe@2.1.0
  * 创建基于 v2.0.0
- * 修改基于 v2.0.0
+ * 修改基于 v2.1.0
  */
 WireframeVue.defineScreen('budget', ({ ref }) => ({
   setup() { return { inviteOpen: ref(false), invitee: ref(''), columns: [{ key: 'item', label: '项目' }, { key: 'owner', label: '承担' }, { key: 'amount', label: '金额' }], costs: [{ id: 'cost-transit', item: '市内交通', owner: '共同', amount: '48' }, { id: 'cost-ticket', item: '展厅门票', owner: '林晓野', amount: '80' }, { id: 'cost-lunch', item: '午餐', owner: '共同', amount: '180' }, { id: 'cost-market', item: '市集预留', owner: '个人', amount: '120' }], members: [{ id: 'member-lin', name: '林晓野' }, { id: 'member-chen', name: '陈榆' }, { id: 'member-zhou', name: '周岸' }] } },

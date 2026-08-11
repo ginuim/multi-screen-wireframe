@@ -1,7 +1,7 @@
 /**
- * @wireframe-skill multi-screen-wireframe@2.0.0
+ * @wireframe-skill multi-screen-wireframe@2.1.0
  * 创建基于 v2.0.0
- * 修改基于 v2.0.0
+ * 修改基于 v2.1.0
  */
 WireframeVue.defineScreen('discover', () => ({
   setup() { return { routes: [{ id: 'route-canal', title: '运河边的一天', meta: '步行 8.6 km · 6 小时', note: '旧仓库、桥下市集与傍晚河岸' }, { id: 'route-hills', title: '城北轻徒步', meta: '徒步 11 km · 7 小时', note: '林间缓坡、观景台与山脚小馆' }, { id: 'route-lanes', title: '老街慢游', meta: '步行 5.2 km · 4 小时', note: '巷口早餐、旧书店与社区花园' }, { id: 'route-lake', title: '环湖骑行半日', meta: '骑行 18 km · 5 小时', note: '湿地栈道、堤岸与日落平台' }, { id: 'route-museum', title: '雨天博物馆线', meta: '公交 4 站 · 6 小时', note: '三个展馆与一间安静咖啡馆' }, { id: 'route-night', title: '夜色建筑散步', meta: '步行 6.4 km · 3 小时', note: '广场、剧院与江边灯光带' }] } },

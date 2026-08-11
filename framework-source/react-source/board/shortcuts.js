@@ -1,14 +1,14 @@
 const SHORTCUT_DEFINITIONS = [
-  { id: 'canvas', suffix: '1', label: '切换到画板模式' },
-  { id: 'demo', suffix: '2', label: '切换到演示模式' },
-  { id: 'interaction', suffix: 'I', label: '切换可交互 / 不可交互' },
-  { id: 'review', suffix: 'M', label: '开启或关闭修改模式' },
-  { id: 'immersive', suffix: '3', label: '切换沉浸模式' },
-  { id: 'browser-fullscreen', suffix: 'Shift+F', label: '切换浏览器全屏' },
-  { id: 'hotspots', suffix: 'H', label: '显示或隐藏演示热区' },
-  { id: 'space', keys: 'Space', label: '按住临时拖动画布' },
-  { id: 'escape', keys: 'Esc', label: '关闭当前面板或退出模式' },
-  { id: 'help', keys: '?', label: '打开或关闭帮助 / 快捷键' },
+  { id: 'canvas', suffix: '1' },
+  { id: 'demo', suffix: '2' },
+  { id: 'interaction', suffix: 'I' },
+  { id: 'review', suffix: 'M' },
+  { id: 'immersive', suffix: '3' },
+  { id: 'browser-fullscreen', suffix: 'Shift+F' },
+  { id: 'hotspots', suffix: 'H' },
+  { id: 'space', keys: 'Space' },
+  { id: 'escape', keys: 'Esc' },
+  { id: 'help', keys: '?' },
 ]
 
 export function isMacPlatform() {
@@ -20,14 +20,14 @@ export function shortcutModifierLabel(isMac = isMacPlatform()) {
   return isMac ? 'Ctrl' : 'Alt'
 }
 
-export function getBoardShortcuts(isMac = isMacPlatform()) {
+export function getBoardShortcuts(isMac = isMacPlatform(), t = (key) => key) {
   const modifier = shortcutModifierLabel(isMac)
-  return SHORTCUT_DEFINITIONS.map((shortcut) => shortcut.keys
-    ? shortcut
-    : { ...shortcut, keys: `${modifier}+${shortcut.suffix}` })
+  return SHORTCUT_DEFINITIONS.map((shortcut) => ({
+    ...shortcut,
+    label: t(`shortcut.${shortcut.id}`),
+    keys: shortcut.keys || `${modifier}+${shortcut.suffix}`,
+  }))
 }
-
-export const BOARD_SHORTCUTS = getBoardShortcuts()
 
 export function isEditableShortcutTarget(target) {
   if (!target) return false

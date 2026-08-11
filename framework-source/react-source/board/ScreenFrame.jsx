@@ -3,6 +3,7 @@ import { ErrorBoundary } from '../core/ErrorBoundary.jsx'
 import { ScreenIdentityProvider } from '../core/ScreenIdentity.jsx'
 import { findFlowTargetId } from '../ui/flow-target.js'
 import { findReviewTarget } from './review.js'
+import { useT } from './i18n/context.jsx'
 import {
   collapseScreenContent,
   expandScreenContent,
@@ -28,6 +29,7 @@ export function ScreenFrame({
   reviewEnabled = false,
   onReviewSelect,
 }) {
+  const t = useT()
   const { navigate } = usePrototype()
   const contentRef = React.useRef(null)
   const dragRef = React.useRef(null)
@@ -189,7 +191,7 @@ export function ScreenFrame({
                 onToggleExpand()
               }}
             >
-              {expanded ? '收起' : '展开'}
+              {expanded ? t('screen.collapse') : t('screen.expand')}
             </button>
           ) : null}
           {mode === 'canvas' && onExport ? (
@@ -201,7 +203,7 @@ export function ScreenFrame({
                 onExport()
               }}
             >
-              导出 PNG
+              {t('screen.exportPng')}
             </button>
           ) : null}
         </span>

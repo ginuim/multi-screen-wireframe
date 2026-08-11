@@ -1,3 +1,5 @@
+import { useT } from './i18n/context.jsx'
+
 const LAUNCHER_SIZE = 48
 const LAUNCHER_MARGIN = 20
 const DRAG_THRESHOLD = 4
@@ -49,6 +51,7 @@ function CommentIcon() {
 }
 
 export function ReviewLauncher({ boardRef, count, projectName, onOpen }) {
+  const t = useT()
   const storageKey = `wf-review-launcher-position:${projectName}`
   const [position, setPosition] = React.useState(null)
   const [dragging, setDragging] = React.useState(false)
@@ -95,8 +98,8 @@ export function ReviewLauncher({ boardRef, count, projectName, onOpen }) {
       type="button"
       className={dragging ? 'wf-review-launcher is-dragging' : 'wf-review-launcher'}
       style={position ? { left: position.x, top: position.y } : { right: LAUNCHER_MARGIN, bottom: LAUNCHER_MARGIN }}
-      aria-label={`展开修改清单，共 ${count} 条修改`}
-      data-tooltip="展开修改清单"
+      aria-label={t('review.launcherAria', { count })}
+      data-tooltip={t('review.launcherTooltip')}
       onPointerDown={(event) => {
         if (event.button !== 0) return
         const origin = positionRef.current || defaultPosition(boardRef.current)

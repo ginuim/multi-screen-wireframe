@@ -98,9 +98,9 @@ Board 的修改与注释能力依赖稳定 DOM：
 
 ```js
 /**
- * @wireframe-skill multi-screen-wireframe@2.0.0
- * 创建基于 v2.0.0
- * 修改基于 v2.0.0
+ * @wireframe-skill multi-screen-wireframe@2.1.0
+ * 创建基于 v2.1.0
+ * 修改基于 v2.1.0
  */
 ```
 

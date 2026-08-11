@@ -1,6 +1,6 @@
 # Multi-Screen Wireframe
 
-**Skill 版本 / Version：`2.0.0`**（见 `VERSION`）
+**Skill 版本 / Version：`2.1.0`**（见 `VERSION`）
 
 **交付格式 / Format：`vue-global@2`**
 
@@ -30,6 +30,8 @@ The v2 deliverable ships with source, Vue 3 Global Build, the board, and export 
   Persistent page and module annotations with local drafts, JSON exchange, and an AI sync prompt
 - **帮助与快捷操作**：键盘切换画板、演示、交互锁、修改、沉浸、全屏与热区；按 `?` 查看完整清单
   Keyboard shortcuts for board modes, interaction lock, review, immersive/fullscreen, and hotspots
+- **界面语言**：画板 chrome 支持简体中文 / 繁体中文 / 英文；默认跟随浏览器，可在设置中切换
+  Board chrome UI languages: Simplified Chinese, Traditional Chinese, and English; follows the browser by default
 - **可配置索引**：画板索引可拖拽、关闭，并按项目记住显示开关
   Draggable canvas index with a per-project visibility preference
 - **无需构建、可继续改**：业务源码按 screen 拆成普通 `.js`；保存后刷新浏览器
@@ -192,7 +194,7 @@ node scripts/check-project.mjs /absolute/path/to/new-prototype
 
 macOS 使用 `Ctrl+1` / `Ctrl+2` 切换画板与演示，`Ctrl+I` 切换交互锁，`Ctrl+M` 切换修改模式；Windows/Linux 使用 `Alt+1` / `Alt+2`、`Alt+I`、`Alt+M`。浏览器全屏使用当前平台修饰键加 `Shift+F`，沉浸模式使用当前平台修饰键加 `3`；缩放使用 `Ctrl+滚轮`。按住 `Space` 临时拖动画布，按 `Esc` 关闭当前面板或退出模式，按 `?` 打开“帮助 / 快捷键”面板。输入框和可编辑内容不会响应普通快捷键；沉浸工具栏同样提供帮助和设置入口。
 
-画板底部索引可通过独立把手拖动，也可直接关闭。工具栏“帮助 / 快捷键 / 设置”面板中的“显示画板索引”可重新开启索引；“默认显示注释标记”可控制普通浏览状态是否展示 Marker，关闭后进入注释模式仍会临时显示。显示状态按项目保存在浏览器本地，拖拽位置只在当前页面会话中保留。
+画板底部索引可通过独立把手拖动，也可直接关闭。工具栏“帮助 / 快捷键 / 设置”面板中的“显示画板索引”可重新开启索引；“默认显示注释标记”可控制普通浏览状态是否展示 Marker，关闭后进入注释模式仍会临时显示。显示状态按项目保存在浏览器本地，拖拽位置只在当前页面会话中保留。同一面板可切换界面语言（简体中文 / 繁体中文 / English）；语言偏好全局保存在本机，与项目设置分开。
 
 ## 运行 / Run
 

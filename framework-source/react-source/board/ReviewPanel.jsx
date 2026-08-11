@@ -1,4 +1,5 @@
-import { buildReviewPrompt, reviewTargets, REVIEW_TYPE_LABELS } from './review.js'
+import { buildReviewPrompt, reviewTargets, reviewTypeLabels } from './review.js'
+import { useT } from './i18n/context.jsx'
 
 function copyText(text) {
   if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text)
@@ -32,8 +33,10 @@ export function ReviewPanel({
   onRemoveItem,
   onClose,
 }) {
+  const t = useT()
+  const typeLabels = reviewTypeLabels(t)
   const selected = selections[selections.length - 1] || null
-  const generatedPrompt = React.useMemo(() => buildReviewPrompt(project, items), [project, items])
+  const generatedPrompt = React.useMemo(() => buildReviewPrompt(project, items, t), [project, items, t])
   const [type, setType] = React.useState('comment')
   const [instruction, setInstruction] = React.useState('')
   const [prompt, setPrompt] = React.useState(generatedPrompt)
@@ -81,27 +84,27 @@ export function ReviewPanel({
   }
 
   const instructionLabel = type === 'text'
-    ? '新文字'
+    ? t('review.instruction.text')
     : type === 'order'
-      ? '顺序要求'
+      ? t('review.instruction.order')
       : type === 'remove'
-        ? '删除说明（可选）'
-        : '给 AI 的修改建议'
+        ? t('review.instruction.remove')
+        : t('review.instruction.comment')
 
   return (
-    <aside className="wf-review-panel" aria-label="修改原型" hidden={!visible}>
+    <aside className="wf-review-panel" aria-label={t('review.panelAria')} hidden={!visible}>
       <header className="wf-review-panel-header">
         <div className="wf-review-panel-heading">
-          <strong className="wf-review-panel-title">修改原型</strong>
-          <span className="wf-review-panel-count">{items.length} 条修改</span>
+          <strong className="wf-review-panel-title">{t('review.title')}</strong>
+          <span className="wf-review-panel-count">{t('review.count', { count: items.length })}</span>
         </div>
-        <button type="button" className="wf-review-close" onClick={onClose}>关闭</button>
+        <button type="button" className="wf-review-close" onClick={onClose}>{t('review.close')}</button>
       </header>
 
       <div className="wf-review-panel-body">
         <section className="wf-review-section">
           <div className="wf-review-selection-heading">
-            <h2 className="wf-review-section-heading">已选节点 ({selections.length})</h2>
+            <h2 className="wf-review-section-heading">{t('review.selectedHeading', { count: selections.length })}</h2>
             <div className="wf-review-selection-actions">
               <button
                 type="button"
@@ -109,20 +112,20 @@ export function ReviewPanel({
                 aria-pressed={multiSelect}
                 onClick={onToggleMultiSelect}
               >
-                多选 {multiSelect ? 'ON' : 'OFF'}
+                {t('review.multiSelect')} {multiSelect ? 'ON' : 'OFF'}
               </button>
               {selections.length > 0 ? (
-                <button className="wf-review-clear-selection" type="button" onClick={onClearSelection}>清空</button>
+                <button className="wf-review-clear-selection" type="button" onClick={onClearSelection}>{t('review.clear')}</button>
               ) : null}
             </div>
           </div>
-          <p className="wf-review-selection-hint">多选开启后点击节点可加入或移除；也可按住 Shift / Command / Ctrl 点击。</p>
+          <p className="wf-review-selection-hint">{t('review.selectionHint')}</p>
           {selections.length > 0 ? (
             <ol className="wf-review-selections">
               {selections.map((selection, index) => (
                 <li className={selection === selected ? 'wf-review-selection is-active' : 'wf-review-selection'} key={`${selection.screenId}:${selection.selector}`}>
                   <code className="wf-review-selection-selector">{index + 1}. {selection.selector}</code>
-                  <button className="wf-review-selection-remove" type="button" onClick={() => onRemoveSelection(selection.element)}>移除</button>
+                  <button className="wf-review-selection-remove" type="button" onClick={() => onRemoveSelection(selection.element)}>{t('review.remove')}</button>
                 </li>
               ))}
             </ol>
@@ -130,7 +133,7 @@ export function ReviewPanel({
           {selected ? (
             <>
               <div className="wf-review-screen-name">{selected.screenTitle} · {selected.screenId}</div>
-              <div className="wf-review-breadcrumbs" aria-label="节点层级">
+              <div className="wf-review-breadcrumbs" aria-label={t('review.breadcrumbAria')}>
                 {selected.ancestors.map((ancestor, index) => (
                   <React.Fragment key={ancestor.selector}>
                     {index > 0 ? (
@@ -155,12 +158,12 @@ export function ReviewPanel({
               </div>
               <code className="wf-review-selector">{selected.selector}</code>
               {selected.currentText ? (
-                <p className="wf-review-current-text">当前：{selected.currentText}</p>
+                <p className="wf-review-current-text">{t('review.currentText', { text: selected.currentText })}</p>
               ) : null}
               <label className="wf-review-field">
-                <span className="wf-review-field-label">修改类型</span>
+                <span className="wf-review-field-label">{t('review.typeLabel')}</span>
                 <select className="wf-review-type-select" value={type} onChange={(event) => setType(event.target.value)}>
-                  {Object.entries(REVIEW_TYPE_LABELS).map(([value, label]) => (
+                  {Object.entries(typeLabels).map(([value, label]) => (
                     <option className="wf-review-type-option" value={value} key={value}>{label}</option>
                   ))}
                 </select>
@@ -170,7 +173,7 @@ export function ReviewPanel({
                 <textarea
                   className="wf-review-instruction"
                   value={instruction}
-                  placeholder={type === 'order' ? '例如：移动到订单摘要之后' : '描述希望 AI 如何修改'}
+                  placeholder={type === 'order' ? t('review.placeholder.order') : t('review.placeholder.default')}
                   onChange={(event) => setInstruction(event.target.value)}
                 />
               </label>
@@ -180,40 +183,40 @@ export function ReviewPanel({
                 disabled={!instruction.trim() && type !== 'remove'}
                 onClick={addItem}
               >
-                加入修改清单（{selections.length} 个节点）
+                {t('review.add', { count: selections.length })}
               </button>
             </>
           ) : (
-            <p className="wf-review-empty">点击页面中的节点开始修改。点击面包屑可切换到父级组件。</p>
+            <p className="wf-review-empty">{t('review.emptySelect')}</p>
           )}
         </section>
 
         <section className="wf-review-section">
-          <h2 className="wf-review-section-heading">修改清单</h2>
+          <h2 className="wf-review-section-heading">{t('review.listHeading')}</h2>
           {items.length > 0 ? (
             <ol className="wf-review-items">
               {items.map((item, index) => (
                 <li className="wf-review-item" key={item.id}>
                   <div className="wf-review-item-content">
-                    <strong className="wf-review-item-title">{index + 1}. {REVIEW_TYPE_LABELS[item.type]}</strong>
+                    <strong className="wf-review-item-title">{index + 1}. {typeLabels[item.type]}</strong>
                     <code className="wf-review-item-selector">
-                      {reviewTargets(item).map((target) => target.selector).join('、')}
+                      {reviewTargets(item).map((target) => target.selector).join(t('review.targetSeparator'))}
                     </code>
-                    <p className="wf-review-item-instruction">{item.instruction || '删除该节点，并同步清理无用代码。'}</p>
+                    <p className="wf-review-item-instruction">{item.instruction || t('review.removeDefaultInstruction')}</p>
                   </div>
-                  <button className="wf-review-item-delete" type="button" onClick={() => onRemoveItem(item.id)}>删除</button>
+                  <button className="wf-review-item-delete" type="button" onClick={() => onRemoveItem(item.id)}>{t('review.delete')}</button>
                 </li>
               ))}
             </ol>
-          ) : <p className="wf-review-empty">还没有修改意见。</p>}
+          ) : <p className="wf-review-empty">{t('review.emptyList')}</p>}
         </section>
 
         <section className="wf-review-section wf-review-prompt-section">
           <div className="wf-review-section-title">
-            <h2 className="wf-review-section-heading">最终 Prompt</h2>
-            <button className="wf-review-regenerate" type="button" onClick={regenerate}>重新生成</button>
+            <h2 className="wf-review-section-heading">{t('review.promptHeading')}</h2>
+            <button className="wf-review-regenerate" type="button" onClick={regenerate}>{t('review.regenerate')}</button>
           </div>
-          {promptDirty ? <p className="wf-review-manual">Prompt 已手动修改；重新生成会覆盖手动内容。</p> : null}
+          {promptDirty ? <p className="wf-review-manual">{t('review.manualEditNote')}</p> : null}
           <textarea
             className="wf-review-prompt"
             value={prompt}
@@ -223,7 +226,7 @@ export function ReviewPanel({
             }}
           />
           <button type="button" className="wf-review-copy" onClick={copyPrompt}>
-            {copied ? '已复制' : '复制 Prompt'}
+            {copied ? t('review.copied') : t('review.copy')}
           </button>
         </section>
       </div>

@@ -3,6 +3,7 @@ import { focusCanvasScreen, resetCanvasViewport, panFromDragSnapshot } from './n
 import { ScreenFrame } from './ScreenFrame.jsx'
 import { useWheelZoom } from './useWheelZoom.js'
 import { canUseDemo } from './validation.js'
+import { useT } from './i18n/context.jsx'
 import {
   clampCanvasIndexPosition,
   defaultCanvasIndexPosition,
@@ -26,6 +27,7 @@ function CanvasIndex({
   navigate,
   enterDemo,
 }) {
+  const t = useT()
   const indexRef = React.useRef(null)
   const dragRef = React.useRef(null)
   const [dragging, setDragging] = React.useState(false)
@@ -94,8 +96,8 @@ function CanvasIndex({
       <button
         type="button"
         className="wf-canvas-index-handle"
-        aria-label="拖动画板索引"
-        title="拖动画板索引"
+        aria-label={t('canvas.indexHandleAria')}
+        title={t('canvas.indexHandleAria')}
         onPointerDown={(event) => {
           if (event.button !== 0) return
           const origin = position || constrain(null, true)
@@ -126,7 +128,7 @@ function CanvasIndex({
         onPointerCancel={finishDrag}
       >
         <span className="wf-canvas-index-grip" aria-hidden="true"><i /><i /><i /></span>
-        <span>索引</span>
+        <span>{t('canvas.indexLabel')}</span>
       </button>
       <div className="wf-canvas-index-list">
         {project.screens.map((screen, index) => (
@@ -143,7 +145,7 @@ function CanvasIndex({
               enterDemo(screen.id)
             }}
             aria-label={`${index + 1}. ${screen.title}`}
-            title={demoAvailable ? '双击进入演示' : undefined}
+            title={demoAvailable ? t('canvas.doubleClickDemo') : undefined}
           >
             <span>{index + 1}</span>
             <span className="wf-canvas-index-tooltip" aria-hidden="true">
@@ -156,8 +158,8 @@ function CanvasIndex({
       <button
         type="button"
         className="wf-canvas-index-close"
-        aria-label="关闭画板索引"
-        title="关闭画板索引"
+        aria-label={t('canvas.indexCloseAria')}
+        title={t('canvas.indexCloseAria')}
         onClick={(event) => {
           event.stopPropagation()
           onClose()
@@ -169,13 +171,13 @@ function CanvasIndex({
   )
 }
 
-export async function runExportWithFeedback(task, setError) {
+export async function runExportWithFeedback(task, setError, t = (key, vars) => key) {
   setError(null)
   try {
     await task()
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    setError(`导出失败：${message}`)
+    setError(t('canvas.exportFailed', { message }))
   }
 }
 
@@ -218,6 +220,7 @@ export function CanvasMode({
   onCanvasIndexPositionChange,
   onCloseCanvasIndex,
 }) {
+  const t = useT()
   const { currentScreenId, navigate, viewport, viewportKey, enterDemo: enterDemoMode } = usePrototype()
   const [view, setView] = React.useState(() => ({ ...resetCanvasViewport(), scale }))
   const [dragging, setDragging] = React.useState(false)
@@ -317,7 +320,7 @@ export function CanvasMode({
     event.preventDefault()
     copyText(text).then(() => {
       setCopiedKey(key)
-      setCopyToast('已复制')
+      setCopyToast(t('canvas.copied'))
       if (copiedTimer.current) window.clearTimeout(copiedTimer.current)
       copiedTimer.current = window.setTimeout(() => {
         setCopiedKey(null)
@@ -353,13 +356,13 @@ export function CanvasMode({
               onChange={toggleAll}
               tabIndex={sidebarCollapsed ? -1 : undefined}
             />
-            全选
+            {t('canvas.selectAll')}
           </label>
           <button
             type="button"
             className="wf-sidebar-toggle"
-            aria-label="收起侧栏"
-            title="收起侧栏"
+            aria-label={t('canvas.collapseSidebar')}
+            title={t('canvas.collapseSidebar')}
             tabIndex={sidebarCollapsed ? -1 : undefined}
             onClick={() => setSidebarCollapsed(true)}
           >
@@ -377,7 +380,7 @@ export function CanvasMode({
               key={screen.id}
               onClick={() => navigate(screen.id)}
               onDoubleClick={() => enterDemo(screen.id)}
-              title={demoAvailable ? '双击进入演示' : undefined}
+              title={demoAvailable ? t('canvas.doubleClickDemo') : undefined}
             >
               <input
                 type="checkbox"
@@ -387,7 +390,7 @@ export function CanvasMode({
                   toggleSelected(screen.id)
                 }}
                 onClick={(event) => event.stopPropagation()}
-                aria-label={`选择 ${screen.title}`}
+                aria-label={t('canvas.selectScreen', { title: screen.title })}
                 tabIndex={sidebarCollapsed ? -1 : undefined}
               />
               <span className="wf-screen-index-num">{index + 1}</span>
@@ -395,12 +398,12 @@ export function CanvasMode({
             </li>
           ))}
         </ul>
-        <div className="wf-sidebar-tips" aria-label="操作提示">
+        <div className="wf-sidebar-tips" aria-label={t('canvas.tipsAria')}>
           <div className="wf-sidebar-tip">
-            <span>不可交互：拖拽平移 / 滚轮缩放</span>
+            <span>{t('canvas.tipLocked')}</span>
           </div>
           <div className="wf-sidebar-tip">
-            <span>可交互：空格拖拽 / Ctrl+滚轮</span>
+            <span>{t('canvas.tipInteractive')}</span>
           </div>
         </div>
       </aside>
@@ -408,8 +411,8 @@ export function CanvasMode({
         <button
           type="button"
           className="wf-sidebar-expand"
-          aria-label="展开侧栏"
-          title="展开侧栏"
+          aria-label={t('canvas.expandSidebar')}
+          title={t('canvas.expandSidebar')}
           onClick={() => setSidebarCollapsed(false)}
         >
           <svg className="wf-sidebar-toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -443,7 +446,7 @@ export function CanvasMode({
                 className={screen.id === currentScreenId ? 'wf-canvas-screen is-focused' : 'wf-canvas-screen'}
                 data-canvas-screen-id={screen.id}
                 key={screen.id}
-                title={demoAvailable ? '双击进入演示' : undefined}
+                title={demoAvailable ? t('canvas.doubleClickDemo') : undefined}
                 onClick={(event) => {
                   if (event.target.closest('.wf-export-one, .wf-expand-one, .wf-screen-meta-copy')) return
                   navigate(screen.id)
@@ -457,7 +460,7 @@ export function CanvasMode({
                 <div className="wf-screen-meta">
                   <div
                     className={`wf-screen-meta-title wf-screen-meta-copy${copiedKey === titleKey ? ' is-copied' : ''}`}
-                    title={copiedKey === titleKey ? '已复制' : '点击复制'}
+                    title={copiedKey === titleKey ? t('canvas.copied') : t('canvas.clickCopy')}
                     onClick={(event) => copyMeta(titleKey, titleText, event)}
                   >
                     {titleText}
@@ -465,10 +468,10 @@ export function CanvasMode({
                   {screen.description ? <div>{screen.description}</div> : null}
                   <div
                     className={`wf-meta-line wf-screen-meta-copy${copiedKey === fileKey ? ' is-copied' : ''}`}
-                    title={copiedKey === fileKey ? '已复制' : '点击复制'}
+                    title={copiedKey === fileKey ? t('canvas.copied') : t('canvas.clickCopy')}
                     onClick={(event) => copyMeta(fileKey, fileText, event)}
                   >
-                    <strong>文件：</strong>
+                    <strong>{t('canvas.fileLabel')}</strong>
                     {fileText}
                   </div>
                 </div>

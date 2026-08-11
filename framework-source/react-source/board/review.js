@@ -1,8 +1,19 @@
+import { createTranslator } from './i18n/context.jsx'
+
 const TYPE_LABELS = {
   comment: '修改建议',
   text: '修改文字',
   order: '调整顺序',
   remove: '删除节点',
+}
+
+export function reviewTypeLabels(t) {
+  return {
+    comment: t('review.type.comment'),
+    text: t('review.type.text'),
+    order: t('review.type.order'),
+    remove: t('review.type.remove'),
+  }
 }
 
 function escapeSelectorToken(value) {
@@ -140,10 +151,14 @@ export function describeReviewElement(element, contentRoot, screen) {
   }
 }
 
-function itemRequest(item) {
-  if (item.type === 'text') return `修改为：${item.instruction}`
-  if (item.type === 'order') return `顺序要求：${item.instruction}`
-  if (item.type === 'remove') return `删除要求：${item.instruction || '删除该节点，并同步清理无用代码。'}`
+function itemRequest(item, t) {
+  if (item.type === 'text') return t('prompt.review.request.text', { instruction: item.instruction })
+  if (item.type === 'order') return t('prompt.review.request.order', { instruction: item.instruction })
+  if (item.type === 'remove') {
+    return t('prompt.review.request.remove', {
+      instruction: item.instruction || t('prompt.review.removeDefault'),
+    })
+  }
   return item.instruction
 }
 
@@ -159,50 +174,56 @@ export function reviewTargets(item) {
   }]
 }
 
-export function buildReviewPrompt(project, items) {
-  const projectName = project?.name || '未命名线框原型'
+export function buildReviewPrompt(project, items, t = createTranslator('zh-CN')) {
+  const typeLabels = reviewTypeLabels(t)
+  const projectName = project?.name || t('prompt.review.unnamedProject')
 
   const lines = [
-    `请修改线框原型「${projectName}」。`,
+    t('prompt.review.intro', { projectName }),
     '',
-    '修改约束：',
-    '- 只修改业务 src/；不要修改 framework/。',
-    '- 通过 DOM 选择器在 src/screens/*.js 的 Vue template 中搜索对应的 id、class 或 data-wf-key。',
-    '- 保留所有语义 class、关键节点 id 和重复数据节点的 data-wf-key；新增节点也遵守同一命名规则。',
-    '- 修改 screen 时保留「创建基于」，并把「修改基于」及 @wireframe-skill 更新为当前 skill 版本。',
-    '- 保持 screens[].links 为页面流的唯一边数据；不要引入 Vue Router、import/export 或构建步骤。',
-    '- 完成后刷新 index.html，验证画板、演示和修改模式。',
+    t('prompt.review.constraintsTitle'),
+    t('prompt.review.constraint1'),
+    t('prompt.review.constraint2'),
+    t('prompt.review.constraint3'),
+    t('prompt.review.constraint4'),
+    t('prompt.review.constraint5'),
+    t('prompt.review.constraint6'),
   ]
 
   if (!items?.length) {
-    lines.push('', '当前没有修改意见。')
+    lines.push('', t('prompt.review.noItems'))
     return lines.join('\n')
   }
 
   items.forEach((item, itemIndex) => {
     const targets = reviewTargets(item)
-    lines.push('', `## 修改 ${itemIndex + 1}：${TYPE_LABELS[item.type] || TYPE_LABELS.comment}`)
+    const type = typeLabels[item.type] || typeLabels.comment
+    lines.push('', t('prompt.review.section', { index: itemIndex + 1, type }))
     targets.forEach((target, targetIndex) => {
       const screenId = target.screenId || item.screenId
+      const title = target.screenTitle || item.screenTitle || screenId || t('prompt.review.unnamedScreen')
+      const sourceHint = target.sourceHint || item.sourceHint || (
+        screenId ? `src/screens/${screenId}.js` : t('prompt.review.searchSelector')
+      )
       lines.push(
         '',
-        `目标 ${targetIndex + 1}：${target.screenTitle || item.screenTitle || screenId || '未命名页面'}`,
-        `页面 ID：${screenId || '未知'}`,
-        `源码提示：${target.sourceHint || item.sourceHint || (screenId ? `src/screens/${screenId}.js` : '请搜索选择器')}`,
-        'DOM 选择器：',
+        t('prompt.review.target', { index: targetIndex + 1, title }),
+        t('prompt.review.screenId', { id: screenId || t('prompt.review.unknownScreenId') }),
+        t('prompt.review.sourceHint', { hint: sourceHint }),
+        t('prompt.review.selectorTitle'),
         `\`${target.selector}\``,
       )
-      if (target.currentText) lines.push('', '当前内容：', target.currentText)
+      if (target.currentText) lines.push('', t('prompt.review.currentContent'), target.currentText)
     })
-    lines.push('', '修改要求：', itemRequest(item))
+    lines.push('', t('prompt.review.requestTitle'), itemRequest(item, t))
   })
 
   lines.push(
     '',
-    '## 完成标准',
-    '- 逐项完成以上修改；优先修改源码提示指向的独立 screen 文件。',
-    '- 不用 DOM 层级或 nth-child 替代已有的稳定业务选择器。',
-    '- 刷新后检查受影响页面及其上下游跳转，确认没有 Vue 编译或运行错误。',
+    t('prompt.review.completionTitle'),
+    t('prompt.review.completion1'),
+    t('prompt.review.completion2'),
+    t('prompt.review.completion3'),
   )
   return lines.join('\n')
 }

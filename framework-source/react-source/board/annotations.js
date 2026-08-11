@@ -1,3 +1,5 @@
+import { createTranslator } from './i18n/context.jsx'
+
 export const ANNOTATION_SCHEMA_VERSION = 1
 export const UNSAVED_ANNOTATION_MESSAGE = '注释草稿未能保存在浏览器中，离开页面后会丢失。是否继续？'
 
@@ -31,10 +33,10 @@ export function getAnnotationStorage() {
   }
 }
 
-export function preventUnsavedAnnotationExit(event) {
+export function preventUnsavedAnnotationExit(event, message = UNSAVED_ANNOTATION_MESSAGE) {
   event.preventDefault()
-  event.returnValue = UNSAVED_ANNOTATION_MESSAGE
-  return UNSAVED_ANNOTATION_MESSAGE
+  event.returnValue = message
+  return message
 }
 
 function normalizeAnchor(anchor) {
@@ -187,11 +189,11 @@ export function saveAnnotationDraft(storage, project, operations) {
   }
 }
 
-export function createAnnotationExport(project, annotations, operations = []) {
+export function createAnnotationExport(project, annotations, operations = [], t = createTranslator('zh-CN')) {
   return {
     schemaVersion: ANNOTATION_SCHEMA_VERSION,
     projectId: annotationProjectId(project),
-    projectName: project?.name || '未命名线框原型',
+    projectName: project?.name || t('prompt.annotation.unnamedProject'),
     baseRevision: annotationBaseRevision(project),
     exportedAt: new Date().toISOString(),
     annotations: (annotations || []).map(normalizeAnnotation).filter(Boolean),
@@ -199,17 +201,19 @@ export function createAnnotationExport(project, annotations, operations = []) {
   }
 }
 
-export function parseAnnotationImport(value, project) {
+export function parseAnnotationImport(value, project, t = createTranslator('zh-CN')) {
   const parsed = typeof value === 'string' ? JSON.parse(value) : value
   if (!parsed || parsed.schemaVersion !== ANNOTATION_SCHEMA_VERSION) {
-    throw new Error('不支持的注释 JSON 版本')
+    throw new Error(t('import.annotation.unsupportedVersion'))
   }
   if (parsed.projectId !== annotationProjectId(project)) {
-    throw new Error(`注释 JSON 属于其他项目：${parsed.projectName || parsed.projectId}`)
+    throw new Error(t('import.annotation.wrongProject', {
+      name: parsed.projectName || parsed.projectId,
+    }))
   }
-  if (!Array.isArray(parsed.annotations)) throw new Error('注释 JSON 缺少 annotations 数组')
+  if (!Array.isArray(parsed.annotations)) throw new Error(t('import.annotation.missingArray'))
   const annotations = parsed.annotations.map(normalizeAnnotation).filter(Boolean)
-  if (annotations.length !== parsed.annotations.length) throw new Error('注释 JSON 包含无效注释')
+  if (annotations.length !== parsed.annotations.length) throw new Error(t('import.annotation.invalidEntries'))
   const operations = reconcileAnnotationOperations(
     baseAnnotations(project),
     Array.isArray(parsed.operations) ? parsed.operations : [],
@@ -217,8 +221,8 @@ export function parseAnnotationImport(value, project) {
   return { ...parsed, annotations, operations }
 }
 
-export function buildAnnotationSyncPrompt(project, operations) {
-  const projectName = project?.name || '未命名线框原型'
+export function buildAnnotationSyncPrompt(project, operations, t = createTranslator('zh-CN')) {
+  const projectName = project?.name || t('prompt.annotation.unnamedProject')
   const normalized = reconcileAnnotationOperations(baseAnnotations(project), operations)
   const payload = {
     schemaVersion: ANNOTATION_SCHEMA_VERSION,
@@ -227,16 +231,16 @@ export function buildAnnotationSyncPrompt(project, operations) {
     operations: normalized,
   }
   return [
-    `请把线框原型「${projectName}」的本机注释同步到业务源码。`,
+    t('prompt.annotation.intro', { projectName }),
     '',
-    '同步约束：',
-    '- 只修改业务 src/；不要修改 framework/。',
-    '- 注释的正式数据文件是 src/annotations.js；文件通过 WireframeVue.defineAnnotations() 注册数据。',
-    '- 按注释 id 幂等合并：upsert 新增或替换同 id 注释，delete 删除同 id 注释；保留未涉及的注释。',
-    '- 更新 annotationsRevision 为新的唯一值。不要把注释文字写进 screen template。',
-    '- 完成后刷新 index.html，并验证注释标记、页面/模块定位及修改模式。',
+    t('prompt.annotation.constraintsTitle'),
+    t('prompt.annotation.constraint1'),
+    t('prompt.annotation.constraint2'),
+    t('prompt.annotation.constraint3'),
+    t('prompt.annotation.constraint4'),
+    t('prompt.annotation.constraint5'),
     '',
-    '待同步操作：',
+    t('prompt.annotation.operationsTitle'),
     '```json',
     JSON.stringify(payload, null, 2),
     '```',

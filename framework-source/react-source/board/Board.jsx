@@ -23,6 +23,7 @@ import {
   upsertAnnotationOperation,
 } from './annotations.js'
 import { ShortcutHelp } from './BoardPanels.jsx'
+import { LocaleProvider, useLocale, useT } from './i18n/context.jsx'
 import {
   getBoardStorage,
   normalizeZoomSensitivity,
@@ -31,18 +32,14 @@ import {
 } from './board-settings.js'
 import { isEditableShortcutTarget, shortcutIdForEvent, shortcutModifierLabel } from './shortcuts.js'
 
-const VIEWPORT_LABELS = {
-  mobile: '手机',
-  desktop: '桌面',
-}
-
 function ZoomControls({ scale, setScale, onReset }) {
+  const t = useT()
   return (
     <div className="wf-zoom-controls">
-      <button type="button" title="缩小" onClick={() => setScale((value) => clampScale(value - 0.1))}>-</button>
+      <button type="button" title={t('zoom.out')} onClick={() => setScale((value) => clampScale(value - 0.1))}>-</button>
       <span className="wf-zoom-value">{Math.round(scale * 100)}%</span>
-      <button type="button" title="放大" onClick={() => setScale((value) => clampScale(value + 0.1))}>+</button>
-      <button type="button" title="重置缩放" onClick={onReset}>复位</button>
+      <button type="button" title={t('zoom.in')} onClick={() => setScale((value) => clampScale(value + 0.1))}>+</button>
+      <button type="button" title={t('zoom.resetTitle')} onClick={onReset}>{t('zoom.reset')}</button>
     </div>
   )
 }
@@ -98,6 +95,7 @@ function LockIcon({ open }) {
 
 /** interactive=true 显示开锁「可交互」；false 为上锁，可直接拖拽平移、滚轮缩放 */
 function InteractionLock({ interactive, onToggle }) {
+  const t = useT()
   const shortcutModifier = shortcutModifierLabel()
   return (
     <button
@@ -106,11 +104,11 @@ function InteractionLock({ interactive, onToggle }) {
       onClick={onToggle}
       aria-pressed={!interactive}
       title={interactive
-        ? `当前可交互页面。点击锁住后：拖拽平移画布，滚轮缩放；快捷键 ${shortcutModifier}+I`
-        : `当前已锁住。点击恢复可交互；快捷键 ${shortcutModifier}+I`}
+        ? t('interaction.titleInteractive', { modifier: shortcutModifier })
+        : t('interaction.titleLocked', { modifier: shortcutModifier })}
     >
       <LockIcon open={interactive} />
-      <span>{interactive ? '可交互' : '不可交互'}</span>
+      <span>{interactive ? t('interaction.interactive') : t('interaction.locked')}</span>
     </button>
   )
 }
@@ -133,6 +131,16 @@ function exitBoardFullscreen() {
 }
 
 export function Board({ project }) {
+  return (
+    <LocaleProvider>
+      <BoardContent project={project} />
+    </LocaleProvider>
+  )
+}
+
+function BoardContent({ project }) {
+  const t = useT()
+  const { locale, setLocale } = useLocale()
   const {
     mode,
     setMode,
@@ -360,9 +368,10 @@ export function Board({ project }) {
 
   React.useEffect(() => {
     if (reviewItems.length === 0) return undefined
-    window.addEventListener('beforeunload', preventUnsavedReviewExit)
-    return () => window.removeEventListener('beforeunload', preventUnsavedReviewExit)
-  }, [reviewItems.length])
+    const handler = (event) => preventUnsavedReviewExit(event, t('unsaved.review'))
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [reviewItems.length, t])
 
   React.useEffect(() => {
     const draft = readAnnotationDraft(getAnnotationStorage(), project)
@@ -379,9 +388,10 @@ export function Board({ project }) {
 
   React.useEffect(() => {
     if (!annotationOperations.length || annotationStorageSaved) return undefined
-    window.addEventListener('beforeunload', preventUnsavedAnnotationExit)
-    return () => window.removeEventListener('beforeunload', preventUnsavedAnnotationExit)
-  }, [annotationOperations.length, annotationStorageSaved])
+    const handler = (event) => preventUnsavedAnnotationExit(event, t('unsaved.annotation'))
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [annotationOperations.length, annotationStorageSaved, t])
 
   const exitImmersive = React.useCallback(() => {
     setImmersive(false)
@@ -579,11 +589,11 @@ export function Board({ project }) {
           projectName: project.name,
         }
       })
-      await exportSelected(screens)
+      await exportSelected(screens, t)
     } finally {
       setExporting(false)
     }
-  }, setExportError)
+  }, setExportError, t)
 
   const resetDemoView = () => {
     setDemoViewResetKey((value) => value + 1)
@@ -599,33 +609,33 @@ export function Board({ project }) {
       <header className="wf-board-toolbar">
         <div className="wf-toolbar-left">
           <h1 className="wf-project-name">{project.name}</h1>
-          <span className="wf-project-meta">{project.screens.length} 页</span>
+          <span className="wf-project-meta">{t('toolbar.pageCount', { count: project.screens.length })}</span>
         </div>
 
         <div className="wf-toolbar-center">
           {demoAvailable ? (
-            <div className="wf-mode-switcher" role="group" aria-label="模式">
+            <div className="wf-mode-switcher" role="group" aria-label={t('toolbar.modeAria')}>
               <button
                 type="button"
                 className={mode === 'canvas' ? 'is-active' : ''}
                 onClick={() => setMode('canvas')}
-                title={`画板模式（${shortcutModifier}+1）`}
+                title={t('toolbar.canvasTitle', { modifier: shortcutModifier })}
               >
-                画板
+                {t('toolbar.canvas')}
               </button>
               <button
                 type="button"
                 className={mode === 'demo' ? 'is-active' : ''}
                 onClick={() => setMode('demo')}
-                title={`演示模式（${shortcutModifier}+2）`}
+                title={t('toolbar.demoTitle', { modifier: shortcutModifier })}
               >
-                演示
+                {t('toolbar.demo')}
               </button>
             </div>
           ) : null}
 
           {viewportOptions.length > 1 ? (
-            <div className="wf-viewport-switcher" role="group" aria-label="视口">
+            <div className="wf-viewport-switcher" role="group" aria-label={t('toolbar.viewportAria')}>
               {viewportOptions.map((key) => (
                 <button
                   type="button"
@@ -633,7 +643,7 @@ export function Board({ project }) {
                   className={viewportKey === key ? 'is-active' : ''}
                   onClick={() => setViewportKey(key)}
                 >
-                  {VIEWPORT_LABELS[key] || key}
+                  {key === 'mobile' || key === 'desktop' ? t(`viewport.${key}`) : key}
                 </button>
               ))}
             </div>
@@ -666,17 +676,17 @@ export function Board({ project }) {
                 type="button"
                 className={hotspotsVisible ? 'wf-board-button is-active' : 'wf-board-button'}
                 onClick={() => setHotspotsVisible((value) => !value)}
-                title={`显示或隐藏演示热区（${shortcutModifier}+H）`}
+                title={t('toolbar.hotspotsTitle', { modifier: shortcutModifier })}
               >
-                {hotspotsVisible ? '热区 ON' : '热区 OFF'}
+                {hotspotsVisible ? t('toolbar.hotspotsOn') : t('toolbar.hotspotsOff')}
               </button>
               <div className="wf-demo-entry">
-                <label htmlFor="wf-demo-entry">入口</label>
+                <label htmlFor="wf-demo-entry">{t('toolbar.entry')}</label>
                 <select
                   id="wf-demo-entry"
                   value={entryId}
                   onChange={(event) => selectEntry(event.target.value)}
-                  title="选择演示入口页"
+                  title={t('toolbar.entryTitle')}
                 >
                   {project.screens.map((screen, index) => (
                     <option key={screen.id} value={screen.id}>
@@ -686,7 +696,7 @@ export function Board({ project }) {
                 </select>
               </div>
               {canGoBack ? (
-                <button type="button" className="wf-board-button" onClick={goBack}>返回</button>
+                <button type="button" className="wf-board-button" onClick={goBack}>{t('toolbar.back')}</button>
               ) : null}
             </>
           )}
@@ -696,32 +706,32 @@ export function Board({ project }) {
           <button
             type="button"
             className={helpVisible ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
-            aria-label="打开帮助、快捷键与设置"
+            aria-label={t('toolbar.helpAria')}
             aria-expanded={helpVisible}
             aria-controls="wf-board-utility"
-            title="帮助 / 快捷键 / 设置（?）"
+            title={t('toolbar.helpTitle')}
             onClick={() => setHelpVisible((value) => !value)}
           >
             <ToolbarIcon name="help" />
-            <span className="wf-visually-hidden">帮助 / 快捷键 / 设置</span>
+            <span className="wf-visually-hidden">{t('toolbar.help')}</span>
           </button>
           <button
             type="button"
             className={reviewEnabled && reviewTool === 'modify' ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
             aria-pressed={reviewEnabled && reviewTool === 'modify'}
-            aria-label={reviewEnabled && reviewTool === 'modify' ? '修改中' : '修改'}
-            title={`修改：点选页面节点并整理成可编辑的 AI 修改 Prompt（${shortcutModifier}+M）`}
+            aria-label={reviewEnabled && reviewTool === 'modify' ? t('toolbar.reviewActive') : t('toolbar.review')}
+            title={t('toolbar.reviewTitle', { modifier: shortcutModifier })}
             onClick={() => toggleReview('modify')}
           >
             <ToolbarIcon name="edit" />
-            <span className="wf-visually-hidden">修改</span>
+            <span className="wf-visually-hidden">{t('toolbar.review')}</span>
           </button>
           <button
             type="button"
             className={reviewEnabled && reviewTool === 'annotation' ? 'wf-toolbar-icon-button is-active' : 'wf-toolbar-icon-button'}
             aria-pressed={reviewEnabled && reviewTool === 'annotation'}
-            aria-label={reviewEnabled && reviewTool === 'annotation' ? '注释中' : '注释'}
-            title="注释：给页面或模块添加可持久化说明"
+            aria-label={reviewEnabled && reviewTool === 'annotation' ? t('toolbar.annotationActive') : t('toolbar.annotation')}
+            title={t('toolbar.annotationTitle')}
             onClick={() => toggleReview('annotation')}
           >
             <ToolbarIcon name="comment" />
@@ -730,49 +740,49 @@ export function Board({ project }) {
                 {annotations.length}
               </span>
             ) : null}
-            <span className="wf-visually-hidden">注释</span>
+            <span className="wf-visually-hidden">{t('toolbar.annotation')}</span>
           </button>
           <button
             type="button"
             className="wf-toolbar-icon-button"
-            aria-label={immersive ? '退出沉浸模式' : '进入沉浸模式'}
-            title={`切换沉浸模式（${shortcutModifier}+3）`}
+            aria-label={immersive ? t('toolbar.immersiveExit') : t('toolbar.immersiveEnter')}
+            title={t('toolbar.immersiveTitle', { modifier: shortcutModifier })}
             onClick={toggleImmersive}
           >
             <ToolbarIcon name="fullscreen" />
-            <span className="wf-visually-hidden">全屏</span>
+            <span className="wf-visually-hidden">{t('toolbar.fullscreen')}</span>
           </button>
           <button
             type="button"
             className="wf-toolbar-icon-button"
-            aria-label={selectedIds.size > 0 ? '展开已勾选的屏' : '展开全部屏'}
-            title={selectedIds.size > 0 ? '展开已勾选的屏；无勾选时展开全部' : '展开全部屏'}
+            aria-label={selectedIds.size > 0 ? t('toolbar.expandSelected') : t('toolbar.expandAll')}
+            title={selectedIds.size > 0 ? t('toolbar.expandSelectedTitle') : t('toolbar.expandAllTitle')}
             onClick={() => expandTargets(true)}
           >
             <ToolbarIcon name="expand" />
-            <span className="wf-visually-hidden">全部展开</span>
+            <span className="wf-visually-hidden">{t('toolbar.expandAll')}</span>
           </button>
           <button
             type="button"
             className="wf-toolbar-icon-button"
-            aria-label={selectedIds.size > 0 ? '收起已勾选的屏' : '收起全部屏'}
-            title={selectedIds.size > 0 ? '收起已勾选的屏；无勾选时收起全部' : '收起全部屏'}
+            aria-label={selectedIds.size > 0 ? t('toolbar.collapseSelected') : t('toolbar.collapseAll')}
+            title={selectedIds.size > 0 ? t('toolbar.collapseSelectedTitle') : t('toolbar.collapseAllTitle')}
             onClick={() => expandTargets(false)}
           >
             <ToolbarIcon name="collapse" />
-            <span className="wf-visually-hidden">全部收起</span>
+            <span className="wf-visually-hidden">{t('toolbar.collapseAll')}</span>
           </button>
           <button
             type="button"
             className="wf-toolbar-icon-button wf-toolbar-icon-button--primary"
             disabled={exporting || selectedIds.size === 0 || mode === 'demo'}
-            aria-label={exporting ? '正在导出' : `打包下载（${selectedIds.size} 个屏幕）`}
-            title={exporting ? '导出中…' : `打包下载 ${selectedIds.size} 个屏幕`}
+            aria-label={exporting ? t('toolbar.exporting') : t('toolbar.export', { count: selectedIds.size })}
+            title={exporting ? t('toolbar.exportingTitle') : t('toolbar.exportTitle', { count: selectedIds.size })}
             onClick={() => exportIds([...selectedIds])}
           >
             <ToolbarIcon name="download" />
             <span className="wf-toolbar-icon-count">{exporting ? '…' : selectedIds.size}</span>
-            <span className="wf-visually-hidden">打包下载</span>
+            <span className="wf-visually-hidden">{t('toolbar.download')}</span>
           </button>
         </div>
       </header>
@@ -785,27 +795,27 @@ export function Board({ project }) {
         <div
           className={`wf-immersive-chrome${immersiveToolbarExpanded ? '' : ' is-collapsed'}`}
           role="toolbar"
-          aria-label="沉浸控件"
+          aria-label={t('immersive.controlsAria')}
         >
           {immersiveToolbarExpanded ? (
             <div className="wf-immersive-controls">
               <button
                 type="button"
                 className="wf-board-button"
-                title="退出沉浸（Esc）"
+                title={t('immersive.exitTitle')}
                 onClick={exitImmersive}
               >
-                退出
+                {t('immersive.exit')}
               </button>
               <button
                 type="button"
                 className={browserFullscreen ? 'wf-board-button is-active' : 'wf-board-button'}
                 title={browserFullscreen
-                  ? `退出浏览器全屏（${shortcutModifier}+Shift+F）`
-                  : `浏览器全屏（${shortcutModifier}+Shift+F）`}
+                  ? t('immersive.browserFullscreenExitTitle', { modifier: shortcutModifier })
+                  : t('immersive.browserFullscreenEnterTitle', { modifier: shortcutModifier })}
                 onClick={toggleBrowserFullscreen}
               >
-                {browserFullscreen ? '浏览器全屏 ON' : '浏览器全屏'}
+                {browserFullscreen ? t('immersive.browserFullscreenOn') : t('immersive.browserFullscreen')}
               </button>
               <ZoomControls
                 scale={activeScale}
@@ -819,10 +829,10 @@ export function Board({ project }) {
               <button
                 type="button"
                 className={helpVisible ? 'wf-toolbar-icon-button wf-immersive-action-button is-active' : 'wf-toolbar-icon-button wf-immersive-action-button'}
-                aria-label="打开帮助、快捷键与设置"
+                aria-label={t('toolbar.helpAria')}
                 aria-expanded={helpVisible}
                 aria-controls="wf-board-utility"
-                title="帮助 / 快捷键 / 设置（?）"
+                title={t('toolbar.helpTitle')}
                 onClick={() => setHelpVisible((value) => !value)}
               >
                 <ToolbarIcon name="help" />
@@ -830,8 +840,8 @@ export function Board({ project }) {
               <button
                 type="button"
                 className="wf-toolbar-icon-button wf-immersive-action-button"
-                aria-label={selectedIds.size > 0 ? '展开已勾选的屏' : '展开全部屏'}
-                title={selectedIds.size > 0 ? '展开已勾选的屏；无勾选时展开全部' : '展开全部屏'}
+                aria-label={selectedIds.size > 0 ? t('toolbar.expandSelected') : t('toolbar.expandAll')}
+                title={selectedIds.size > 0 ? t('toolbar.expandSelectedTitle') : t('toolbar.expandAllTitle')}
                 onClick={() => expandTargets(true)}
               >
                 <ToolbarIcon name="expand" />
@@ -839,8 +849,8 @@ export function Board({ project }) {
               <button
                 type="button"
                 className="wf-toolbar-icon-button wf-immersive-action-button"
-                aria-label={selectedIds.size > 0 ? '收起已勾选的屏' : '收起全部屏'}
-                title={selectedIds.size > 0 ? '收起已勾选的屏；无勾选时收起全部' : '收起全部屏'}
+                aria-label={selectedIds.size > 0 ? t('toolbar.collapseSelected') : t('toolbar.collapseAll')}
+                title={selectedIds.size > 0 ? t('toolbar.collapseSelectedTitle') : t('toolbar.collapseAllTitle')}
                 onClick={() => expandTargets(false)}
               >
                 <ToolbarIcon name="collapse" />
@@ -848,15 +858,15 @@ export function Board({ project }) {
               {isDemo ? (
                 <>
                   {canGoBack ? (
-                    <button type="button" className="wf-board-button" onClick={goBack}>返回</button>
+                    <button type="button" className="wf-board-button" onClick={goBack}>{t('toolbar.back')}</button>
                   ) : null}
                   <button
                     type="button"
                     className={hotspotsVisible ? 'wf-board-button is-active' : 'wf-board-button'}
                     onClick={() => setHotspotsVisible((value) => !value)}
-                    title={`显示或隐藏演示热区（${shortcutModifier}+H）`}
+                    title={t('toolbar.hotspotsTitle', { modifier: shortcutModifier })}
                   >
-                    {hotspotsVisible ? '热区 ON' : '热区 OFF'}
+                    {hotspotsVisible ? t('toolbar.hotspotsOn') : t('toolbar.hotspotsOff')}
                   </button>
                 </>
               ) : null}
@@ -866,8 +876,8 @@ export function Board({ project }) {
             type="button"
             className="wf-toolbar-icon-button wf-immersive-toolbar-toggle"
             aria-expanded={immersiveToolbarExpanded}
-            aria-label={immersiveToolbarExpanded ? '收起精简工具栏' : '展开精简工具栏'}
-            title={immersiveToolbarExpanded ? '收起精简工具栏' : '展开精简工具栏'}
+            aria-label={immersiveToolbarExpanded ? t('immersive.collapseToolbar') : t('immersive.expandToolbar')}
+            title={immersiveToolbarExpanded ? t('immersive.collapseToolbar') : t('immersive.expandToolbar')}
             onClick={() => setImmersiveToolbarExpanded((value) => !value)}
           >
             <ToolbarIcon name={immersiveToolbarExpanded ? 'toolbarCollapse' : 'toolbarExpand'} />
@@ -938,6 +948,8 @@ export function Board({ project }) {
           onTrackpadZoomChange={updateTrackpadZoom}
           zoomSensitivity={zoomSensitivity}
           onZoomSensitivityChange={updateZoomSensitivity}
+          locale={locale}
+          onLocaleChange={setLocale}
           onClose={() => setHelpVisible(false)}
         />
       ) : null}

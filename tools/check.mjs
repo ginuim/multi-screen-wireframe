@@ -11,7 +11,7 @@ const version = (await readFile(join(root, 'VERSION'), 'utf8')).trim()
 const packageState = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
 assert.equal(packageState.name, 'multi-screen-wireframe', 'package name is stale')
 assert.equal(packageState.version, version, 'VERSION and package.json must match')
-assert.equal(version, '2.0.0', 'v2 release version is stale')
+assert.equal(version, '2.1.0', 'v2 release version is stale')
 assert.equal(
   normalizePathSeparators('framework\\runtime\\board.js'),
   'framework/runtime/board.js',
@@ -39,6 +39,7 @@ assert.match(rootAgentsSource, /v1 \/ v2.*framework|framework.*v1 \/ v2/, 'root 
 assert.match(starterAgentsSource, /v1.*v2.*迁移[\s\S]*新目录|新目录[\s\S]*v1.*v2.*迁移/, 'starter AGENTS.md must require copy-on-migration')
 
 const changelogSource = await readFile(join(root, 'CHANGELOG.md'), 'utf8')
+assert.match(changelogSource, /^## 2\.1\.0$/m, 'CHANGELOG.md must document v2.1.0')
 assert.match(changelogSource, /^## 2\.0\.0$/m, 'CHANGELOG.md must document v2.0.0')
 assert.match(changelogSource, /^## 1\.8\.0$/m, 'CHANGELOG.md must document frozen v1.8.0')
 

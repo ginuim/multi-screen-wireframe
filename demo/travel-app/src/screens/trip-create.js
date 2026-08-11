@@ -1,7 +1,7 @@
 /**
- * @wireframe-skill multi-screen-wireframe@2.0.0
+ * @wireframe-skill multi-screen-wireframe@2.1.0
  * 创建基于 v2.0.0
- * 修改基于 v2.0.0
+ * 修改基于 v2.1.0
  */
 WireframeVue.defineScreen('trip-create', ({ ref }) => ({
   setup() { return { name: ref('周六运河散步'), date: ref('2026-08-15'), start: ref('metro'), note: ref(''), easy: ref(true), standard: ref(false), compact: ref(false), accessible: ref(false), noBooking: ref(true), reminder: ref(true), steps: [{ id: 'basic', label: '基本信息' }, { id: 'budget', label: '预算' }, { id: 'confirm', label: '确认' }] } },

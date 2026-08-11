@@ -1,7 +1,7 @@
 /**
- * @wireframe-skill multi-screen-wireframe@2.0.0
+ * @wireframe-skill multi-screen-wireframe@2.1.0
  * 创建基于 v2.0.0
- * 修改基于 v2.0.0
+ * 修改基于 v2.1.0
  */
 WireframeVue.defineScreen('route-detail', ({ ref }) => ({
   setup() { return { tab: ref('overview'), breadcrumbs: [{ label: '发现', to: 'discover' }, { label: '运河边的一天' }], tabs: [{ id: 'overview', label: '路线概览' }, { id: 'notes', label: '出发须知' }], stops: [{ id: 'stop-warehouse', title: '旧仓库展厅', subtitle: '09:30 · 建议停留 60 分钟' }, { id: 'stop-bridge', title: '桥下周末市集', subtitle: '11:00 · 建议停留 90 分钟' }, { id: 'stop-lane', title: '水岸小巷', subtitle: '13:30 · 午餐与街区散步' }, { id: 'stop-garden', title: '社区花园', subtitle: '15:20 · 建议停留 45 分钟' }, { id: 'stop-bend', title: '河湾日落平台', subtitle: '17:10 · 路线终点' }] } },
