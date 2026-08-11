@@ -6,6 +6,7 @@ import { checkProject, normalizePathSeparators } from '../scripts/check-project.
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
 const starter = join(root, 'starter')
+const frameworkSource = join(root, 'framework-source')
 const version = (await readFile(join(root, 'VERSION'), 'utf8')).trim()
 const packageState = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
 assert.equal(packageState.name, 'multi-screen-wireframe', 'package name is stale')
@@ -81,7 +82,6 @@ results.push(await checkProject(join(root, 'demo/travel-app'), {
   frameworkDirectory: join(starter, 'framework'),
   delivery: false,
 }))
-results.push(await checkProject(root, { allowMaintenanceSource: true }))
 
 async function relativeFiles(directory) {
   const entries = await readdir(directory, { recursive: true, withFileTypes: true })
@@ -91,28 +91,16 @@ async function relativeFiles(directory) {
     .sort()
 }
 
-async function assertMirrored(relativeDirectory) {
-  const previewDirectory = join(root, relativeDirectory)
-  const starterDirectory = join(starter, relativeDirectory)
-  const previewFiles = await relativeFiles(previewDirectory)
-  const starterFiles = await relativeFiles(starterDirectory)
-  assert.deepEqual(previewFiles, starterFiles, `${relativeDirectory} preview and starter file lists differ`)
-  for (const file of previewFiles) {
-    const previewContent = await readFile(join(previewDirectory, file))
-    const starterContent = await readFile(join(starterDirectory, file))
-    assert.deepEqual(previewContent, starterContent, `${relativeDirectory}/${file} differs between preview and starter`)
-  }
-}
-
-await assertMirrored('src')
-
 const starterFrameworkFiles = await relativeFiles(join(starter, 'framework'))
 assert.ok(!starterFrameworkFiles.some((file) => /\.(?:jsx|tsx|ts)$/i.test(file)), 'starter framework contains maintenance source')
-for (const file of starterFrameworkFiles) {
-  const previewContent = await readFile(join(root, 'framework', file))
-  const starterContent = await readFile(join(starter, 'framework', file))
-  assert.deepEqual(previewContent, starterContent, `framework/${file} differs between maintenance source and starter`)
-}
+const frameworkSourceFiles = await relativeFiles(frameworkSource)
+assert.ok(frameworkSourceFiles.includes('bridge-entry.jsx'), 'framework-source/bridge-entry.jsx is missing')
+assert.ok(frameworkSourceFiles.some((file) => file.startsWith('react-source/board/')), 'framework-source Board source is missing')
+assert.ok(frameworkSourceFiles.some((file) => file.startsWith('react-source/core/')), 'framework-source core source is missing')
+assert.ok(frameworkSourceFiles.some((file) => file.startsWith('react-source/ui/')), 'framework-source UI source is missing')
+assert.ok(!frameworkSourceFiles.some((file) => /^(?:runtime|styles|vendor)\//.test(file)), 'framework-source must not contain deliverable runtime mirrors')
+const bridgeSource = await readFile(join(frameworkSource, 'bridge-entry.jsx'), 'utf8')
+assert.match(bridgeSource, /from '\.\/react-source\//, 'bridge-entry.jsx must import its colocated maintenance source')
 
 for (const demoName of ['api-client', 'travel-app']) {
   const html = await readFile(join(root, 'demo', demoName, 'index.html'), 'utf8')
@@ -121,9 +109,14 @@ for (const demoName of ['api-client', 'travel-app']) {
   assert.match(html, /COVERAGE FIXTURE ONLY/, `${demoName} must warn that its framework path is demo-only`)
 }
 
+const rootNames = await readdir(root)
+for (const stalePreview of ['framework', 'src', 'index.html', 'EDITING.md']) {
+  assert.ok(!rootNames.includes(stalePreview), `root preview mirror must not exist: ${stalePreview}`)
+}
+
 const starterNames = await readdir(starter)
 assert.ok(!starterNames.includes('SKILL.md'), 'starter must not contain Skill authoring files')
 assert.ok(!starterNames.includes('scripts') && !starterNames.includes('tools'), 'starter must not contain maintenance tools')
 
 const totalScreens = results.slice(0, 3).reduce((sum, result) => sum + result.screenCount, 0)
-console.log(`vue-global skill: pass (${results.length - 1} deliverable/demo projects, ${totalScreens} screens, v${version})`)
+console.log(`vue-global skill: pass (${results.length} deliverable/demo projects, ${totalScreens} screens, v${version})`)

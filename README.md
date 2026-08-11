@@ -92,7 +92,7 @@ v1 React/JSX 最终版保存在 Git tag `v1.8.0`。v2 从 `v2.0.0` 起作为主�
 | `SKILL.md` | 给 AI Agent 的生成、修改、格式识别与迁移约束 |
 | `reference.md` | Project、Vue factory、组件和注释协议 |
 | `AGENTS.md` | 仓库维护边界与技术约束 |
-| `framework/react-source/` | Board 的 React/JSX 维护源，不进入交付物 |
+| `framework-source/` | Board 的 React/JSX 维护源，不进入交付物；编译产物写入 `starter/framework/runtime/board.js` |
 | `scripts/` | 创建与检查单个交付物 |
 | `tools/check.mjs` | 检查整个 Skill、starter 与 demos |
 | `CHANGELOG.md` | major 版本和 breaking changes |

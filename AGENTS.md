@@ -13,11 +13,11 @@
 
 - 交付复制源永远是整个 `starter/`。
 - 生成项目时优先使用 `scripts/create-project.mjs`；环境没有 Node.js 时可完整复制 `starter/`，随后只修改目标副本的 `src/`。
-- 不得用 `demo/` 或根目录预览作为复制源；demo 只覆盖复杂交互和长内容。
+- 不得用 `demo/` 作为复制源；demo 只覆盖复杂交互和长内容。
 - demo 共享 `starter/framework/`，其中 `../../starter/framework/` 只是仓库测试路径，不能复制进交付物。
-- 根目录的 `framework/`、`src/`、`index.html` 是维护预览镜像；交付内容以 `starter/` 为准。
-- `framework/react-source/` 与 `framework/runtime/bridge-entry.jsx` 仅供维护，不进入 starter。
-- 修改公共 runtime 后重新生成 `framework/runtime/board.js`，同步交付所需 runtime、styles、vendor 和 `FORMAT_VERSION` 到 `starter/framework/`，再验证 starter 与两个 demo。
+- 仓库根目录不保留可运行的 `framework/`、`src/` 或 `index.html` 镜像；交付内容只以 `starter/` 为准。
+- `framework-source/` 只保存 Board 的 React/JSX 维护源码，不进入 starter；入口为 `framework-source/bridge-entry.jsx`。
+- 修改 Board 维护源码后重新生成 `starter/framework/runtime/board.js`；其他 runtime、styles、vendor 和 `FORMAT_VERSION` 直接在 `starter/framework/` 维护，再验证 starter 与两个 demo。
 - 交付物不加入 esbuild、WASM、Node runtime、包管理器或服务器。
 
 ## 组件契约维护
@@ -31,8 +31,8 @@
 ## 版本
 
 - `VERSION`、`package.json`、screen/layout 的 `@wireframe-skill` 和“修改基于”必须同步。
-- major 格式变更必须同步 `project.formatVersion`、三个 framework 镜像中的 `FORMAT_VERSION`、README 兼容矩阵和 CHANGELOG。
-- 根预览 `src/` 与 `starter/src/` 保持镜像；starter、根预览和两个 demo 都使用当前版本注释。
+- major 格式变更必须同步 `project.formatVersion`、`starter/framework/FORMAT_VERSION`、README 兼容矩阵和 CHANGELOG。
+- starter 和两个 demo 都使用当前版本注释；不得新增根目录业务源码镜像。
 
 ## 验证
 

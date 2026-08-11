@@ -1,6 +1,6 @@
-import { Board } from '../react-source/board/Board.jsx'
-import { PrototypeProvider, usePrototype } from '../react-source/core/PrototypeContext.jsx'
-import { validateProject } from '../react-source/core/validateProject.js'
+import { Board } from './react-source/board/Board.jsx'
+import { PrototypeProvider, usePrototype } from './react-source/core/PrototypeContext.jsx'
+import { validateProject } from './react-source/core/validateProject.js'
 
 function VueScreenError({ screenId, error }) {
   return (
