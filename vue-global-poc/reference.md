@@ -244,15 +244,28 @@ items 使用稳定 id/to；rows 默认以 `row.id` 作为 key。不能把 screen
 
 ## 注释协议
 
-`src/annotations.js`：
+除非用户明确要求添加、固化或导入原型注释，否则保持 `src/annotations.js` 为空注释集。注释只写入该文件，不把注释文字写进 screen template 或 `project.js`。
+
+### 文件结构
+
+`src/annotations.js` 通过 `WireframeVue.defineAnnotations()` 注册一次：
 
 ```js
 (function defineAnnotations({ defineAnnotations }) {
   defineAnnotations({
-    annotationsRevision: 'annotations-r2',
+    annotationsRevision: 'annotations-r3',
     annotations: [
       {
-        id: 'note-order-summary',
+        id: 'note-orders-page-purpose',
+        screenId: 'orders',
+        screenTitle: '订单',
+        anchor: { kind: 'screen' },
+        content: '确认这个页面是否只展示近 90 天订单',
+        createdAt: '2026-08-11T02:00:00.000Z',
+        updatedAt: '2026-08-11T02:00:00.000Z',
+      },
+      {
+        id: 'note-orders-summary-discount',
         screenId: 'orders',
         screenTitle: '订单',
         anchor: {
@@ -261,7 +274,6 @@ items 使用稳定 id/to；rows 默认以 `row.id` 作为 key。不能把 screen
           fallbackPosition: { x: 0.76, y: 0.2 },
         },
         content: '确认是否展示优惠明细',
-        status: 'open',
         createdAt: '2026-08-11T02:00:00.000Z',
         updatedAt: '2026-08-11T02:00:00.000Z',
       },
@@ -270,7 +282,48 @@ items 使用稳定 id/to；rows 默认以 `row.id` 作为 key。不能把 screen
 })(window.WireframeVue)
 ```
 
-注释 id 长期稳定。同步时按 id upsert/delete，保留未涉及项并更新 revision。页面注释使用 `{ kind: 'screen' }`；节点注释必须有稳定 selector。
+没有注释时保留同样的注册外壳：
+
+```js
+(function defineAnnotations({ defineAnnotations }) {
+  defineAnnotations({ annotationsRevision: 'annotations-r1', annotations: [] })
+})(window.WireframeVue)
+```
+
+### 容器字段
+
+| 字段 | 要求 | 说明 |
+| --- | --- | --- |
+| `annotationsRevision` | 非空字符串 | 注释源码的基线版本。每次固化新增、修改或删除后更换为新的唯一值，例如 `annotations-r4` 或带时间戳的值。 |
+| `annotations` | 数组 | 已固化的注释列表；无注释时写 `[]`。 |
+
+### 注释字段
+
+| 字段 | 要求 | 说明 |
+| --- | --- | --- |
+| `id` | 必填，非空字符串 | 在整个项目中唯一且长期稳定。推荐 `note-<screen>-<topic>`；修改内容时不更换 id。 |
+| `screenId` | 必填 | 必须引用 `project.screens` 中已存在的 screen id。 |
+| `screenTitle` | 可选 | 面板中显示的页面名称；省略时回退为 `screenId`。 |
+| `anchor` | 必填 | 页面注释写 `{ kind: 'screen' }`；节点注释写 `{ kind: 'node', selector, fallbackPosition? }`。 |
+| `content` | 必填，非空字符串 | 注释正文；运行时会去除首尾空白。 |
+| `createdAt` | 可选 | 推荐写 ISO 8601 时间字符串。省略时以加载时间补齐；列表会先按它排序。 |
+| `updatedAt` | 可选 | 推荐写 ISO 8601 时间字符串。修改内容时更新；省略时回退为 `createdAt`。 |
+
+不要写 `status` 等未列出字段；当前运行时只保留上述字段，未支持的字段会在标准化、导出或同步时丢失。
+
+### 页面与节点定位
+
+- 页面注释使用 `anchor: { kind: 'screen' }`，标记相对当前 screen 内容区定位。
+- 节点注释必须提供合法且稳定的 CSS `selector`。优先使用以 screen id 开头的全局唯一 `#id`；重复数据节点使用稳定 `data-wf-key` 组合选择器。不使用文字、`nth-child`、短命状态 class 或易变 DOM 层级定位。
+- `selector` 命中的节点必须位于 `screenId` 对应的 `.wf-screen-content` 内。选择器无效、未命中或命中其他 screen 时，注释显示为定位失效并改用备用位置。
+- `fallbackPosition` 是相对 screen 内容区的归一化坐标，`x` 和 `y` 均取 `0`–`1`。超出范围的有限数值会被截断；缺失或非有限数值时使用默认备用位置 `{ x: 0.96, y: 0.04 }`。
+
+### 修改、删除与同步
+
+- 把 `src/annotations.js` 视为正式基线；Board 中新增、编辑和删除的注释先保存为浏览器本机草稿，不会自动改写源码。
+- 同步 Prompt 中的 `operations` 只支持 `upsert` 和 `delete`。`upsert` 按 id 新增或完整替换，`delete` 按 id 删除；保留未涉及的基线注释。
+- 同步完成后更新 `annotationsRevision`，刷新 `index.html`，验证页面注释、节点定位、失效定位提示和待同步状态。
+- Board 导出的 `*.wireframe-annotations.json` 是交换包，包含 `schemaVersion`、`projectId`、`baseRevision`、`annotations` 和 `operations`；它不是 `src/annotations.js` 的源码格式，不要原样粘贴进该文件。导入时要求 `schemaVersion` 受支持、`projectId` 与当前项目一致且注释数组全部有效。
 
 ## 运行与错误隔离
 

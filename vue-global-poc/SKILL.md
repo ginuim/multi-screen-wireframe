@@ -114,6 +114,7 @@ Board 的修改与注释能力依赖稳定 DOM：
 
 ## 注释与修改回归
 
+- 除非用户明确要求添加、固化或导入原型注释，否则不得自行生成页面注释或节点注释；保留 starter 中的空 `src/annotations.js` 即可。
 - 正式注释写 `src/annotations.js`，通过 `WireframeVue.defineAnnotations()` 注册。
 - 修改模式的 Prompt 只指向业务 `src/` 和 `.js` template，不指示修改 framework。
 - 注释同步只修改 `src/annotations.js`；更新 `annotationsRevision`，按稳定 id 幂等合并。
