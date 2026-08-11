@@ -6,6 +6,7 @@
 
   const Vue = global.Vue
   const screenRecords = new Map()
+  const componentRecords = new Map()
   const keys = Object.freeze({
     screenId: Symbol('wireframe-screen-id'),
     viewportKey: Symbol('wireframe-viewport-key'),
@@ -26,6 +27,12 @@
 
   function sourceFor(id) {
     return `src/screens/${id}.js`
+  }
+
+  function assertComponentName(name) {
+    if (typeof name !== 'string' || !/^Wf[A-Z][A-Za-z0-9]*$/.test(name)) {
+      fail(`business component name "${String(name)}" must start with Wf and use PascalCase`)
+    }
   }
 
   function formatCompilerProblem(problem) {
@@ -59,21 +66,15 @@
     })
   }
 
-  function defineScreen(id, factory) {
-    assertScreenId(id)
-    if (screenRecords.has(id)) fail(`duplicate screen registration "${id}"`)
-
-    const record = { id, source: sourceFor(id), component: null, error: null, warnings: [] }
-    screenRecords.set(id, record)
-
+  function compileDefinition(label, source, factory) {
     try {
-      if (typeof factory !== 'function') fail(`screen "${id}" must register with a factory function`)
+      if (typeof factory !== 'function') fail(`${label} must register with a factory function`)
       const definition = factory(apiForScreens())
       if (!definition || typeof definition !== 'object') {
-        fail(`screen "${id}" factory must return a Vue component object`)
+        fail(`${label} factory must return a Vue component object`)
       }
       if (typeof definition.template !== 'string' || !definition.template.trim()) {
-        fail(`screen "${id}" must provide a non-empty template string`)
+        fail(`${label} must provide a non-empty template string`)
       }
 
       const compilerErrors = []
@@ -87,20 +88,50 @@
         },
       })
       if (compilerErrors.length) {
-        fail(`${record.source} template failed: ${compilerErrors.map(formatCompilerProblem).join('; ')}`)
+        fail(`${source} template failed: ${compilerErrors.map(formatCompilerProblem).join('; ')}`)
       }
 
-      record.warnings = compilerWarnings.map(formatCompilerProblem)
-      record.component = Object.freeze({
+      return {
+        warnings: compilerWarnings.map(formatCompilerProblem),
+        component: Object.freeze({
         ...definition,
-        name: definition.name || `WireframeScreen_${id.replace(/-/g, '_')}`,
         template: undefined,
         render,
-      })
+        }),
+      }
     } catch (error) {
-      record.error = error instanceof Error ? error : new Error(String(error))
-      console.error(`[wireframe:screen-registration:${id}]`, record.error)
+      return { error: error instanceof Error ? error : new Error(String(error)) }
     }
+  }
+
+  function defineScreen(id, factory) {
+    assertScreenId(id)
+    if (screenRecords.has(id)) fail(`duplicate screen registration "${id}"`)
+    const record = { id, source: sourceFor(id), component: null, error: null, warnings: [] }
+    screenRecords.set(id, record)
+    const result = compileDefinition(`screen "${id}"`, record.source, factory)
+    Object.assign(record, result)
+    if (record.component) {
+      record.component = Object.freeze({
+        ...record.component,
+        name: record.component.name || `WireframeScreen_${id.replace(/-/g, '_')}`,
+      })
+    }
+    if (record.error) console.error(`[wireframe:screen-registration:${id}]`, record.error)
+  }
+
+  function defineComponent(name, factory) {
+    assertComponentName(name)
+    if (componentRecords.has(name)) fail(`duplicate business component registration "${name}"`)
+    const source = document.currentScript && document.currentScript.src
+      ? new URL(document.currentScript.src).pathname.split('/').slice(-3).join('/')
+      : name
+    const record = { name, source, component: null, error: null, warnings: [] }
+    componentRecords.set(name, record)
+    const result = compileDefinition(`business component "${name}"`, source, factory)
+    Object.assign(record, result)
+    if (record.component) record.component = Object.freeze({ ...record.component, name })
+    if (record.error) console.error(`[wireframe:component-registration:${name}]`, record.error)
   }
 
   function recordLoadFailure(id, reason) {
@@ -149,6 +180,10 @@
   function installUi(app) {
     if (!uiInstaller) fail('framework/runtime/ui.js was not loaded')
     uiInstaller(app)
+    for (const record of componentRecords.values()) {
+      if (!record.component) fail(`${record.source} failed to register ${record.name}: ${record.error && record.error.message}`)
+      app.component(record.name, record.component)
+    }
   }
 
   function validateRegistrations() {
@@ -187,5 +222,9 @@
     },
     installUi,
     validateRegistrations,
+    defineComponent,
+    getComponent(name) {
+      return componentRecords.get(name) || null
+    },
   })
 })(window)

@@ -7,6 +7,7 @@
 - AI 生成和日常修改只写 `src/`。
 - 每个 `src/project.js` 中的 screen id 必须对应 `src/screens/<id>.js`。
 - screen 文件必须调用同 id 的 `WireframeVue.defineScreen(id, factory)`。
+- 共享业务组件必须在 `project.components` 声明，并以 `Wf` 前缀调用 `WireframeVue.defineComponent(name, factory)`；声明顺序就是依赖加载顺序。
 - 不修改 `framework/` 来绕过业务错误。
 - 修改 `src/` 后不构建，刷新 `index.html` 验证。
 
@@ -32,7 +33,7 @@
 
 ## 验证
 
-1. 可选运行 `node tools/check.mjs` 做目录和静态契约检查。
-2. 双击 `index.html`，确认无需目录授权即可进入 Board。
+1. 可选在 PoC 根目录运行 `node tools/check.mjs`，一次检查 starter 与两个 demo。
+2. 双击任一 `index.html`，确认无需目录授权即可进入 Board。
 3. 检查画布、演示、viewport、导航、屏内交互、修改、注释与导出。
 4. 故意破坏一个测试 screen 时，应只显示该 screen 的错误卡，不影响其他 screen。

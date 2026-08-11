@@ -22,7 +22,17 @@ index.html
   └─ loader.js → 依次加载 src/screens/<id>.js → 挂载 Board
 ```
 
-PoC 刻意只迁移 AI 经常生成和修改的业务页面层。现有 React Board 被预编译成 `framework/runtime/board.js`，不需要在交付物中携带编译器；Vue screen 的 DOM 仍由原 Board 统一处理导航、修改、注释和导出。
+PoC 刻意只迁移 AI 经常生成和修改的业务页面层。现有 React Board 被预编译成 `framework/runtime/board.js`，不需要在交付物中携带编译器；Vue screen 的 DOM 仍由原 Board 统一处理导航、修改、注释和导出。共享业务布局和组件也按普通脚本先于 screen 加载，并统一使用 `Wf` 前缀注册。
+
+## 三个完整入口
+
+| 入口 | 内容 |
+| --- | --- |
+| `index.html` | starter 对比入口，2 个基础页面 |
+| `demo/api-client/index.html` | API Client，6 个页面和共享桌面布局 |
+| `demo/travel-app/index.html` | 周末出发，10 个页面、共享移动布局、地图组件和弹层状态 |
+
+三个入口都可直接通过 `file://` 打开，不需要选择目录。两个 demo 共享根目录的 `framework/`，不重复携带 runtime 或 vendor。
 
 ## 运行与修改
 
@@ -37,7 +47,7 @@ PoC 刻意只迁移 AI 经常生成和修改的业务页面层。现有 React Bo
 3. 在 `src/project.js` 的 `screens` 中添加同一个 id。
 4. 用 `links` 声明页面流，刷新浏览器。
 
-页面不需要在 `index.html` 添加 `<script>`；loader 会从 project id 推导文件路径。
+页面不需要在 `index.html` 添加 `<script>`；loader 会从 project id 推导文件路径。共享业务组件通过 `project.components` 显式声明名称与源文件，loader 会先校验并加载它们，再加载 screen。
 
 ## 稳定性约束
 
@@ -59,10 +69,12 @@ PoC 刻意只迁移 AI 经常生成和修改的业务页面层。现有 React Bo
 | `src/project.js` | viewport、screen 元数据、入口和 links |
 | `src/annotations.js` | 已固化注释 |
 | `src/styles/app.css` | 业务共享样式 |
+| `demo/*/src/layouts` / `components` | demo 的 Vue Global 共享业务组件 |
+| `demo/*/styles/demo.css` | demo 独立业务样式 |
 | `framework/runtime/registry.js` | 页面注册、模板预编译和完整性检查 |
 | `framework/runtime/ui.js` | `Wf*` Vue 组件库 |
 | `framework/runtime/board.js` | 预编译 Board 桥接产物 |
 | `framework/react-source/` | Board 桥接的维护源，仅用于复现 PoC |
 | `framework/vendor/` | Vue、React 和离线导出库 |
 
-`tools/check.mjs` 是仓库维护校验，不参与浏览器运行，也不是构建步骤。
+`tools/check.mjs` 会一次校验 starter 和两个 demo，共 18 个 screen；它是仓库维护校验，不参与浏览器运行，也不是构建步骤。

@@ -4,31 +4,40 @@
   const Wireframe = global.WireframeVue
   const project = Wireframe.getProject()
 
-  function loadScript(screen) {
-    const id = screen.id
-    const source = screen.source || `src/screens/${id}.js`
+  function injectScript(source, dataset) {
     return new Promise((resolve) => {
       const script = document.createElement('script')
       script.src = source
       script.async = false
-      script.dataset.screenId = id
-      script.onload = () => {
-        if (!Wireframe.getScreen(id)) {
-          Wireframe.recordLoadFailure(id, new Error(`${source} loaded but did not register "${id}"`))
-        }
-        resolve()
-      }
-      script.onerror = () => {
-        Wireframe.recordLoadFailure(id, new Error(`Unable to load ${source}`))
-        resolve()
-      }
+      Object.assign(script.dataset, dataset)
+      script.onload = () => resolve(true)
+      script.onerror = () => resolve(false)
       document.head.appendChild(script)
     })
   }
 
+  async function loadBusinessComponent(entry) {
+    const loaded = await injectScript(entry.source, { componentName: entry.name })
+    if (!loaded) throw new Error(`Unable to load ${entry.source}`)
+    const record = Wireframe.getComponent(entry.name)
+    if (!record) throw new Error(`${entry.source} loaded but did not register "${entry.name}"`)
+    if (record.error) throw record.error
+  }
+
+  async function loadScreen(screen) {
+    const id = screen.id
+    const source = screen.source || `src/screens/${id}.js`
+    const loaded = await injectScript(source, { screenId: id })
+    if (!loaded) Wireframe.recordLoadFailure(id, new Error(`Unable to load ${source}`))
+    else if (!Wireframe.getScreen(id)) Wireframe.recordLoadFailure(id, new Error(`${source} loaded but did not register "${id}"`))
+  }
+
   async function boot() {
+    for (const entry of project.components || []) {
+      await loadBusinessComponent(entry)
+    }
     for (const screen of project.screens) {
-      await loadScript(screen)
+      await loadScreen(screen)
     }
     Wireframe.validateRegistrations()
     if (!global.WireframeVueBoard || typeof global.WireframeVueBoard.mount !== 'function') {
