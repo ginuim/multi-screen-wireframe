@@ -1,4 +1,8 @@
-/** @wireframe-skill multi-screen-wireframe@1.8.0 · Vue Global PoC */
+/**
+ * @wireframe-skill multi-screen-wireframe-vue-global@1.8.0
+ * 创建基于 v1.8.0
+ * 修改基于 v1.8.0
+ */
 WireframeVue.defineScreen('trip-confirm', ({ onUnmounted, ref }) => ({
   setup() {
     const confirmOpen = ref(false)

@@ -110,7 +110,7 @@ function mount() {
     </PrototypeProvider>,
   )
 
-  window.__WF_VUE_POC__ = {
+  window.__WF_VUE_GLOBAL__ = {
     mounted: true,
     project,
     screenIds: project.screens.map((screen) => screen.id),

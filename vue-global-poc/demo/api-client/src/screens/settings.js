@@ -1,4 +1,8 @@
-/** @wireframe-skill multi-screen-wireframe@1.8.0 · Vue Global PoC */
+/**
+ * @wireframe-skill multi-screen-wireframe-vue-global@1.8.0
+ * 创建基于 v1.8.0
+ * 修改基于 v1.8.0
+ */
 WireframeVue.defineScreen('settings', ({ ref }) => ({
   setup() { return { ssl: ref(true), followRedirect: ref(true), proxy: ref(false), timeout: ref('15000'), host: ref('127.0.0.1'), port: ref('7890') } },
   template: /*html*/ `<WfAppShell><WfColumn id="settings-page" class="settings__page" :gap="16" :style="{ padding: '24px' }"><WfPageHeader id="settings-header" title-id="settings-title" class="settings__header" title="设置" subtitle="通用偏好、代理与证书（线框示意）"><template #actions><WfButton class="settings__action-workspace" to="workspace">返回工作区</WfButton></template></WfPageHeader>

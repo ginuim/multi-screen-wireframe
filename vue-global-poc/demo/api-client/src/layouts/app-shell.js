@@ -1,6 +1,7 @@
 /**
- * @wireframe-skill multi-screen-wireframe@1.8.0
- * Vue Global 多文件 PoC
+ * @wireframe-skill multi-screen-wireframe-vue-global@1.8.0
+ * 创建基于 v1.8.0
+ * 修改基于 v1.8.0
  */
 (function defineAppShell({ defineComponent }) {
   defineComponent('WfAppShell', ({ useScreenId }) => ({

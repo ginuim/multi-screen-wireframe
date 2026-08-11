@@ -1,39 +1,31 @@
-# Vue Global PoC 编辑约定
+# AGENTS.md — Vue Global Multi-Screen Wireframe Skill
 
-本目录是独立实验。只能修改本目录内文件，不得修改上级 `starter/`、`demo/`、`tests/` 或其他 `experiments/`。
+本目录是独立的 Vue Global 多屏线框 Skill。生成流程见 `SKILL.md`，业务协议见 `reference.md`，当前版本见 `VERSION`。
 
-## 业务边界
+## 维护边界
 
-- AI 生成和日常修改只写 `src/`。
-- 每个 `src/project.js` 中的 screen id 必须对应 `src/screens/<id>.js`。
-- screen 文件必须调用同 id 的 `WireframeVue.defineScreen(id, factory)`。
-- 共享业务组件必须在 `project.components` 声明，并以 `Wf` 前缀调用 `WireframeVue.defineComponent(name, factory)`；声明顺序就是依赖加载顺序。
-- 不修改 `framework/` 来绕过业务错误。
-- 修改 `src/` 后不构建，刷新 `index.html` 验证。
+- 交付复制源永远是整个 `starter/`。
+- 生成项目时使用 `scripts/create-project.mjs`，随后只修改目标副本的 `src/`。
+- 不得用 `demo/` 作为复制源；demo 只覆盖复杂交互和长内容。
+- demo 共享 `starter/framework/`，不携带自己的 runtime 或 vendor。
+- 根目录的 `framework/`、`src/`、`index.html` 是早期 PoC 预览镜像；新增功能以 `starter/` 为准。
+- 根目录 `framework/react-source/` 与 `framework/runtime/bridge-entry.jsx` 仅供维护，不进入 starter。
+- 修改公共 runtime 后重新生成根目录 `framework/runtime/board.js`，再把交付所需的 runtime JS、styles、vendor 同步到 `starter/framework/`，验证 starter 和两个 demo。
+- 不添加 esbuild、WASM、Node runtime、包管理器或服务器到交付物。
 
-## Vue 代码约束
+## 版本
 
-- 使用 Vue 3 Composition API 的 `setup()`；禁止 Options API 的 `data` / `methods` 混写。
-- factory 参数按需解构 `ref`、`computed`、`watch`、`onMounted`、`useScreenId` 等。
-- 禁止 import/export、`.vue` SFC、`<script setup>`、JSX、TypeScript 和 npm 裸依赖。
-- 禁止在 screen 文件顶层写 `const` / `let` 等共享声明；状态和函数写在 factory 或 `setup()` 内。
-- template 必须是当前文件内的字符串，禁止 fetch HTML/JSON。
-- 全局组件只使用有 `Wf` 前缀的组件；业务组件/节点使用页面语义 class。
-- `v-for` 必须提供稳定 `:key`，实际重复 DOM 同时提供 `:data-wf-key`。
-- 模板表达式只写单一表达式；复杂逻辑移入 computed 或函数。
-- 不使用 `v-html`、在线资源、真实后端、emoji、Unicode 图标或语义 SVG。
-
-## 导航和定位
-
-- `project.screens[].links` 是唯一页面流边。
-- 导航使用 `to="screen-id"`，不要引入 Vue Router 或操作 location hash。
-- 页面根、标题、主内容、关键卡片/表单/表格/操作/弹层使用以 screen id 开头的全局唯一 id。
-- 所有业务节点使用英文语义 class；重复数据使用稳定 `data-wf-key`。
-- 弹层只用 `WfModal` / `WfConfirmDialog`，保持相对单个 screen 定位。
+`VERSION` 与 `package.json` 必须一致。`src/screens/*.js`、`src/layouts/*.js` 的 `@wireframe-skill` 和“修改基于”必须使用当前版本；bump 时同步 starter、根预览和两个 demo。
 
 ## 验证
 
-1. 可选在 PoC 根目录运行 `node tools/check.mjs`，一次检查 starter 与两个 demo。
-2. 双击任一 `index.html`，确认无需目录授权即可进入 Board。
-3. 检查画布、演示、viewport、导航、屏内交互、修改、注释与导出。
-4. 故意破坏一个测试 screen 时，应只显示该 screen 的错误卡，不影响其他 screen。
+1. `node scripts/check-project.mjs starter`
+2. `node tools/check.mjs`
+3. 使用 `file://` 回归 `starter/index.html`、`demo/api-client/index.html`、`demo/travel-app/index.html`
+4. 验证控制台、错误隔离、主路径导航、弹层、TabBar、修改与注释能力
+
+## 文件修改
+
+- 使用 `apply_patch` 编辑文本文件；机械版本替换可使用格式化/批处理命令。
+- 用户未明确要求时，不修改 `vue-global-poc/` 之外的文件。
+- 不覆盖用户在其他目录的未提交修改。
