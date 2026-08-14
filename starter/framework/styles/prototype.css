@@ -641,7 +641,7 @@ button:disabled {
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.wf-interaction-lock:hover {
+.wf-interaction-lock:hover:not(:disabled) {
   background: var(--board-fill);
 }
 

@@ -196,6 +196,9 @@ function BoardContent({ project }) {
   const [zoomSensitivity, setZoomSensitivity] = React.useState(
     () => readBoardSettings(getBoardStorage(), project.name).zoomSensitivity,
   )
+  const [demoUnlockInteraction, setDemoUnlockInteraction] = React.useState(
+    () => readBoardSettings(getBoardStorage(), project.name).demoUnlockInteraction,
+  )
   const [canvasIndexPosition, setCanvasIndexPosition] = React.useState(null)
   const boardRef = React.useRef(null)
   const selectedReviewElementsRef = React.useRef(new Set())
@@ -430,8 +433,9 @@ function BoardContent({ project }) {
       showAnnotationMarkers,
       trackpadZoom,
       zoomSensitivity,
+      demoUnlockInteraction,
     })
-  }, [project.name, showAnnotationMarkers, trackpadZoom, zoomSensitivity])
+  }, [demoUnlockInteraction, project.name, showAnnotationMarkers, trackpadZoom, zoomSensitivity])
 
   const updateShowAnnotationMarkers = React.useCallback((visible) => {
     setShowAnnotationMarkers(visible)
@@ -440,8 +444,9 @@ function BoardContent({ project }) {
       showAnnotationMarkers: visible,
       trackpadZoom,
       zoomSensitivity,
+      demoUnlockInteraction,
     })
-  }, [canvasIndexVisible, project.name, trackpadZoom, zoomSensitivity])
+  }, [canvasIndexVisible, demoUnlockInteraction, project.name, trackpadZoom, zoomSensitivity])
 
   const updateTrackpadZoom = React.useCallback((enabled) => {
     setTrackpadZoom(enabled)
@@ -450,8 +455,9 @@ function BoardContent({ project }) {
       showAnnotationMarkers,
       trackpadZoom: enabled,
       zoomSensitivity,
+      demoUnlockInteraction,
     })
-  }, [canvasIndexVisible, project.name, showAnnotationMarkers, zoomSensitivity])
+  }, [canvasIndexVisible, demoUnlockInteraction, project.name, showAnnotationMarkers, zoomSensitivity])
 
   const updateZoomSensitivity = React.useCallback((value) => {
     const normalized = normalizeZoomSensitivity(value)
@@ -461,24 +467,45 @@ function BoardContent({ project }) {
       showAnnotationMarkers,
       trackpadZoom,
       zoomSensitivity: normalized,
+      demoUnlockInteraction,
     })
-  }, [canvasIndexVisible, project.name, showAnnotationMarkers, trackpadZoom])
+  }, [canvasIndexVisible, demoUnlockInteraction, project.name, showAnnotationMarkers, trackpadZoom])
+
+  const updateDemoUnlockInteraction = React.useCallback((enabled) => {
+    setDemoUnlockInteraction(enabled)
+    saveBoardSettings(getBoardStorage(), project.name, {
+      showCanvasIndex: canvasIndexVisible,
+      showAnnotationMarkers,
+      trackpadZoom,
+      zoomSensitivity,
+      demoUnlockInteraction: enabled,
+    })
+  }, [canvasIndexVisible, project.name, showAnnotationMarkers, trackpadZoom, zoomSensitivity])
 
   // 只在切换项目时清位置。首屏 useEffect 若也 set null，会盖掉 CanvasIndex
   // useLayoutEffect 刚算好的坐标，索引会一直 visibility:hidden。
   const canvasIndexSettingsProjectRef = React.useRef(null)
+  const wasDemoRef = React.useRef(false)
   React.useEffect(() => {
     const settings = readBoardSettings(getBoardStorage(), project.name)
     setCanvasIndexVisible(settings.showCanvasIndex)
     setShowAnnotationMarkers(settings.showAnnotationMarkers)
     setTrackpadZoom(settings.trackpadZoom)
     setZoomSensitivity(settings.zoomSensitivity)
+    setDemoUnlockInteraction(settings.demoUnlockInteraction)
     const previousName = canvasIndexSettingsProjectRef.current
     canvasIndexSettingsProjectRef.current = project.name
     if (previousName != null && previousName !== project.name) {
       setCanvasIndexPosition(null)
     }
   }, [project.name])
+
+  React.useEffect(() => {
+    const enteredDemo = isDemo && !wasDemoRef.current
+    wasDemoRef.current = isDemo
+    if (!enteredDemo || !demoUnlockInteraction) return
+    setInteractive((value) => (value ? value : true))
+  }, [demoUnlockInteraction, isDemo])
 
   React.useEffect(() => {
     setExpandedIds(new Set())
@@ -948,6 +975,8 @@ function BoardContent({ project }) {
           onTrackpadZoomChange={updateTrackpadZoom}
           zoomSensitivity={zoomSensitivity}
           onZoomSensitivityChange={updateZoomSensitivity}
+          demoUnlockInteraction={demoUnlockInteraction}
+          onDemoUnlockInteractionChange={updateDemoUnlockInteraction}
           locale={locale}
           onLocaleChange={setLocale}
           onClose={() => setHelpVisible(false)}

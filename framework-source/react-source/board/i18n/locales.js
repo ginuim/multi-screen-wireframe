@@ -93,6 +93,8 @@ const zhCN = {
   'settings.zoomLess': '更细腻',
   'settings.zoomMore': '更灵敏',
   'settings.language': '界面语言',
+  'settings.demoUnlockInteraction': '进入演示时恢复可交互',
+  'settings.demoUnlockInteractionDesc': '进入演示时若处于不可交互，自动切换为可交互；演示中仍可手动锁住',
 
   'review.panelAria': '修改原型',
   'review.title': '修改原型',
@@ -358,6 +360,8 @@ const zhTW = {
   'settings.zoomLess': '更細膩',
   'settings.zoomMore': '更靈敏',
   'settings.language': '介面語言',
+  'settings.demoUnlockInteraction': '進入演示時恢復可互動',
+  'settings.demoUnlockInteractionDesc': '進入演示時若處於不可互動，自動切換為可互動；演示中仍可手動鎖住',
 
   'review.panelAria': '修改原型',
   'review.title': '修改原型',
@@ -629,6 +633,8 @@ const en = {
   'settings.zoomLess': 'Finer',
   'settings.zoomMore': 'Faster',
   'settings.language': 'Language',
+  'settings.demoUnlockInteraction': 'Unlock when entering demo',
+  'settings.demoUnlockInteractionDesc': 'If interaction is locked, entering demo restores interactivity; you can still lock manually in demo',
 
   'review.panelAria': 'Review prototype',
   'review.title': 'Review prototype',

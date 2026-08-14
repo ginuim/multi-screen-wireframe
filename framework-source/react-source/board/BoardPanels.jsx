@@ -47,6 +47,8 @@ export function ShortcutHelp({
   onTrackpadZoomChange,
   zoomSensitivity,
   onZoomSensitivityChange,
+  demoUnlockInteraction,
+  onDemoUnlockInteractionChange,
   locale,
   onLocaleChange,
   onClose,
@@ -96,6 +98,17 @@ export function ShortcutHelp({
             type="checkbox"
             checked={showAnnotationMarkers}
             onChange={(event) => onShowAnnotationMarkersChange(event.target.checked)}
+          />
+        </label>
+        <label className="wf-board-setting-row">
+          <span>
+            <strong>{t('settings.demoUnlockInteraction')}</strong>
+            <small>{t('settings.demoUnlockInteractionDesc')}</small>
+          </span>
+          <input
+            type="checkbox"
+            checked={demoUnlockInteraction}
+            onChange={(event) => onDemoUnlockInteractionChange(event.target.checked)}
           />
         </label>
         <label className="wf-board-setting-row">

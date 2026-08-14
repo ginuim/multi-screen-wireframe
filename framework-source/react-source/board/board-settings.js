@@ -14,6 +14,7 @@ function defaultSettings(navigatorLike) {
     showAnnotationMarkers: true,
     trackpadZoom: detectMacOS(navigatorLike),
     zoomSensitivity: DEFAULT_ZOOM_SENSITIVITY,
+    demoUnlockInteraction: true,
   }
 }
 
@@ -51,6 +52,7 @@ export function readBoardSettings(
           ? parsed.trackpadZoom
           : defaults.trackpadZoom,
         zoomSensitivity: normalizeZoomSensitivity(parsed.zoomSensitivity),
+        demoUnlockInteraction: parsed.demoUnlockInteraction !== false,
       }
     }
   } catch {
@@ -65,6 +67,7 @@ export function saveBoardSettings(storage, projectName, settings) {
     showAnnotationMarkers: settings.showAnnotationMarkers !== false,
     trackpadZoom: settings.trackpadZoom === true,
     zoomSensitivity: normalizeZoomSensitivity(settings.zoomSensitivity),
+    demoUnlockInteraction: settings.demoUnlockInteraction !== false,
   }
   try {
     storage?.setItem(boardSettingsStorageKey(projectName), JSON.stringify(normalized))
