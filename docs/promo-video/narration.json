@@ -1,0 +1,60 @@
+{
+  "voice": "Chinese (Mandarin)_Male_Announcer",
+  "language": "zh-CN",
+  "segments": [
+    {
+      "id": "01-open",
+      "title": "开场",
+      "holdSeconds": 2.5,
+      "text": "Multi-Screen Wireframe，是一套给产品和设计用的多屏线框原型工具。双击就能打开，不用构建，不用装 Node，也不用本地服务器。下面用两个官方 demo，把核心功能过一遍。"
+    },
+    {
+      "id": "02-board",
+      "title": "多屏画板",
+      "holdSeconds": 2.0,
+      "text": "先看桌面端 demo。画板模式把所有页面铺在一张画布上，页面之间用链接连成流程。你可以缩放、拖动画布，快速看清整条用户路径。"
+    },
+    {
+      "id": "03-demo",
+      "title": "演示模式",
+      "holdSeconds": 2.0,
+      "text": "切到演示模式，原型就变成可点击的流程。打开热区，能看到可跳转区域。按真实页面流前进、返回，适合给评审和走查。"
+    },
+    {
+      "id": "04-modify",
+      "title": "修改模式",
+      "holdSeconds": 2.0,
+      "text": "修改模式用来收集改稿意见。点选页面节点，整理成带黄色编号的修改清单，再生成可复制给 AI 的 Prompt。选中什么，改什么，范围很清楚。"
+    },
+    {
+      "id": "05-annotation",
+      "title": "注释",
+      "holdSeconds": 2.0,
+      "text": "注释模式可以给页面或模块加蓝色说明标记。本机自动保存，支持编辑、删除，以及 JSON 导入导出，还能批量同步回原型源码。"
+    },
+    {
+      "id": "06-help",
+      "title": "帮助与设置",
+      "holdSeconds": 1.8,
+      "text": "按问号打开帮助。这里有快捷键、交互锁、沉浸和全屏，还有简体、繁体、英文界面切换。画板索引可以拖拽或关闭，并按项目记住显示偏好。"
+    },
+    {
+      "id": "07-mobile",
+      "title": "移动端",
+      "holdSeconds": 2.0,
+      "text": "再看移动端 demo。同样有多屏画板和演示模式，底栏、TabBar、弹层都按单屏定位。桌面后台和移动小程序，一套工具就能覆盖。"
+    },
+    {
+      "id": "08-export",
+      "title": "导出与编辑",
+      "holdSeconds": 2.0,
+      "text": "支持单页导出 PNG，或多屏打包 ZIP。业务源码是普通多文件 JavaScript，保存后刷新即可。某个页面报错时，其他页面还能继续跑，错误被隔离在单屏里。"
+    },
+    {
+      "id": "09-close",
+      "title": "结尾",
+      "holdSeconds": 2.5,
+      "text": "总结一下：多屏页面流、演示跳转、修改 Prompt、持久注释、快捷键与多语言、PNG 和 ZIP 导出，全部离线可用。把需求丢给 AI Agent，按 Skill 复制 starter，就能继续改这套原型。"
+    }
+  ]
+}

@@ -3,9 +3,9 @@ name: multi-screen-wireframe
 description: Create or revise complete offline multi-screen wireframes and page-flow prototypes with Vue 3 Global Build, multi-file JavaScript screens, no build step, no Node dependency in the deliverable, and direct file:// opening. Use for mobile apps, mini-program flows, desktop admin tools, interactive product demos, or visual-reference reconstruction when the output must remain AI-editable without JSX, esbuild, WASM, npm, a local server, or directory-selection permissions.
 ---
 
-# Vue Global Multi-Screen Wireframe
+# Multi-Screen Wireframe
 
-生成可直接双击、可继续由 AI 编辑、无需构建的 Vue Global 多屏线框交付物。
+生成可直接双击、可继续由 AI 编辑、无需构建的多屏线框交付物。
 
 ## 先识别交付格式
 

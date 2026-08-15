@@ -8,7 +8,11 @@
 
 从产品需求或视觉参考，生成**可双击打开**、可继续由 AI 编辑的多屏线框原型。
 
+打开原型后怎么用画板、演示、修改、注释、导出等功能，见 **[使用说明](docs/使用说明.md)**。
+
 Generate **double-clickable**, AI-editable multi-screen wireframe prototypes from product requirements or visual references.
+
+End-user board guide (Chinese): [`docs/使用说明.md`](docs/使用说明.md).
 
 v2 交付物自带业务源码、Vue 3 Global Build、画板与导出能力。无需构建、Node.js、包管理器、网络、本地服务器或目录授权；修改业务 `.js` / CSS 后刷新 `index.html` 即可。
 
@@ -91,6 +95,7 @@ v1 React/JSX 最终版保存在 Git tag `v1.8.0`。v2 从 `v2.0.0` 起作为主�
 | --- | --- |
 | `starter/` | 唯一复制源：生成原型时整目录复制到目标路径 |
 | `demo/` | 覆盖示例（后台 / 移动），不是复制源 |
+| `docs/使用说明.md` | 面向产品/设计的画板功能使用说明 |
 | `SKILL.md` | 给 AI Agent 的生成、修改、格式识别与迁移约束 |
 | `reference.md` | Project、Vue factory、组件和注释协议 |
 | `AGENTS.md` | 仓库维护边界与技术约束 |
@@ -178,7 +183,9 @@ node scripts/check-project.mjs /absolute/path/to/new-prototype
 
 ## 修改并生成 Prompt / Modify to prompt
 
-打开原型后点击工具栏「修改」：点选屏内节点，通过层级面包屑切换到父组件，添加修改建议、文字替换、顺序调整或删除要求。开启「多选」或按住 Shift / Command / Ctrl 点击，可以把多个节点绑定到同一条意见。每条意见会在所有目标旁显示同一个半透明黄色编号；点击编号浮动查看意见。按住空格可临时拖动画布，松开后继续修改。修改清单会生成 Prompt；Prompt 可继续手动编辑，再一键复制给 AI。
+传统原型工具直接维护元素的内容、样式和位置；本工具的界面由 AI 生成的业务源码驱动，无法从画面反推该改哪段代码。因此修改模式的作用是：精确定位 DOM 节点，生成带稳定选择器的 Prompt，交给 AI 改 `src/`。
+
+打开原型后点击工具栏「修改」：点选屏内节点；第一次常点到最内层，用层级面包屑切换到父组件。开启「多选」或按住 Shift / Command / Ctrl 点击，可把多个节点绑到同一条意见（例如选两个元素做顺序对调）。每条意见会在所有目标旁显示同一个半透明黄色编号；点击编号浮动查看意见。按住空格可临时拖动画布，松开后继续修改。修改清单会生成 Prompt；Prompt 可继续手动编辑，再一键复制给 AI。
 
 修改记录只保留在当前页面会话中，不会直接改业务源码，也不会生成额外状态文件。AI 应按 Prompt 中的 id / class / `data-wf-key` 搜索 `src/screens/*.js` 中的 Vue template；修改源码后刷新 `index.html`。
 
