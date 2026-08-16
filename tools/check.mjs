@@ -44,18 +44,44 @@ assert.match(changelogSource, /^## 2\.0\.0$/m, 'CHANGELOG.md must document v2.0.
 assert.match(changelogSource, /^## 1\.8\.0$/m, 'CHANGELOG.md must document frozen v1.8.0')
 
 const readmeSource = await readFile(join(root, 'README.md'), 'utf8')
+const readmeEnSource = await readFile(join(root, 'README.en.md'), 'utf8')
+assert.ok(readmeSource.includes('](README.en.md)'), 'README.md must link to README.en.md for language switch')
+assert.ok(readmeEnSource.includes('](README.md)'), 'README.en.md must link to README.md for language switch')
+assert.ok(readmeSource.includes('](docs/使用说明.md)'), 'README.md must link to Chinese user guide')
+assert.ok(readmeSource.includes('](docs/user-guide.md)'), 'README.md must link to English user guide')
+assert.ok(readmeEnSource.includes('](docs/user-guide.md)'), 'README.en.md must link to English user guide')
+assert.ok(readmeEnSource.includes('](docs/使用说明.md)'), 'README.en.md must link to Chinese user guide')
+
+const userGuideZh = await readFile(join(root, 'docs/使用说明.md'), 'utf8')
+const userGuideEn = await readFile(join(root, 'docs/user-guide.md'), 'utf8')
+assert.ok(userGuideZh.includes('](user-guide.md)'), 'docs/使用说明.md must link to English user guide')
+assert.ok(userGuideEn.includes('](使用说明.md)'), 'docs/user-guide.md must link to Chinese user guide')
+
 for (const heading of [
-  '能做什么 / What it does',
-  '功能示意 / Screenshots',
-  '不适合 / Not for',
-  '安装 / Install',
-  '生成新原型 / Generate a prototype',
-  '修改交付物 / Edit a deliverable',
-  '添加与同步注释 / Annotate and sync',
-  '快捷键与画板设置 / Shortcuts and board settings',
-  '平台与版本 / Platforms',
+  '能做什么',
+  '功能示意',
+  '不适合',
+  '安装',
+  '生成新原型',
+  '修改交付物',
+  '添加与同步注释',
+  '快捷键与画板设置',
+  '平台与版本',
 ]) {
-  assert.match(readmeSource, new RegExp(`^#{2,3} ${heading.replaceAll('/', '\\/')}\s*$`, 'm'), `README.md is missing ${heading}`)
+  assert.match(readmeSource, new RegExp(`^#{2,3} ${heading}\\s*$`, 'm'), `README.md is missing ${heading}`)
+}
+for (const heading of [
+  'What it does',
+  'Screenshots',
+  'Not for',
+  'Install',
+  'Generate a prototype',
+  'Edit a deliverable',
+  'Annotate and sync',
+  'Shortcuts and board settings',
+  'Platforms',
+]) {
+  assert.match(readmeEnSource, new RegExp(`^#{2,3} ${heading}\\s*$`, 'm'), `README.en.md is missing ${heading}`)
 }
 for (const screenshot of [
   '01-api-client-board.png',
@@ -67,11 +93,14 @@ for (const screenshot of [
 ]) {
   const relativePath = `docs/screenshots/${screenshot}`
   assert.ok(readmeSource.includes(`](${relativePath})`), `README.md must embed ${relativePath}`)
+  assert.ok(readmeEnSource.includes(`](${relativePath})`), `README.en.md must embed ${relativePath}`)
   const image = await readFile(join(root, relativePath))
   assert.ok(image.length > 0, `${relativePath} must not be empty`)
 }
-assert.match(readmeSource, /无需构建|no build step/i, 'README.md must explain the v2 no-build workflow')
+assert.match(readmeSource, /无需构建/, 'README.md must explain the v2 no-build workflow')
+assert.match(readmeEnSource, /no build step/i, 'README.en.md must explain the v2 no-build workflow')
 assert.doesNotMatch(readmeSource, /\.\/build\.command|\bbuild\.cmd\b/, 'README.md must not instruct v2 users to run v1 build scripts')
+assert.doesNotMatch(readmeEnSource, /\.\/build\.command|\bbuild\.cmd\b/, 'README.en.md must not instruct v2 users to run v1 build scripts')
 
 const results = []
 results.push(await checkProject(starter))
