@@ -8,6 +8,8 @@
 
 **作者：** [reaidea](https://reaidea.com/)
 
+**下载：** [ClawHub](https://clawhub.ai/ginuim/skills/multi-screen-wireframe)
+
 从产品需求或视觉参考，生成**可双击打开**、可继续由 AI 编辑的多屏线框原型。
 
 打开原型后怎么用画板、演示、修改、注释、导出等功能，见 **[使用说明](docs/使用说明.md)**（[English](docs/user-guide.md)）。
@@ -89,7 +91,15 @@ v1 React/JSX 最终版保存在 Git tag `v1.8.0`。v2 从 `v2.0.0` 起作为主�
 
 ## 安装
 
-本仓库本身就是一个 Agent Skill（根目录有 `SKILL.md`）。任选一种方式接入支持 Skills 的 AI Agent（Cursor、Claude Code、Codex、OpenCode 等）。
+本仓库本身就是一个 Agent Skill（根目录有 `SKILL.md`）。任选一种方式接入支持 Skills 的 AI Agent（Cursor、Claude Code、Codex、OpenCode 等）。也可直接从 [ClawHub](https://clawhub.ai/ginuim/skills/multi-screen-wireframe) 下载。
+
+### 从 ClawHub 下载
+
+打开 [ClawHub 页面](https://clawhub.ai/ginuim/skills/multi-screen-wireframe) 即可下载当前 Skill。使用 OpenClaw 时：
+
+```sh
+openclaw skills install @ginuim/multi-screen-wireframe
+```
 
 ### 1. 用 Skills CLI 安装（推荐）
 

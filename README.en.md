@@ -8,6 +8,8 @@
 
 **Author:** [reaidea](https://reaidea.com/)
 
+**Download:** [ClawHub](https://clawhub.ai/ginuim/skills/multi-screen-wireframe)
+
 Generate **double-clickable**, AI-editable multi-screen wireframe prototypes from product requirements or visual references.
 
 End-user board guide: **[User Guide](docs/user-guide.md)** ([中文](docs/使用说明.md)).
@@ -89,7 +91,15 @@ The final v1 React/JSX release is frozen at Git tag `v1.8.0`. v2 is the mainline
 
 ## Install
 
-This repo is an Agent Skill (`SKILL.md` at the root). Use any option below with a Skills-capable agent (Cursor, Claude Code, Codex, OpenCode, etc.).
+This repo is an Agent Skill (`SKILL.md` at the root). Use any option below with a Skills-capable agent (Cursor, Claude Code, Codex, OpenCode, etc.). You can also download it from [ClawHub](https://clawhub.ai/ginuim/skills/multi-screen-wireframe).
+
+### Download from ClawHub
+
+Open the [ClawHub page](https://clawhub.ai/ginuim/skills/multi-screen-wireframe) to download the current Skill. With OpenClaw:
+
+```sh
+openclaw skills install @ginuim/multi-screen-wireframe
+```
 
 ### 1. Install with the Skills CLI (recommended)
 
